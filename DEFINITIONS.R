@@ -18,6 +18,9 @@ SUN_FOLDER = "/home/athan/DATA_RAW/SUN/PySolar_LAP/"
 SIRENA_DIR = "/home/athan/DATA_RAW/Bband/AC21_LAP.GLB/"
 RADMON_DIR = "/home/athan/DATA_RAW/Raddata/6"
 
+####  Log files  ####
+MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")
+
 ####  Variables  ####
 
 ## date range to process

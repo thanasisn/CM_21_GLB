@@ -19,7 +19,7 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM_P00")
+Script.Name = c("CM21_P00_Read_LAP.R")
 
 
 library(data.table)
@@ -68,30 +68,73 @@ if ( length(missing_from_sir) > 0 ) {
 }
 
 
-####  Read files to data.table  ####
+####  Read files of all years  ####
 
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
 
 ## one output file per year
+## we assume the files are in the correct folder
+
 for ( YYYY in years_to_do ) {
     yy = substr(YYYY, 3,4)
 
-    data_year    <- data.table()
+    year_data    <- data.table()
     days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
 
     for ( aday in days_of_year ) {
-        paste0( SIRENA_DIR,"/",YYYY,"/" )
+        aday  = as.Date(aday, origin = "1970-01-01")
+        sunfl = paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
+
+        found = grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
+        ## check file names
+        if ( length(found) > 1 ) {
+            stop("Found more file than we should") }
+        if ( length(found) == 0 ) {
+            cat(paste0("Missing file: ", YYYY,"/", format(aday, "%d%m%y06"), "\n"))
+            cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n", file = MISSING_INP, append = T )
+            next()
+        }
+
+        suppressWarnings(rm(D_minutes))
+        D_minutes <- seq(from = as.POSIXct(paste(aday,"00:00:30 UTC")), length.out = 1440, by = "min" )
+
+        #### . . Read LAP file  ####
+        lap <- fread( sirena_files[found], na.strings = "-9" )
+        stopifnot( dim(lap)[1] == 1440 )
+
+        #### . . Read SUN file  ####
+        if ( !file.exists( sunfl ) ) stop(cat(paste("Missing:", sunfl, "\nRun:   Sun_vector_constraction_cron.py?\n")))
+        sun_temp <- read.table( sunfl,
+                                sep = ";",
+                                header = TRUE,
+                                na.strings = "None" ,strip.white = TRUE,  as.is = TRUE)
+
+        #### . . Day table to save  ####
+        day_data <- data.table( Date        = D_minutes,      # Date of the data point
+                                CM21value   = lap$V1,         # Raw value for CM21
+                                CM21sd      = lap$V2,         # Raw SD value for CM21
+                                Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
+                                Elevat      = sun_temp$ELEV ) # Elevation sun angle
+
+        #### . . Gather data  ####
+        year_data <- rbind( year_data, day_data )
+
     }
 
-    ## we assume the files are in the correct folder
-    paste0( SIRENA_DIR )
+    #### . . All the minutes of year ####
+    all_min <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
+                   as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
+    all_min <- data.frame(Date = all_min)
+
+    year_data <- merge(year_data, all_min, all = T)
+
+    ####  Save data to file  ####
 
 
-    # theday  = as.POSIXct(dd, origin = "1970-01-01")
-    # test    = format( theday, format = "%d%m%y06" )
-    # afile   = all_files[grep(test, all_files)]
-    # sunfl   = paste0(sunfolder,"sun_path_",format(theday, "%F"), ".dat.gz")
+    break()
+
+
 
 
 }
@@ -101,3 +144,7 @@ for ( YYYY in years_to_do ) {
 
 
 
+
+## END ##
+tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
+cat(sprintf("%s %10s %10s %25s  %f mins\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
