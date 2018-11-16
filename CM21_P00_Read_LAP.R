@@ -5,7 +5,7 @@
 #'   - from Sirena
 #'   - from Radmon
 #'   - add sun position
-#'   - plot input data
+#'   - all minutes of year
 #'   - NO FILTERING
 #' Store as a binary file for further use
 #' Works for a set date range
@@ -129,22 +129,19 @@ for ( YYYY in years_to_do ) {
 
     year_data <- merge(year_data, all_min, all = T)
 
+
     ####  Save data to file  ####
 
+    outfile = paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
 
-    break()
+    RAerosols::write_RDS(year_data, outfile )
 
-
-
-
+    system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
 }
-
-
-
 
 
 
 
 ## END ##
 tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %10s %10s %25s  %f mins\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
