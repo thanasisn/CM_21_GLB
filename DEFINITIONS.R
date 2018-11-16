@@ -21,6 +21,6 @@ RADMON_DIR = "/home/athan/DATA_RAW/Raddata/6"
 ####  Variables  ####
 
 ## date range to process
-START_DAY = as.POSIXct("2007-01-01 00:00:00 UTC")
+START_DAY = as.POSIXct("2006-01-01 00:00:00 UTC")
 END_DAY   = as.POSIXct("2018-01-01 00:00:00 UTC")
 
