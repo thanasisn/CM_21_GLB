@@ -30,3 +30,8 @@ MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")
 START_DAY = as.POSIXct("2006-01-01 00:00:00 UTC")
 END_DAY   = as.POSIXct("2019-01-01 00:00:00 UTC")
 
+
+
+#### Plot files ####
+
+

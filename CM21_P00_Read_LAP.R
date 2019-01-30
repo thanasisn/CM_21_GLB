@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
 #' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
 #'
-#' Read text files with CM_21 data
+#' Read text files with CM_21 signal data
 #'   - from Sirena
 #'   - from Radmon
 #'   - add sun position
 #'   - all minutes of year
 #'   - NO FILTERING
-#' Store as a binary file for further use
+#' Store as .Rds binaries files for further use
 #' Works for a set date range
 #' based on level_0_CM21_x8
 #' Reads from Sirena only
