@@ -190,7 +190,7 @@ ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 ## loop all input files
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files[12]) {
+for (afile in input_files) {
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
@@ -304,8 +304,8 @@ for (afile in input_files[12]) {
 
 
 
-
-    sub(".Rds", "_L1.Rds", afile)
+    RAerosols::write_RDS(rawdata,
+                         sub(".Rds", "_L1.Rds", afile))
 
 
 }
