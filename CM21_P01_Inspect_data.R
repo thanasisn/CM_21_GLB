@@ -3,8 +3,9 @@
 #'
 #' ---
 #' title: "CM21 signal inspection."
-#' author: "Natsis Ath."
+#' author: "Natsis Athanasios"
 #' date: "`r format(Sys.time(), '%B %d, %Y')`"
+#' keywords: "CM21, CM21 data validation, global irradiance"
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -58,6 +59,7 @@ Script.Name = c("CM21_P01_Inspect_data.R")
 
 
 library(data.table)
+library(pander)
 
 
 ####  . . Variables  ####
@@ -72,7 +74,7 @@ source("/home/athan/CM_21_GLB/DEFINITIONS.R")
 
 
 signal_files <- list.files(path        = SIGNAL_DIR,
-                           pattern     = "LAP_CM21H_SIG.*.rds$",
+                           pattern     = "LAP_CM21H_SIG_[0-9]{4}.rds$",
                            ignore.case = T,
                            full.names  = T)
 signal_files <- sort(signal_files)
@@ -89,9 +91,13 @@ for (ff in signal_files) {
     cat(paste("\\newpage\n"))
     cat(paste("## ",yyyy,"\n"))
 
+    panderOptions('table.alignment.default', 'right')
 
-    cat(pander::pander( summary(dyear) ))
+    cat('\\scriptsize\n')
 
+    cat(pander::pander( summary(dyear[,-c('Date','Azimuth')]) ))
+
+    cat('\\normalsize\n')
 
     cat('\n')
 
@@ -99,9 +105,16 @@ for (ff in signal_files) {
 
     hist(dyear$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
 
-    plot(dyear$Elevat, dyear$CM21value, pch = 19, cex=.8,main = paste("CM21 signal ", yyyy )  )
+    plot(dyear$Elevat, dyear$CM21value, pch = 19, cex = .8,
+         main = paste("CM21 signal ", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal" )
 
-    plot(dyear$Elevat, dyear$CM21sd,    pch = 19, cex=.8,main = paste("CM21 signal SD", yyyy )  )
+    plot(dyear$Elevat, dyear$CM21sd,    pch = 19, cex = .8,
+         main = paste("CM21 signal SD", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal Standard Deviations")
+
     cat('\n')
     cat('\n')
 
