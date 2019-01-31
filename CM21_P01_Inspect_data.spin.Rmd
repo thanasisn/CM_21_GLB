@@ -1,34 +1,32 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com> */
-#'
-#' ---
-#' title: "CM21 signal inspection."
-#' author: "Natsis Athanasios"
-#' date: "`r format(Sys.time(), '%B %d, %Y')`"
-#' keywords: "CM21, CM21 data validation, global irradiance"
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      11pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'   html_document: default
-#'   odt_document:  default
-#'   word_document: default
-#' ---
 
-#+ echo=F, include=T
+---
+title: "CM21 signal inspection."
+author: "Natsis Athanasios"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+keywords: "CM21, CM21 data validation, global irradiance"
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      11pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+  html_document: default
+  odt_document:  default
+  word_document: default
+---
+
+```{r echo=F, include=T}
 
 
 ####_  Document options _####
@@ -64,15 +62,15 @@ library(pander)
 
 ####  . . Variables  ####
 source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+```
 
 
-#'
-#' ## Info
-#'
-#' Raw data from CM21 without any filtering.
-#'
+## Info
+
+Raw data from CM21 without any filtering.
 
 
+```{r }
 signal_files <- list.files(path        = SIGNAL_DIR,
                            pattern     = "LAP_CM21H_SIG_[0-9]{4}.rds$",
                            ignore.case = T,
@@ -83,7 +81,8 @@ signal_files <- sort(signal_files)
 all_data <- data.table()
 
 
-#+ include=TRUE, echo=F, results="asis"
+```
+```{r include=TRUE, echo=F, results="asis"}
 for (ff in signal_files) {
     dyear <- readRDS(ff)
     yyyy = format(dyear$Date[1], "%Y")
@@ -120,10 +119,11 @@ for (ff in signal_files) {
 
 
 }
-#'
+```
 
 
 
+```{r }
 # gather_dir <- tempdir()
 # cnt=0
 # for (ff in signal_files) {
@@ -158,3 +158,11 @@ for (ff in signal_files) {
 ## END ##
 tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
 cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
+
+---
+title: "CM21_P01_Inspect_data.R"
+author: "athan"
+date: "Fri Feb  1 00:08:13 2019"
+---
