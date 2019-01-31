@@ -1,26 +1,83 @@
-#!/usr/bin/env Rscript
+# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
+#'
+#' ---
+#' title: "CM21 signal filtering."
+#' author: "Natsis Ath."
+#' date: "`r format(Sys.time(), '%B %d, %Y')`"
+#' documentclass: article
+#' classoption:   a4paper,oneside
+#' fontsize:      11pt
+#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#'
+#' output:
+#'   bookdown::pdf_document2:
+#'     number_sections:  no
+#'     fig_caption:      no
+#'     keep_tex:         no
+#'     latex_engine:     xelatex
+#'     toc:              yes
+#'   html_document: default
+#'   odt_document:  default
+#'   word_document: default
+#' ---
+
+#+ echo=F, include=T
+
+
+####_  Document options _####
+
+knitr::opts_chunk$set(echo       = FALSE   )
+knitr::opts_chunk$set(cache      = TRUE    )
+# knitr::opts_chunk$set(include    = FALSE   )
+knitr::opts_chunk$set(include    = TRUE    )
+knitr::opts_chunk$set(comment    = ""      )
+
+# pdf output is huge too many point to plot
+# knitr::opts_chunk$set(dev        = "pdf"   )
+knitr::opts_chunk$set(dev        = "png"   )
+
+knitr::opts_chunk$set(fig.width  = 8       )
+knitr::opts_chunk$set(fig.height = 6       )
+
+knitr::opts_chunk$set(out.width  = "60%"    )
+knitr::opts_chunk$set(fig.align  = "center" )
+# knitr::opts_chunk$set(fig.pos    = '!h'     )
+
+
+####_ Notes _####
+
+#
+# this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
+#
+#
+# Read all yearly data and create
+# database of all data
+# pdf of all days
+# pdf of suspects
+# statistic on days
+#
+#  - IGNORING   too bad days
+#  - FILTERING  date ranges
+#
+#
 
 
 #'
-#' Read all raw data and create
-#' database of all data
-#' pdf of all days
-#' pdf of suspects
-#' statistic on days
-#'
-#' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#'   FILTERING  positive signal
-#'   FILTERING  negative signal
-#'   FILTERING  positive night signal
-#'   FILTERING  negative night signal
-#'   FILTERING  date ranges
-#'   FILTERING  std > value
-#'   FILTERING  too low global value
-#'   IGNORING   too bad days
-#' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#'
-#' this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
+#' -  CONVERT    total irradiance
+#' -  FILTERING  positive signal
+#' -  FILTERING  negative signal
+#' -  FILTERING  positive night signal
+#' -  FILTERING  negative night signal
+#' -
+#' -  FILTERING  std > value
+#' -  FILTERING  too low global value
+#' -
 #'
 
 
@@ -29,14 +86,13 @@
 
 
 ####  Set environment  ####
-closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = c("CM21_P20_Import_Data_filtered_LAP.R")
 
 
-library(data.table)
+library(data.table, quietly = T)
 source("/home/athan/CM_21_GLB/CM21_functions.R")
 
 
@@ -59,7 +115,7 @@ MINsunup      =  0          ## Exclude signal values below that
 STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
 ## Lower global limit
-GLB_LOW_LIM   = -7         ## any Gloabal value below this should be erronius data
+GLB_LOW_LIM   = -7         ## any Global value below this should be erroneous data
 
 ## Dark Calculations
 DARK_ELEV     = -10        ## sun elevation limit
@@ -77,129 +133,193 @@ TEST      = FALSE
 
 
 
+## . get data input files ####
+input_files <- list.files( path    = SIGNAL_DIR,
+                           pattern = "LAP_CM21H_SIG_[0-9]{4}.Rds",
+                           full.names = T )
+input_files <- sort(input_files)
+
+
+
+
+
+## . load exclusion list ####
+
+too_bad_days <- read.table( TOO_BAD, as.is = TRUE, comment.char = "#" )
+too_bad_days <- as.Date(too_bad_days$V1, format = "%Y-%m-%d")
+
+ranges       <- read.table( BAD_RANGES,
+                            sep = ";",
+                            colClasses = "character",
+                            header = TRUE, comment.char = "#" )
+ranges$From  <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
+ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
+
+
+
+#'
+#' ## Info
+#'
+#' Apply filtering from measurments log files and
+#' signal limitations.
+#'
+#' ### Too bad days.
+#'
+#' Exclude days from file '`r basename(TOO_BAD)`'.
+#' These were determind with manual inspection and logging.
+#'
+#' ### Bad day ranges.
+#'
+#' Exclude date ranges from file '`r basename(BAD_RANGES)`'.
+#' These were determind with manual inspection and logging.
+#'
+#' ### Filter of posible signal values.
+#'
+#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` is posible to be recorded normaly.
+#'
+#' ### Filter of posible night signal.
+#'
+#'
+#'
 
 
 
 
 
 
+## loop all input files
+
+#+ include=TRUE, echo=F, results="asis"
+for (afile in input_files[12]) {
+
+    #### Get raw data ####
+    rawdata        <- readRDS(afile)
+    rawdata$Global <- NA
+    rawdata$GLstd  <- NA
+    rawdata$day    <- as.Date(rawdata$Date)
+    NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
+
+
+    ####  Filter too bad days  ###########################################
+    NR_too_bad_days <- rawdata[ day %in% too_bad_days & !is.na(CM21value), .N ]
+    rawdata <- rawdata[ ! day %in% too_bad_days ]
+    ######################################################################
 
 
 
-
-
-
-stop("things to do")
-
-
-
-
-####  Files for import  ####
-
-sirena_files <- list.files( path        = SIRENA_DIR,
-                            recursive   = TRUE,
-                            pattern     = "[0-9]*06.LAP$",
-                            ignore.case = TRUE,
-                            full.names  = TRUE )
-cat(paste(length(sirena_files), "files from Sirena\n"))
-
-
-radmon_files <- list.files( path        = RADMON_DIR,
-                            recursive   = TRUE,
-                            pattern     = "[0-9]*06.LAP$",
-                            ignore.case = TRUE,
-                            full.names  = TRUE )
-cat(paste(length(radmon_files), "files from Radmon\n"))
-
-
-####  Check files between Radmon and Sirena  ####
-
-sir_names <- basename(sirena_files)
-rad_names <- basename(radmon_files)
-
-missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
-
-# sir_names[ ! sir_names %in% rad_names ]
-
-cat(paste("There are ",
-          length(missing_from_sir) ,
-          " files on Radmon that are missing from Sirena\n"))
-if ( length(missing_from_sir) > 0 ) {
-    cat(paste(missing_from_sir),sep = "\n")
-    warning(paste("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena"))
-}
-
-
-####  Read files of all years  ####
-
-years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
-
-## one output file per year
-## we assume the files are in the correct folder
-
-for ( YYYY in years_to_do ) {
-    yy = substr(YYYY, 3,4)
-
-    year_data    <- data.table()
-    days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
-                             as.Date(paste0(YYYY,"-12-31")), by = "day")
-
-    for ( aday in days_of_year ) {
-        aday  = as.Date(aday, origin = "1970-01-01")
-        sunfl = paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
-
-        found = grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
-        ## check file names
-        if ( length(found) > 1 ) {
-            stop("Found more file than we should") }
-        if ( length(found) == 0 ) {
-            cat(paste0("Missing file: ", YYYY,"/", format(aday, "%d%m%y06"), "\n"))
-            cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n", file = MISSING_INP, append = T )
-            next()
-        }
-
-        suppressWarnings(rm(D_minutes))
-        D_minutes <- seq(from = as.POSIXct(paste(aday,"00:00:30 UTC")), length.out = 1440, by = "min" )
-
-        #### . . Read LAP file  ####
-        lap <- fread( sirena_files[found], na.strings = "-9" )
-        stopifnot( dim(lap)[1] == 1440 )
-
-        #### . . Read SUN file  ####
-        if ( !file.exists( sunfl ) ) stop(cat(paste("Missing:", sunfl, "\nRun:   Sun_vector_constraction_cron.py?\n")))
-        sun_temp <- read.table( sunfl,
-                                sep = ";",
-                                header = TRUE,
-                                na.strings = "None" ,strip.white = TRUE,  as.is = TRUE)
-
-        #### . . Day table to save  ####
-        day_data <- data.table( Date        = D_minutes,      # Date of the data point
-                                CM21value   = lap$V1,         # Raw value for CM21
-                                CM21sd      = lap$V2,         # Raw SD value for CM21
-                                Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
-                                Elevat      = sun_temp$ELEV ) # Elevation sun angle
-
-        #### . . Gather data  ####
-        year_data <- rbind( year_data, day_data )
-
+    ####  Filter bad date ranges  ########################################
+    pre_count <- rawdata[ !is.na(CM21value), .N ]
+    for ( i in 1:nrow(ranges) ) {
+        lower <- ranges$From[  i ]
+        upper <- ranges$Until[ i ]
+        ## select to remove
+        select  <- rawdata$Date >= lower & rawdata$Date <= upper
+        rawdata <- rawdata[ ! select ]
+        rm(select)
     }
-
-    #### . . All the minutes of year ####
-    all_min <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
-                   as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
-    all_min <- data.frame(Date = all_min)
-
-    year_data <- merge(year_data, all_min, all = T)
+    NR_bad_ranges <- pre_count - rawdata[ !is.na(CM21value), .N ]
+    ######################################################################
 
 
-    ####  Save data to file  ####
 
-    outfile = paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
+    ####  Filter signal physical limits  #################################
+    pre_count <- rawdata[ !is.na(CM21value), .N ]
+    rawdata <- rawdata[ CM21value >= MINsgLIM ]
+    rawdata <- rawdata[ CM21value <= MAXsgLIM ]
+    NR_signal_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
+    ######################################################################
 
-    RAerosols::write_RDS(year_data, outfile )
 
-    system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
+
+    ####  Filter night signal possible limits  ###########################
+    pre_count <- rawdata[ !is.na(CM21value), .N ]
+    getnight  <- rawdata$Eleva < DARK_ELEV
+    ## drop too negative signal values
+    toolowsgDark <- rawdata$CM21value < MINsgLIMnight & getnight
+    rawdata$CM21value[ toolowsgDark ]  <- NA
+    rawdata$CM21sd[    toolowsgDark ]  <- NA
+    ## drop too positive signal values
+    toohighsgDark <- rawdata$CM21value > MAXsgLIMnight & getnight
+    rawdata$CM21value[ toohighsgDark ] <- NA
+    rawdata$CM21sd[    toohighsgDark ] <- NA
+    rm(toohighsgDark,toolowsgDark,getnight)
+    NR_signal_night_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
+    ######################################################################
+
+
+
+    ####  Filter negative values when sun is up  #########################
+    pre_count <- rawdata[ !is.na(CM21value), .N ]
+    neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
+    rawdata$CM21value[ neg_sun ]  <- NA
+    rawdata$CM21sd[    neg_sun ]  <- NA
+    rm( neg_sun )
+    NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
+    ######################################################################
+
+
+
+
+
+    yyyy = year(rawdata$day[1])
+    cat(paste("\\newpage\n\n"))
+    cat(paste("## ",yyyy,"\n\n"))
+
+    cat(paste0( "Initial **",
+                NR_loaded, "** data points loaded\n\n" ))
+
+    cat(paste0( "\"Too bad days\" removed *",
+                NR_too_bad_days, "* data points\n\n" ))
+
+    cat(paste0( "\"Bad date ranges\" removed *",
+                NR_bad_ranges, "* data points\n\n" ))
+
+    cat(paste0( "\"Signal physical limits\" removed *",
+                NR_signal_limit, "* data points\n\n" ))
+
+    cat(paste0( "\"Signal night limits\" removed *",
+                NR_signal_night_limit, "* data points\n\n" ))
+
+    cat(paste0( "\"Negative daytime\" removed *",
+                NR_negative_daytime, "* data points\n\n" ))
+
+
+    cat(paste0( "Remaining **",
+                rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
+
+
+    cat(pander::pander( summary(rawdata) ))
+
+    cat('\n')
+
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
+
+    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+
+    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex=.8,main = paste("CM21 signal ", yyyy )  )
+
+    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex=.8,main = paste("CM21 signal SD", yyyy )  )
+    cat('\n')
+    cat('\n')
+
+
+
+
+    sub(".Rds", "_L1.Rds", afile)
+
+
 }
+#'
+
+
+
+
+
+
+
+
+
+
 
 
 
