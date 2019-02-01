@@ -91,8 +91,8 @@ Script.Name = c("CM21_P20_Import_Data_filtered_LAP.R")
 
 
 library(data.table, quietly = T)
-library(pander)
-library(RAerosols)
+library(pander, quietly = T)
+library(RAerosols, quietly = T)
 source("/home/athan/CM_21_GLB/CM21_functions.R")
 
 
