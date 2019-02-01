@@ -18,6 +18,7 @@ SUN_FOLDER = "/home/athan/DATA_RAW/SUN/PySolar_LAP/"
 SIRENA_DIR = "/home/athan/DATA_RAW/Bband/AC21_LAP.GLB/"
 RADMON_DIR = "/home/athan/DATA_RAW/Raddata/6"
 SIGNAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_signal/"
+GLOBAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_global/"
 
 ####  Parametric files ####
 TOO_BAD    = "/home/athan/CM_21_GLB/PARAMS/Too_bad_dates.dat"
