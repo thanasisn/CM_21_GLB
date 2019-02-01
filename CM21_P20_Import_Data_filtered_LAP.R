@@ -194,7 +194,7 @@ ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 ## loop all input files
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files[1]) {
+for (afile in input_files) {
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
