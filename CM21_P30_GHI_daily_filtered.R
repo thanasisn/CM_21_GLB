@@ -63,14 +63,11 @@ knitr::opts_chunk$set(fig.align  = "center" )
 # pdf of suspects
 # statistic on days
 #
-
-
-
-#'
-#' -  FILTERING  std > value
-#' -  CONVERT    total irradiance
-#' -  FILTERING  too low global value
-#'
+#
+# -  FILTERING   std > value
+# -  CONVERTING  total irradiance
+# -  FILTERING   too low global value
+#
 
 
 
@@ -81,8 +78,10 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM21_P30_GHI_dailiy_filtered.R")
+Script.Name = c("CM21_P30_GHI_daily_filtered.R")
 
+## FIXME this is for pdf output
+options(warn=-1)
 
 #+ echo=F, include=F
 library(data.table, quietly = T)
@@ -108,27 +107,28 @@ DARK_ELEV     = -10         ## sun elevation limit
 DSTRETCH      =  20 * 3600  ## time duration of dark signal for morning and evening of the same day
 DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than these ignore it
 
+## PATHS
+missfiles  = paste0(BASED, "LOGS/", Script.Name ,"_missingfilelist.dat" )
+tmpfolder  = paste0("/dev/shm/", sub(pattern = "\\..*", "" , Script.Name))
+dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , Script.Name), "_daily.pdf")
+daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , Script.Name),"_stats")
 
-missfiles = paste0(BASED, "LOGS/", Script.Name ,"_missingfilelist.dat" )
 
-## dir for pdfs
-tmpfolder = tempdir()
+
+# datafile    = paste0(DATOUT, "/P02_allcm21data" )
+# daylystat   = paste0(DATOUT, "/P02_allcm21stat" )
+
+## create a new temp dir
+unlink(tmpfolder, recursive = TRUE)
+dir.create(tmpfolder, showWarnings = FALSE)
+
 
 
 PLOT_NORM = FALSE
-WRITE_RDS = FALSE
 TEST      = TRUE
 
 PLOT_NORM = TRUE
-WRITE_RDS = TRUE
-# TEST      = FALSE
-
-
-## append a list into list
-list.append <- function (lst, ...){
-    lst <- c(lst, list(...))
-    return(lst)
-}
+TEST      = FALSE
 
 
 
@@ -146,8 +146,8 @@ input_files <- sort(input_files)
 #'
 #' ## Info
 #'
-#' Apply filtering from measurements log files and
-#' signal limitations.
+#' Apply more filtering on the data and do a first dark calculation.
+#' Daily plot with GHI and dark signal are in the file: "`r basename(dailyplots)`" .
 #'
 #' ### Apply variation filtering.
 #'
@@ -159,6 +159,7 @@ input_files <- sort(input_files)
 #'
 #' ### Filter minimum Global irradiance.
 #'
+#' Reject data when GHI < `r GLB_LOW_LIM`.
 #'
 
 
@@ -169,7 +170,7 @@ statist <- data.table()
 pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files[1]) {
+for (afile in input_files) {
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
@@ -209,6 +210,7 @@ for (afile in input_files[1]) {
         daydata     <- rawdata[ day == as.Date(theday) ]
         ## add all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)
+        daydata$day <- as.Date(daydata$Date)
 
 
 
@@ -260,18 +262,18 @@ for (afile in input_files[1]) {
 
 
 
-        if (PLOT_NORM) {
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+            plot_norm2(daydata, test, tag)
 
-            pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
-                plot_norm2(daydata, test, tag)
-
-                ## Dark signal plot
-                plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "W/m^2")
+            ## Dark signal plot
+            if (all(is.na(todaysdark))) {
+                ## empty plot when no data
+                plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
+            } else {
+                plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
                 title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-            dev.off()
-
-        }
-
+            }
+        dev.off()
 
 
 
@@ -306,44 +308,21 @@ for (afile in input_files[1]) {
         ## gather day statistics
         statist    <- rbind(statist, day )
 
-
         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
-
-        # dur = as.numeric(difftime(Sys.time(), stime, units = "secs"))
-        # eta = as.numeric(difftime(Sys.time(), stime, units = "secs"))*(totals/pbcount - 1)
-        # cat( sprintf( "%6.2f%%   %s   %s   %4d/%4d", 100*(pbcount/totals),
-        #               countdownS(eta, "h"),
-        #               countdownS(dur, "h"),
-        #               pbcount, totals ), sep = "\n" )
-
-
 
     } #END loop of days
 
 
-
-
-
-
-
-
-
-
-
-
     tempout <- data.frame()
+    yyyy    <- year(globaldata$day[1])
 
-    yyyy = year(globaldata$day[1])
     cat(paste("\\newpage\n\n"))
     cat(paste("## ",yyyy,"\n\n"))
 
     tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
     tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
     tempout <- rbind( tempout, data.frame(Name = "Minumun GHI limit", Data_points = NR_min_global) )
-
-
     tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
-
 
     panderOptions('table.alignment.default', 'right')
 
@@ -359,49 +338,39 @@ for (afile in input_files[1]) {
 
     cat('\n')
 
-    hist(globaldata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
+    hist(globaldata$CM21value, breaks = 50, main = paste("CM21 GHI ", yyyy ) )
 
-    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 GHI SD", yyyy ) )
 
     plot(globaldata$Elevat, globaldata$Global, pch = 19, cex = .8,
-         main = paste("CM21 signal ", yyyy ),
+         main = paste("CM21 GHI ", yyyy ),
          xlab = "Elevation",
-         ylab = "CM21 signal" )
+         ylab = "CM21 GHI" )
 
     plot(globaldata$Elevat, globaldata$GLstd,    pch = 19, cex = .8,
-         main = paste("CM21 signal SD", yyyy ),
+         main = paste("CM21 GHI SD", yyyy ),
          xlab = "Elevation",
-         ylab = "CM21 signal Standard Deviations")
+         ylab = "CM21 GHI Standard Deviations")
 
     cat('\n')
     cat('\n')
 
-    # capture.output(
-    #     write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
-    #     file = "/dev/null" )
+    ## write this years data
+    capture.output(
+        RAerosols::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
+        file = "/dev/null" )
 
 }
 #'
 
-paste0("pdftk " ,tmpfolder,"/daily*.pdf cat output /home/athan/CM_21_GLB/REPORTS/P30.pdf")
+capture.output(
+    RAerosols::write_RDS(statist, daylystat),
+    file = "/dev/null" )
+
+## create pdf with all dayly plots
+system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
 
 
 ## END ##
 tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
-
-#
-# num.plots <- 400
-# my.plots  <- vector(num.plots, mode='list')
-#
-# for (i in 1:num.plots) {
-#     plot(i)
-#     my.plots[[i]] <- recordPlot()
-# }
-# graphics.off()
-#
-# pdf('myplots.pdf', onefile=TRUE)
-# for (my.plot in my.plots) {
-#     replayPlot(my.plot)
-# }
-# graphics.off()
+cat(sprintf("%s %s %s %s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
