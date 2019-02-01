@@ -72,16 +72,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 #
 
 
-#'
-#' -  CONVERT    total irradiance
-#' -  FILTERING  std > value
-#' -  FILTERING  too low global value
-#'
-
-
-
-
-
 
 ####  Set environment  ####
 rm(list = (ls()[ls() != ""]))
@@ -89,11 +79,12 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = c("CM21_P20_Import_Data_filtered_LAP.R")
 
-
+#+ echo=F, include=F
 library(data.table, quietly = T)
-library(pander, quietly = T)
-library(RAerosols, quietly = T)
+library(pander,     quietly = T)
+library(RAerosols,  quietly = T)
 source("/home/athan/CM_21_GLB/CM21_functions.R")
+#'
 
 
 ####  . Variables  ####
@@ -104,6 +95,7 @@ MINsgLIM      = -0.06      ## Lower signal limit (CF~3344.482  0.03V~100watt)
 MAXsgLIM      = +0.5       ## Higher signal limit (from hardware limitations)
 
 ## Filter when dark (sun below DARK_ELEV )
+DARK_ELEV     = -10        ## sun elevation limit
 MINsgLIMnight = -0.02      ## Lower signal limit when dark
 MAXsgLIMnight = +0.10      ## Higher signal limit when dark
 
@@ -111,25 +103,6 @@ MAXsgLIMnight = +0.10      ## Higher signal limit when dark
 SUN_ELEV      = +5         ## When sun is above that
 MINsunup      =  0          ## Exclude signal values below that
 
-## Standard deviation filter (apply after other filters)
-STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
-
-## Lower global limit
-GLB_LOW_LIM   = -7         ## any Global value below this should be erroneous data
-
-## Dark Calculations
-DARK_ELEV     = -10        ## sun elevation limit
-DSTRETCH      =  20 * 3600  ## time duration of dark signal for morning and evening of the same day
-DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than these ignore it
-
-
-PLOT_NORM = FALSE
-WRITE_RDS = FALSE
-TEST      = TRUE
-
-PLOT_NORM = TRUE
-WRITE_RDS = TRUE
-TEST      = FALSE
 
 
 
@@ -138,7 +111,6 @@ input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21H_SIG_[0-9]{4}.Rds",
                            full.names = T )
 input_files <- sort(input_files)
-
 
 
 
@@ -179,7 +151,7 @@ ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 #'
 #' ### Filter of possible night signal.
 #'
-#' During night we allow a signal range of `r paste0("[",MINsgLIMnight,", " ,MAXsgLIMnight,"]")` to remove various inconsistencies.
+#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow a signal range of `r paste0("[",MINsgLIMnight,", " ,MAXsgLIMnight,"]")` to remove various inconsistencies.
 #'
 #' ### Filter negative signal when sun is up.
 #'
@@ -198,10 +170,12 @@ for (afile in input_files) {
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
-    # rawdata$Global <- NA
-    # rawdata$GLstd  <- NA
     rawdata$day    <- as.Date(rawdata$Date)
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
+
+    ## drop NA signal
+    rawdata <- rawdata[ !is.na(CM21value) ]
+
 
 
     ####  Filter too bad days  ###########################################
