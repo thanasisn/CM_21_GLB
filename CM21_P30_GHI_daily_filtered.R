@@ -87,7 +87,7 @@ Script.Name = c("CM21_P30_GHI_dailiy_filtered.R")
 #+ echo=F, include=F
 library(data.table, quietly = T)
 library(pander,     quietly = T)
-library(RAerosols,  quietly = T)
+# library(RAerosols,  quietly = T)
 source("/home/athan/CM_21_GLB/CM21_functions.R")
 #'
 
@@ -303,9 +303,8 @@ for (afile in input_files[1]) {
         ## gather data
         globaldata <- rbind( globaldata, daydata )
 
-        ## gather days
-        # alldata = rbind(alldata, daydata)
-        statist = rbind(statist, day )
+        ## gather day statistics
+        statist    <- rbind(statist, day )
 
 
         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
@@ -334,14 +333,16 @@ for (afile in input_files[1]) {
 
     tempout <- data.frame()
 
-    yyyy = year(rawdata$day[1])
+    yyyy = year(globaldata$day[1])
     cat(paste("\\newpage\n\n"))
     cat(paste("## ",yyyy,"\n\n"))
 
-    tempout <- rbind( tempout, data.frame(Name = "Initial data",           Data_points = NR_loaded) )
+    tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
+    tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
+    tempout <- rbind( tempout, data.frame(Name = "Minumun GHI limit", Data_points = NR_min_global) )
 
-    tempout <- rbind( tempout, data.frame(Name = "Remaining data",         Data_points = rawdata[ !is.na(CM21value), .N ]) )
 
+    tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
 
 
     panderOptions('table.alignment.default', 'right')
@@ -352,22 +353,22 @@ for (afile in input_files[1]) {
 
     cat(pander( tempout ))
 
-    cat(pander( summary(rawdata[,!c("Date","Azimuth")]) ))
+    cat(pander( summary(globaldata[,!c("Date","Azimuth")]) ))
 
     cat('\\normalsize\n')
 
     cat('\n')
 
-    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
+    hist(globaldata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
 
-    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
 
-    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
+    plot(globaldata$Elevat, globaldata$Global, pch = 19, cex = .8,
          main = paste("CM21 signal ", yyyy ),
          xlab = "Elevation",
          ylab = "CM21 signal" )
 
-    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
+    plot(globaldata$Elevat, globaldata$GLstd,    pch = 19, cex = .8,
          main = paste("CM21 signal SD", yyyy ),
          xlab = "Elevation",
          ylab = "CM21 signal Standard Deviations")
