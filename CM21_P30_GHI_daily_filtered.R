@@ -34,7 +34,7 @@
 ####_  Document options _####
 
 knitr::opts_chunk$set(echo       = FALSE   )
-knitr::opts_chunk$set(cache      = TRUE    )
+# knitr::opts_chunk$set(cache      = TRUE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -55,6 +55,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 #
 # this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
+# and some functionality of 'CM_P02_Explore_Data.R'
 #
 #
 # Read all yearly data and create
@@ -100,7 +101,7 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
 ## Lower global limit
-GLB_LOW_LIM   = -10         ## any Global value below this should be erroneous data (-7 older output)
+GLB_LOW_LIM   = -7          ## any Global value below this should be erroneous data (-7 older output)
 
 ## Dark Calculations
 DARK_ELEV     = -10         ## sun elevation limit
@@ -151,15 +152,17 @@ input_files <- sort(input_files)
 #'
 #' ### Apply variation filtering.
 #'
-#' Exclude from daily data valuew where signals standard deviation > `r STD_relMAX` * max(daily signal).
+#' Exclude from daily data values where signals standard deviation > `r STD_relMAX` * max(daily signal).
 #'
 #' ### Covert signal to global irradiance.
 #'
-#' The convertion is done with a factor which is interpolated between CM-21 callibrations.
+#' The conversion is done with a factor which is interpolated between CM-21 calibrations.
 #'
 #' ### Filter minimum Global irradiance.
 #'
 #' Reject data when GHI < `r GLB_LOW_LIM`.
+#'
+#' After ~2014 a good choice is about -7 before that should be about -15.
 #'
 
 
@@ -321,7 +324,7 @@ for (afile in input_files) {
 
     tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
     tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
-    tempout <- rbind( tempout, data.frame(Name = "Minumun GHI limit", Data_points = NR_min_global) )
+    tempout <- rbind( tempout, data.frame(Name = "Minimum GHI limit", Data_points = NR_min_global) )
     tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
 
     panderOptions('table.alignment.default', 'right')
@@ -367,8 +370,115 @@ capture.output(
     RAerosols::write_RDS(statist, daylystat),
     file = "/dev/null" )
 
-## create pdf with all dayly plots
+## create pdf with all daily plots
 system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
+
+
+
+#'
+#' ## Summary of daily statistics.
+#'
+
+
+hist(statist$NAs,     main = "NAs",                  breaks = 50, xlab = "NA count" )
+hist(statist$MinVa,   main = "Minimum Value",        breaks = 50, xlab = "Min daily signal"  )
+hist(statist$MaxVa,   main = "Maximum Value",        breaks = 50, xlab = "Max daily signal"  )
+hist(statist$AvgVa,   main = "Average Value",        breaks = 50, xlab = "Mean daily signal"  )
+hist(statist$MinGL,   main = "Minimum Global",       breaks = 50, xlab = "Min daily global" )
+hist(statist$MaxGL,   main = "Maximum Global",       breaks = 50, xlab = "Max daily global" )
+hist(statist$AvgGL,   main = "Average Global",       breaks = 50, xlab = "Mean daily global" )
+hist(statist$sunMeas, main = "Sun measurements",     breaks = 50, xlab = "Data count with sun up"  )
+hist(statist$Mavg,    main = "Morning Average Dark", breaks = 50, xlab = "Morning mean dark"           )
+hist(statist$Mmed,    main = "Morning Median Dark",  breaks = 50, xlab = "Morning median dark"         )
+hist(statist$Mcnt,    main = "Morning count Dark",   breaks = 50, xlab = "Morning data count for dark" )
+hist(statist$Eavg,    main = "Evening Average Dark", breaks = 50, xlab = "Evening mean dark"           )
+hist(statist$Emed,    main = "Evening Median Dark",  breaks = 50, xlab = "Evening median dark"         )
+hist(statist$Ecnt,    main = "Evening count Dark",   breaks = 50, xlab = "Evening data count for dark" )
+
+
+plot(statist$Date, statist$CMCF,    "p", pch = 16, cex = .5, main = "Conversion factor"    , xlab = "" )
+plot(statist$Date, statist$NAs,     "p", pch = 16, cex = .5, main = "NA count"             , xlab = "" )
+plot(statist$Date, statist$MinVa,   "p", pch = 16, cex = .5, main = "Minimum Value"        , xlab = "" )
+plot(statist$Date, statist$MaxVa,   "p", pch = 16, cex = .5, main = "Maximum Value"        , xlab = "" )
+plot(statist$Date, statist$AvgVa,   "p", pch = 16, cex = .5, main = "Average Value"        , xlab = "" )
+plot(statist$Date, statist$MinGL,   "p", pch = 16, cex = .5, main = "Minimum Global"       , xlab = "" )
+plot(statist$Date, statist$MaxGL,   "p", pch = 16, cex = .5, main = "Maximum Global"       , xlab = "" )
+plot(statist$Date, statist$AvgGL,   "p", pch = 16, cex = .5, main = "Average Global"       , xlab = "" )
+plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = "Sun measurements"     , xlab = "" )
+plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = "Morning Average Dark" , xlab = "" )
+plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = "Morning Median Dark"  , xlab = "" )
+plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = "Morning count Dark"   , xlab = "" )
+plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = "Evening Average Dark" , xlab = "" )
+plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = "Evening Median Dark"  , xlab = "" )
+plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = "Evening count Dark"   , xlab = "" )
+plot(statist$Date, statist$sunMeas/statist$SunUP , "p", pch=16,cex=.5, main = "Sun up measurements / Sun up count" , xlab = "" )
+
+
+#'
+#' ### Days with average global < -50 .
+#'
+unique( as.Date( statist$Date[ which(statist$AvgGL < -50 ) ] ) )
+
+#'
+#' ### Days with average global > 390 .
+#'
+unique( as.Date( statist$Date[ which(statist$AvgGL > 390 ) ] ) )
+
+# plot(statist$Date[statist$MaxGL<2000], statist$MaxGL[statist$MaxGL<2000], "p", pch=16,cex=.5 )
+
+#'
+#' ### Days with max global > 1500 .
+#'
+unique( as.Date( statist$Date[ which(statist$MaxGL > 1500 ) ] ) )
+
+
+# plot(statist$Date[statist$MinGL>-200], statist$MinGL[statist$MinGL>-200], "p", pch=16,cex=.5 )
+# plot(statist$Date[statist$MinGL<200], statist$MinGL[statist$MinGL<200], "p", pch=16,cex=.5 )
+
+
+#'
+#' ### Days with min global < -200 .
+#'
+unique( as.Date( statist$Date[ which(statist$MinGL < -200 ) ] ) )
+
+#'
+#' ### Days with min global > 200 .
+#'
+unique( as.Date( statist$Date[ which(statist$MinGL > 200 ) ] ) )
+
+
+# plot(statist$Date[statist$Ecnt>100], statist$Ecnt[statist$Ecnt>100] , "p", pch=16,cex=.5 )
+
+
+#'
+#' ### Days with Evening dark data points count < 100 .
+#'
+unique( as.Date( statist$Date[ which(statist$Ecnt < 100 ) ] ) )
+
+#'
+#' ### Days with Morning dark data points count < 50 .
+#'
+unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )
+
+
+# plot(statist$Date[statist$sunMeas<100], statist$sunMeas[statist$sunMeas<100]  , "p", pch=16,cex=.5 )
+
+
+#'
+#' ### Days with ( sun  measurements / sun up ) < 0.2 .
+#'
+unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
+
+
+#'
+#' ### Day with the minimum morning median dark .
+#'
+
+statist$Date[ which.min( statist$Mmed ) ]
+
+
+
+
 
 
 ## END ##
