@@ -144,7 +144,7 @@ dark_correction <- function(dark_day, DCOUNTLIM, type, dd, test, missfiles, miss
     ## with out dark should break!
     if ( sum(is.na( dar_y )) >= 2 ) {
         text = paste( as.POSIXct(dd, origin = "1970-01-01" ), test, "No dark don't know what to do!! using ", missingdark, " for Dark!!" )
-        cat(text, sep = "\n\n")
+        # cat(text, sep = "\n\n")
         warning(text)
         cat(text, sep = "\n", file = missfiles, append = TRUE)
 
