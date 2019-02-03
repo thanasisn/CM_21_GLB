@@ -27,6 +27,9 @@
 #'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
+#'
+#' params:
+#'   CACHE: true
 #' ---
 
 #+ echo=F, include=T
@@ -34,8 +37,8 @@
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE   )
-knitr::opts_chunk$set(cache      = TRUE    )
+knitr::opts_chunk$set(echo       = FALSE     )
+knitr::opts_chunk$set(cache      = params$CACHE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )

@@ -27,6 +27,9 @@
 #'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
+#'
+#' params:
+#'   CACHE: true
 #' ---
 
 #+ echo=F, include=T
@@ -34,8 +37,8 @@
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE   )
-# knitr::opts_chunk$set(cache      = TRUE    )
+knitr::opts_chunk$set(echo       = FALSE     )
+knitr::opts_chunk$set(cache      = params$CACHE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -161,10 +164,10 @@ input_files <- sort(input_files)
 #'
 #' ### Filter minimum Global irradiance.
 #'
-#' Reject data when GHI below an acceptable limit.
-#' Before  `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
-#' after   `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
-#' This is due to changes in instumentation.
+#' Reject data when GHI is below an acceptable limit.
+#' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
+#' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
+#' This is due to changes in instrumentation.
 #'
 
 

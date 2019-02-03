@@ -31,14 +31,14 @@ gain        = approxfun( x = calibration_data$Date,
                          rule = 1:2  )
 
 
-#' Convertion factor from volt to watt for CM21
+#' Conversion factor from volt to watt for CM21
 #'
 #' @details This uses both the sensitivity of the instruments and the gain
-#' factor of the measurmetna device.
+#' factor of the measurement device.
 #'
 #' @param date POSIXct date for the factor
 #'
-#' @return (numeric) Convertion factor
+#' @return (numeric) Conversion factor
 #' @family CM 21 functions
 #' @export
 cm21factor = function(date) {
@@ -71,7 +71,7 @@ dark_calculations <- function(elevatio, darklim, dates, dstretch, values) {
     ## selection for morning dark
     morningdark = selectmorn & dates <= mornigend & mornigstart < dates
 
-    ## evening selection with time limitedLabels
+    ## evening selection with time limit
     eveningstart  = evening[min(index(evening))]
     eveningend    = eveningstart + dstretch
     ## selection for evening dark
@@ -119,7 +119,7 @@ dark_correction <- function(dark_day, DCOUNTLIM, type, dd, test, missfiles, miss
         dar_y = c(dark_day$Mmed, dark_day$Emed)
 
     } else {
-        print("Dont know what to do")
+        print("Don't know what to do")
         stop("Invalid argument in Dark correction")
     }
 
@@ -154,7 +154,7 @@ dark_correction <- function(dark_day, DCOUNTLIM, type, dd, test, missfiles, miss
         }
 
         ## create dummy dark signal for correction
-        ####FIXME this can change to a set value after prossecing from statistics -----
+        ####FIXME this can change to a set value after processing from statistics -----
         dark_line = approxfun(x = dar_x,
                               y = c(missingdark, missingdark),
                               rule = 2,
@@ -215,7 +215,7 @@ plot_norm2 <- function(daydata, test, tag) {
 
 
 
-#' Get a nice string for seconds as formated time
+#' Get a nice string for seconds as formatted time
 #'
 #' @param seconds Time duration in seconds
 #' @param type The output format. "h" "93:29:43.758", "d" "3 21:34:17.072", "s" "336936.990"
@@ -242,10 +242,3 @@ countdownS <- function(seconds, type) {
     }
     return(output)
 }
-
-
-
-
-
-
-
