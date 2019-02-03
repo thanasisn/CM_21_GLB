@@ -23,7 +23,8 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   html_document: default
+#'   html_document:
+#'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
 #' ---
@@ -91,17 +92,20 @@ library(pander,     quietly = T)
 source("/home/athan/CM_21_GLB/CM21_functions.R")
 #'
 
-
 ####  . Variables  ####
 source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 ## Standard deviation filter (apply after other filters)
 STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
-## Lower global limit
-GLB_LOW_LIM   = -7          ## any Global value below this should be erroneous data (-7 older output)
+## Lower global limit any Global value below this should be erroneous data
+GLB_LOW_LIM_01   = -15      ## before breakdate
+GLB_LOW_LIM_02   = -7       ## after breakdata
+
+
 
 ## Dark Calculations
 DARK_ELEV     = -10         ## sun elevation limit
@@ -125,10 +129,7 @@ dir.create(tmpfolder, showWarnings = FALSE)
 
 
 
-PLOT_NORM = FALSE
 TEST      = TRUE
-
-PLOT_NORM = TRUE
 TEST      = FALSE
 
 
@@ -160,9 +161,10 @@ input_files <- sort(input_files)
 #'
 #' ### Filter minimum Global irradiance.
 #'
-#' Reject data when GHI < `r GLB_LOW_LIM`.
-#'
-#' After ~2014 a good choice is about -7 before that should be about -15.
+#' Reject data when GHI below an acceptable limit.
+#' Before  `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
+#' after   `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
+#' This is due to changes in instumentation.
 #'
 
 
@@ -207,6 +209,10 @@ for (afile in input_files) {
             Date = seq( as.POSIXct(paste(as.Date(ddd), "00:00:30")),
                         as.POSIXct(paste(as.Date(ddd), "23:59:30")), by = "min"  )
         )
+
+        ## choose GLB_LOW_LIM by date
+        if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
+        if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
 
 
         ## get daily data

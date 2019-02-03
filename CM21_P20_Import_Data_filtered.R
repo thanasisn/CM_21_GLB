@@ -23,7 +23,8 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   html_document: default
+#'   html_document:
+#'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
 #' ---
@@ -147,7 +148,7 @@ ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 #'
 #' ### Filter of possible signal values.
 #'
-#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` is possible to be recorded normaly.
+#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` Volts is possible to be recorded normaly.
 #'
 #' ### Filter of possible night signal.
 #'
