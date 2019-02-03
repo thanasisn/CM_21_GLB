@@ -29,9 +29,12 @@ MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")
 
 ####  Variables  ####
 
+## break between 2014-02-04 and 2014-02-05
+BREAKDATE  = as.POSIXct("2014-02-05 00:00:00")
+
 ## date range to process
-START_DAY = as.POSIXct("2006-01-01 00:00:00 UTC")
-END_DAY   = as.POSIXct("2019-01-01 00:00:00 UTC")
+START_DAY  = as.POSIXct("2006-01-01 00:00:00 UTC")
+END_DAY    = as.POSIXct("2019-01-01 00:00:00 UTC")
 
 
 

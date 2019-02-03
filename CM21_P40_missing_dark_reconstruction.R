@@ -23,7 +23,8 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   html_document: default
+#'   html_document:
+#'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
 #' ---
@@ -89,8 +90,6 @@ daylystat = paste0(dirname(GLOBAL_DIR), "/CM21_P30_GHI_daily_filtered_stats.Rds"
 darkfile  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
 
 
-## break between 2014-02-04 and 2014-02-05
-breakdate  = as.POSIXct("2014-02-05 00:00:00")
 
 
 
@@ -193,7 +192,7 @@ plot(statist$Date, statist$Dmean, pch = 19, cex = 0.2,
 statist$Dmean[ statist$Dmean == 0 ] <- NA
 
 
-sel_1 <- statist$Date < breakdate
+sel_1 <- statist$Date < BREAKDATE
 
 scatter.smooth( x = statist$Date[sel_1],
                 y = statist$Dmean[sel_1], pch = 19, cex = 0.2,
@@ -202,7 +201,7 @@ scatter.smooth( x = statist$Date[sel_1],
 axis.POSIXct(1, statist$Date[sel_1])
 
 
-sel_2 <- statist$Date >= breakdate
+sel_2 <- statist$Date >= BREAKDATE
 
 scatter.smooth( x = statist$Date[sel_2],
                 y = statist$Dmean[sel_2], pch = 19, cex = 0.2,
