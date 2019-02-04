@@ -2,7 +2,7 @@
 ---
 title: "CM21 dark trend reconstruction."
 author: "Natsis Athanasios"
-date: "February 03, 2019"
+date: "February 04, 2019"
 keywords: "CM21, CM21 data validation, global irradiance, dark"
 documentclass: article
 classoption:   a4paper,oneside
@@ -95,12 +95,12 @@ There are 0 missing dark cases to fill.
 ```
 
 ```
-2019-02-03 17:59:01 sagan athan CM21_P40_missing_dark_reconstruction.R  0.013660 mins
+2019-02-04 19:10:08 sagan athan CM21_P40_missing_dark_reconstruction.R  0.020269 mins
 ```
 
 
 ---
 title: "CM21_P40_missing_dark_reconstruction.R"
 author: "athan"
-date: "Sun Feb  3 17:59:00 2019"
+date: "Mon Feb  4 19:10:06 2019"
 ---
