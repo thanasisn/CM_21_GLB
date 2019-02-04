@@ -34,11 +34,14 @@
 
 #+ echo=F, include=T
 
+if (!exists("params")) {
+    params <- list()
+    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
 knitr::opts_chunk$set(echo       = FALSE     )
-# knitr::opts_chunk$set(cache      = params$CACHE    )
+knitr::opts_chunk$set(cache      = params$CACHE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -58,20 +61,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####_ Notes _####
 
 #
-# this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
-# and some functionality of 'CM_P02_Explore_Data.R'
-#
-#
-# Read all yearly data and create
-# database of all data
-# pdf of all days
-# pdf of suspects
-# statistic on days
-#
-#
-# -  FILTERING   std > value
-# -  CONVERTING  total irradiance
-# -  FILTERING   too low global value
+# this script substitutes
 #
 
 
@@ -98,16 +88,9 @@ source("/home/athan/CM_21_GLB/CM21_functions.R")
 ####  . Variables  ####
 source("/home/athan/CM_21_GLB/DEFINITIONS.R")
 
-
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-
-
-## Dark Calculations
-DARK_ELEV     = -10         ## sun elevation limit
-DSTRETCH      =  20 * 3600  ## time duration of dark signal for morning and evening of the same day
-DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than these ignore it
 
 ## PATHS
 missfiles  = paste0(BASED, "LOGS/", Script.Name ,"_missingfilelist.dat" )
@@ -117,9 +100,6 @@ daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , Script
 
 
 
-# datafile    = paste0(DATOUT, "/P02_allcm21data" )
-# daylystat   = paste0(DATOUT, "/P02_allcm21stat" )
-
 ## create a new temp dir
 unlink(tmpfolder, recursive = TRUE)
 dir.create(tmpfolder, showWarnings = FALSE)
@@ -127,18 +107,19 @@ dir.create(tmpfolder, showWarnings = FALSE)
 
 
 TEST      = TRUE
-# TEST      = FALSE
+TEST      = FALSE
 
 
 
 ## . get data input files ####
-
 input_files <- list.files( path       = GLOBAL_DIR,
                            pattern    = "LAP_CM21H_GHI_[0-9]{4}_L1.Rds",
                            full.names = T )
 input_files <- sort(input_files)
 
-
+## . get functions for missing dark resolution
+## were precomputed at the previus step
+load(DARKFILE)
 
 
 
@@ -167,7 +148,6 @@ for (afile in input_files) {
     daystodo    <- unique( rawdata$day )
 
     ##TODO continue from here
-    stop("jjjj")
 
     if (TEST) { daystodo <- sort(sample(daystodo,20)) }
 
@@ -175,6 +155,7 @@ for (afile in input_files) {
     globaldata    <- data.table()
     NR_extreme_SD = 0
     NR_min_global = 0
+
 
     for (ddd in daystodo) {
 
@@ -203,15 +184,9 @@ for (afile in input_files) {
 
 
 
-        ####  Filter Standard deviation extremes  ##############################
-        pre_count     <- daydata[ !is.na(CM21value), .N ]
-        daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
-        NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
-        ########################################################################
 
-
-
-        ####  Convert to irradiance  ###########################################
+        ####  Re-Convert to irradiance  ########################################
+        ## This will reset the previus dark correction
         daydata$Global <- daydata$CM21value * dayCMCF
         daydata$GLstd  <- daydata$CM21sd    * dayCMCF
         ########################################################################
@@ -234,13 +209,17 @@ for (afile in input_files) {
                                        dstretch = DSTRETCH)
 
         ####    Dark Correction    #################################################
+
+        #### . Fill missing dark with running means of dark ####
+        missingdark <- runningDark$DARK[ runningDark$Date == theday ]
+
         dark_line <-  dark_correction(dark_day    = dark_day,
                                       DCOUNTLIM   = DCOUNTLIM,
                                       type        = "median",
                                       dd          = theday ,
                                       test        = test,
                                       missfiles   = missfiles,
-                                      missingdark = 0 )
+                                      missingdark = missingdark )
 
         ####    Create dark signal for correction    ###############################
         todaysdark <- dark_line(daydata$Date)
@@ -344,10 +323,10 @@ for (afile in input_files) {
     cat('\n')
     cat('\n')
 
-    ## write this years data
-    # capture.output(
-    #     RAerosols::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
-    #     file = "/dev/null" )
+    # write this years data
+    capture.output(
+        RAerosols::write_RDS(globaldata, paste0( GLOBAL_DIR , sub("_L1", "_L2", basename(afile)))),
+        file = "/dev/null" )
 
 }
 #'

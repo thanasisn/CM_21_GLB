@@ -34,6 +34,9 @@
 
 #+ echo=F, include=T
 
+if (!exists("params")) {
+    params <- list()
+    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
@@ -90,7 +93,7 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 ## PATHS
 daylystat = paste0(dirname(GLOBAL_DIR), "/CM21_P30_GHI_daily_filtered_stats.Rds")
-darkfile  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
+
 
 
 
@@ -293,7 +296,7 @@ lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 
 ## keep dark constructed signal for reference when missing
 save( darkmean, darkmedian, runningDark,
-      file = darkfile, compress = TRUE)
+      file = DARKFILE, compress = TRUE)
 
 
 

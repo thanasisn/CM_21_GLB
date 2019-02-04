@@ -104,16 +104,6 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 ## Standard deviation filter (apply after other filters)
 STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
-## Lower global limit any Global value below this should be erroneous data
-GLB_LOW_LIM_01   = -15      ## before breakdate
-GLB_LOW_LIM_02   = -7       ## after breakdata
-
-
-
-## Dark Calculations
-DARK_ELEV     = -10         ## sun elevation limit
-DSTRETCH      =  20 * 3600  ## time duration of dark signal for morning and evening of the same day
-DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than these ignore it
 
 ## PATHS
 missfiles  = paste0(BASED, "LOGS/", Script.Name ,"_missingfilelist.dat" )

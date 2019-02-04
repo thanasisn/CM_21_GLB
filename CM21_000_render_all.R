@@ -44,3 +44,10 @@ render("./CM21_P40_missing_dark_reconstruction.R",
        output_format        = c("html_document", "pdf_document"),
        params = list( CACHE = F ),
        clean                = T )
+
+render("./CM21_P50_GHI_dark_correction.R",
+       output_format        = c("html_document", "pdf_document"),
+       params = list( CACHE = F ),
+       clean                = T )
+
+
