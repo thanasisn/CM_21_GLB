@@ -2,7 +2,7 @@
 # /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
 #' ---
-#' title: "CM21 daily GHI filtering."
+#' title: "CM21 daily GHI complete dark correction."
 #' author: "Natsis Athanasios"
 #' date: "`r format(Sys.time(), '%B %d, %Y')`"
 #' keywords: "CM21, CM21 data validation, global irradiance"
@@ -38,7 +38,7 @@
 ####_  Document options _####
 
 knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = params$CACHE    )
+# knitr::opts_chunk$set(cache      = params$CACHE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -83,10 +83,10 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM21_P30_GHI_daily_filtered.R")
+Script.Name = c("CM21_P50_GHI_dark_correcton.R")
 
 ## FIXME this is for pdf output
-options(warn=-1)
+# options(warn=-1)
 
 #+ echo=F, include=F
 library(data.table, quietly = T)
@@ -101,12 +101,6 @@ source("/home/athan/CM_21_GLB/DEFINITIONS.R")
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
-## Standard deviation filter (apply after other filters)
-STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
-
-## Lower global limit any Global value below this should be erroneous data
-GLB_LOW_LIM_01   = -15      ## before breakdate
-GLB_LOW_LIM_02   = -7       ## after breakdata
 
 
 
@@ -133,13 +127,14 @@ dir.create(tmpfolder, showWarnings = FALSE)
 
 
 TEST      = TRUE
-TEST      = FALSE
+# TEST      = FALSE
 
 
 
 ## . get data input files ####
-input_files <- list.files( path    = SIGNAL_DIR,
-                           pattern = "LAP_CM21H_SIG_[0-9]{4}_L1.Rds",
+
+input_files <- list.files( path       = GLOBAL_DIR,
+                           pattern    = "LAP_CM21H_GHI_[0-9]{4}_L1.Rds",
                            full.names = T )
 input_files <- sort(input_files)
 
@@ -151,23 +146,7 @@ input_files <- sort(input_files)
 #'
 #' ## Info
 #'
-#' Apply more filtering on the data and do a first dark calculation.
-#' Daily plot with GHI and dark signal are in the file: "`r basename(dailyplots)`" .
-#'
-#' ### Apply variation filtering.
-#'
-#' Exclude from daily data values where signals standard deviation > `r STD_relMAX` * max(daily signal).
-#'
-#' ### Covert signal to global irradiance.
-#'
-#' The conversion is done with a factor which is interpolated between CM-21 calibrations.
-#'
-#' ### Filter minimum Global irradiance.
-#'
-#' Reject data when GHI is below an acceptable limit.
-#' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
-#' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
-#' This is due to changes in instrumentation.
+#' Apply dark correction on days with missing dark.
 #'
 
 
@@ -180,17 +159,15 @@ pbcount = 0
 #+ include=TRUE, echo=F, results="asis"
 for (afile in input_files) {
 
+
     #### Get raw data ####
-    rawdata        <- readRDS(afile)
-    rawdata$Global <- NA
-    rawdata$GLstd  <- NA
-    rawdata$day    <- as.Date(rawdata$Date)
-    NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
+    rawdata     <- readRDS(afile)
+    NR_loaded   <- rawdata[ !is.na(CM21value), .N ]
 
-    ## drop NA signal
-    rawdata        <- rawdata[ !is.na(CM21value) ]
+    daystodo    <- unique( rawdata$day )
 
-    daystodo <- unique( rawdata$day )
+    ##TODO continue from here
+    stop("jjjj")
 
     if (TEST) { daystodo <- sort(sample(daystodo,20)) }
 
@@ -368,9 +345,9 @@ for (afile in input_files) {
     cat('\n')
 
     ## write this years data
-    capture.output(
-        RAerosols::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
-        file = "/dev/null" )
+    # capture.output(
+    #     RAerosols::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
+    #     file = "/dev/null" )
 
 }
 #'
