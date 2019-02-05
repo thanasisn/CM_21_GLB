@@ -61,7 +61,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####_ Notes _####
 
 #
-# this script substitutes
+# this script substitutes CM_P03_import_Data_wo_bad_dates.r
 #
 
 
@@ -181,7 +181,6 @@ for (afile in input_files) {
         ## add all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)
         daydata$day <- as.Date(daydata$Date)
-
 
 
 
