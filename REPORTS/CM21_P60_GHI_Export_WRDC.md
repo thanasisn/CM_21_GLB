@@ -40,7 +40,12 @@ params:
 
 ## Info
 
-Apply data aggregation and export values for submission to WRDC.
+Apply data aggregation and export data for submission to WRDC.
+
+We calculate the mean global radiation for every quarter of the hour using all available data and ignoring missing values.
+
+The mean hourly values are produced only for the cases where all four of the quarters of each hour are present in the data set.
+If there is any missing quarterly value the hourly value is not exported.
 
 
 
@@ -48,8 +53,7 @@ Apply data aggregation and export values for submission to WRDC.
 
 ##  2008 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2008_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2008_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2008.dat 
 \scriptsize
 
 
@@ -75,12 +79,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2008_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-1.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-2.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-1.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-2.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2009 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2009_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2009_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2009.dat 
 \scriptsize
 
 
@@ -106,12 +109,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2009_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-3.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-4.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-3.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-4.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2010 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2010_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2010_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2010.dat 
 \scriptsize
 
 
@@ -137,12 +139,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2010_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-5.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-6.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-5.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-6.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2011 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2011_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2011_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2011.dat 
 \scriptsize
 
 
@@ -168,12 +169,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2011_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-7.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-8.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-7.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-8.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2012 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2012_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2012_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2012.dat 
 \scriptsize
 
 
@@ -199,12 +199,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2012_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-9.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-10.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-9.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-10.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2013 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2013_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2013_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2013.dat 
 \scriptsize
 
 
@@ -230,12 +229,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2013_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-11.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-12.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-11.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-12.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2014 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2014_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2014_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2014.dat 
 \scriptsize
 
 
@@ -261,12 +259,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2014_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-13.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-14.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-13.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-14.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2015 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2015_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2015_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2015.dat 
 \scriptsize
 
 
@@ -292,12 +289,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2015_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-15.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-16.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-15.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-16.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2016 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2016_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2016_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2016.dat 
 \scriptsize
 
 
@@ -323,12 +319,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2016_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-17.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-18.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-17.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-18.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2017 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2017_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2017_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2017.dat 
 \scriptsize
 
 
@@ -354,12 +349,11 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2017_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-19.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-20.png" width="60%" style="display: block; margin: auto;" />\newpage
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-19.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-20.png" width="60%" style="display: block; margin: auto;" />\newpage
 
 ##  2018 
 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2018_QRT.Rds 
-Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2018_QRT.inf.md 
+Data Exported to: sumbit_to_WRDC_2018.dat 
 \scriptsize
 
 
@@ -385,13 +379,13 @@ Written:  /home/athan/DATA/cm21_data_validation/CM21_exports/LAP_CM21H_GHI_2018_
 
 \normalsize
 
-<img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-21.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P60_GHI_Export_files/figure-html/unnamed-chunk-5-22.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-21.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P60_GHI_Export_WRDC_files/figure-html/unnamed-chunk-5-22.png" width="60%" style="display: block; margin: auto;" />
   --   CM21_P60_GHI_Export.R  DONE  --  
-2019-02-05 09:54:10 sagan athan CM21_P60_GHI_Export.R  1.865950 mins
+2019-02-05 10:43:29 sagan athan CM21_P60_GHI_Export.R  1.891169 mins
 
 
 ---
-title: "CM21_P60_GHI_Export.R"
+title: "CM21_P60_GHI_Export_WRDC.R"
 author: "athan"
-date: "Tue Feb  5 09:52:18 2019"
+date: "Tue Feb  5 10:41:35 2019"
 ---

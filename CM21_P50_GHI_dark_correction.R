@@ -292,6 +292,7 @@ for (afile in input_files) {
     tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
 
     panderOptions('table.alignment.default', 'right')
+    panderOptions('table.split.table',        120   )
 
     cat('\\scriptsize\n')
 

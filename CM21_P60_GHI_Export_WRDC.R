@@ -115,7 +115,12 @@ stopifnot(length(input_files) == length(yearstodo))
 #'
 #' ## Info
 #'
-#' Apply data aggregation and export values for submission to WRDC.
+#' Apply data aggregation and export data for submission to WRDC.
+#'
+#' We calculate the mean global radiation for every quarter of the hour using all available data and ignoring missing values.
+#'
+#' The mean hourly values are produced only for the cases where all four of the quarters of each hour are present in the data set.
+#' If there is any missing quarterly value the hourly value is not exported.
 #'
 
 
@@ -253,6 +258,8 @@ for (afile in input_files) {
     cat(paste("Data Exported to:", basename(wrdcfile),"\n"))
 
     panderOptions('table.alignment.default', 'right')
+    panderOptions('table.split.table',        120   )
+
 
     cat('\\scriptsize\n')
 

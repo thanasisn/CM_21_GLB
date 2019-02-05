@@ -18,6 +18,7 @@ RADMON_DIR = "/home/athan/DATA_RAW/Raddata/6"
 SIGNAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_signal/"
 GLOBAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_global/"
 EXPORT_DIR = "/home/athan/DATA/cm21_data_validation/CM21_exports/"
+REPORT_DIR = "/home/athan/CM_21_GLB/REPORTS/"
 
 
 ####  Parametric files ####

@@ -2,7 +2,7 @@
 ---
 title: "CM21 signal filtering."
 author: "Natsis Athanasios"
-date: "February 03, 2019"
+date: "February 05, 2019"
 keywords: "CM21, CM21 data validation, global irradiance"
 documentclass: article
 classoption:   a4paper,oneside
@@ -73,46 +73,32 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \scriptsize
 
---------------------------------------
-                    Name   Data_points
------------------------- -------------
-            Initial data        472282
 
-            Too bad days          4060
-
-         Bad date ranges             0
-
-  Signal physical limits            24
-
-     Signal night limits             0
-
-        Negative daytime           940
-
-          Remaining data        467258
---------------------------------------
+|                   Name | Data_points |
+|-----------------------:|------------:|
+|           Initial data |      472282 |
+|           Too bad days |        4060 |
+|        Bad date ranges |           0 |
+| Signal physical limits |          24 |
+|    Signal night limits |           0 |
+|       Negative daytime |         940 |
+|         Remaining data |      467258 |
 
 
---------------------------------------------------------------------------
-        CM21value           CM21sd             Elevat                  day
------------------ ---------------- ------------------ --------------------
-   Min.  :-0.0071    Min.  :0.0000    Min.  :-72.8133    Min.  :2006-01-01
 
-  1st Qu.:-0.0024   1st Qu.:0.0000   1st Qu.:-27.2109   1st Qu.:2006-03-28
-
-  Median :-0.0001   Median :0.0000    Median : 1.1509   Median :2006-06-28
-
-    Mean : 0.0533     Mean :0.0009      Mean : 0.9378     Mean :2006-06-25
-
-  3rd Qu.: 0.0906   3rd Qu.:0.0003   3rd Qu.: 28.9159   3rd Qu.:2006-09-20
-
-   Max.  : 0.3817    Max.  :0.1219    Max.  : 72.8115    Max.  :2006-12-27
-
-        NA's :940        NA's :940                 NA                   NA
---------------------------------------------------------------------------
+|       CM21value |         CM21sd |           Elevat |                day |
+|----------------:|---------------:|-----------------:|-------------------:|
+| Min.   :-0.0071 | Min.   :0.0000 | Min.   :-72.8133 | Min.   :2006-01-01 |
+| 1st Qu.:-0.0024 | 1st Qu.:0.0000 | 1st Qu.:-27.2109 | 1st Qu.:2006-03-28 |
+| Median :-0.0001 | Median :0.0000 | Median :  1.1509 | Median :2006-06-28 |
+| Mean   : 0.0533 | Mean   :0.0009 | Mean   :  0.9378 | Mean   :2006-06-25 |
+| 3rd Qu.: 0.0906 | 3rd Qu.:0.0003 | 3rd Qu.: 28.9159 | 3rd Qu.:2006-09-20 |
+| Max.   : 0.3817 | Max.   :0.1219 | Max.   : 72.8115 | Max.   :2006-12-27 |
+|     NA's   :940 |    NA's   :940 |               NA |                 NA |
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-1.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-2.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-3.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-4.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-1.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-2.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-3.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-4.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -145,7 +131,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-5.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-6.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-7.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-8.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-5.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-6.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-7.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-8.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -178,7 +164,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-9.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-10.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-11.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-12.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-9.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-10.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-11.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-12.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -211,7 +197,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-13.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-14.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-15.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-16.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-13.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-14.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-15.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-16.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -244,7 +230,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-17.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-18.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-19.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-20.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-17.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-18.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-19.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-20.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -277,7 +263,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-21.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-22.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-23.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-24.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-21.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-22.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-23.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-24.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -310,7 +296,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-25.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-26.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-27.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-28.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-25.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-26.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-27.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-28.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -343,7 +329,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-29.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-30.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-31.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-32.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-29.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-30.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-31.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-32.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -376,7 +362,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-33.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-34.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-35.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-36.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-33.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-34.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-35.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-36.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -409,7 +395,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-37.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-38.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-39.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-40.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-37.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-38.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-39.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-40.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -442,7 +428,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-41.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-42.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-43.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-44.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-41.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-42.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-43.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-44.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -463,31 +449,19 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 
 
-|          CM21value |            CM21sd |           Elevat |
-|-------------------:|------------------:|-----------------:|
-| Min.   :-0.0027390 | Min.   :0.0000000 | Min.   :-72.8070 |
-| 1st Qu.:-0.0000496 | 1st Qu.:0.0006782 | 1st Qu.:-27.4602 |
-| Median : 0.0014725 | Median :0.0007868 | Median :  0.7852 |
-| Mean   : 0.0574517 | Mean   :0.0014853 | Mean   :  0.4488 |
-| 3rd Qu.: 0.0985413 | 3rd Qu.:0.0009552 | 3rd Qu.: 28.2770 |
-| Max.   : 0.3998566 | Max.   :0.1279875 | Max.   : 72.8045 |
-|          NA's   :3 |         NA's   :3 |               NA |
-
- 
-
-|                day |
-|-------------------:|
-| Min.   :2017-01-01 |
-| 1st Qu.:2017-04-01 |
-| Median :2017-06-30 |
-| Mean   :2017-07-01 |
-| 3rd Qu.:2017-09-30 |
-| Max.   :2017-12-31 |
-|                 NA |
+|          CM21value |            CM21sd |           Elevat |                day |
+|-------------------:|------------------:|-----------------:|-------------------:|
+| Min.   :-0.0027390 | Min.   :0.0000000 | Min.   :-72.8070 | Min.   :2017-01-01 |
+| 1st Qu.:-0.0000496 | 1st Qu.:0.0006782 | 1st Qu.:-27.4602 | 1st Qu.:2017-04-01 |
+| Median : 0.0014725 | Median :0.0007868 | Median :  0.7852 | Median :2017-06-30 |
+| Mean   : 0.0574517 | Mean   :0.0014853 | Mean   :  0.4488 | Mean   :2017-07-01 |
+| 3rd Qu.: 0.0985413 | 3rd Qu.:0.0009552 | 3rd Qu.: 28.2770 | 3rd Qu.:2017-09-30 |
+| Max.   : 0.3998566 | Max.   :0.1279875 | Max.   : 72.8045 | Max.   :2017-12-31 |
+|          NA's   :3 |         NA's   :3 |               NA |                 NA |
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-45.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-46.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-47.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-48.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-45.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-46.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-47.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-48.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -520,7 +494,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-49.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-50.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-51.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-52.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-49.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-50.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-51.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-52.png" width="60%" style="display: block; margin: auto;" />
 
 \newpage
 
@@ -552,7 +526,7 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 
 \normalsize
 
-<img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-53.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-54.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-55.png" width="60%" style="display: block; margin: auto;" /><img src="CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-56.png" width="60%" style="display: block; margin: auto;" />
+<img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-53.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-54.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-55.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P20_Import_Data_filtered_files/figure-html/unnamed-chunk-5-56.png" width="60%" style="display: block; margin: auto;" />
 
 
 
@@ -563,12 +537,12 @@ When sun elevation > 5 ignore CM-21 signal < 0.
 ```
 
 ```
-2019-02-03 17:40:28      sagan      athan CM21_P20_Import_Data_filtered_LAP.R  5.423845 mins
+2019-02-05 11:21:22      sagan      athan CM21_P20_Import_Data_filtered_LAP.R  5.648960 mins
 ```
 
 
 ---
 title: "CM21_P20_Import_Data_filtered.R"
 author: "athan"
-date: "Sun Feb  3 17:35:03 2019"
+date: "Tue Feb  5 11:15:43 2019"
 ---
