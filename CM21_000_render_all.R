@@ -39,15 +39,19 @@ OUTPUT_FORMAT = NULL
 #        output_format     = c("html_document", "pdf_document"),
 #        params = list( CACHE = F ),
 #        clean             = T )
+#
+# render("./CM21_P40_missing_dark_reconstruction.R",
+#        output_format        = c("html_document", "pdf_document"),
+#        params = list( CACHE = F ),
+#        clean                = T )
+#
+# render("./CM21_P50_GHI_dark_correction.R",
+#        output_format        = c("html_document", "pdf_document"),
+#        params = list( CACHE = F ),
+#        clean                = T )
 
-render("./CM21_P40_missing_dark_reconstruction.R",
+render("./CM21_P60_GHI_Export.R",
        output_format        = c("html_document", "pdf_document"),
        params = list( CACHE = F ),
        clean                = T )
-
-render("./CM21_P50_GHI_dark_correction.R",
-       output_format        = c("html_document", "pdf_document"),
-       params = list( CACHE = F ),
-       clean                = T )
-
 
