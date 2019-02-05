@@ -96,6 +96,7 @@ for (ff in signal_files) {
     cat(paste("## ",yyyy,"\n"))
 
     panderOptions('table.alignment.default', 'right')
+    panderOptions('table.split.table',        120   )
 
     cat('\\scriptsize\n')
 

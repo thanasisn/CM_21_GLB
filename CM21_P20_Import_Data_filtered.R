@@ -272,6 +272,7 @@ for (afile in input_files) {
     #             rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
 
     panderOptions('table.alignment.default', 'right')
+    panderOptions('table.split.table',        120   )
 
     cat('\\scriptsize\n')
 

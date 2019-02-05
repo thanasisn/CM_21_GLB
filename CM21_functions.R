@@ -199,8 +199,8 @@ plot_norm2 <- function(daydata, test, tag) {
     ylim = c(dddd , uuuu)
 
     plot(daydata$Date, daydata$Global,
-         "l", xlab = "UTC", ylab = "W/m^2",
-         col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim )
+         "l", xlab = "UTC", ylab = expression(W / m^2),
+         col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
     abline(h = 0, col = "gray60")
     abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
            col = "lightgray", lty = "dotted", lwd = par("lwd"))
