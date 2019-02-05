@@ -76,7 +76,8 @@ tic = Sys.time()
 Script.Name = c("CM21_P50_GHI_dark_correcton.R")
 
 ## FIXME this is for pdf output
-# options(warn=-1)
+# options(warn=-1) ## hide warnigs
+# options(warn=2)  ## stop on warnigs
 
 #+ echo=F, include=F
 library(data.table, quietly = T)
@@ -138,7 +139,7 @@ statist <- data.table()
 pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files) {
+for (afile in input_files[1]) {
 
 
     #### Get raw data ####
@@ -192,7 +193,7 @@ for (afile in input_files) {
 
 
 
-        #### Filter too low Global values  #####################################
+        ####  Filter too low Global values  ####################################
         pre_count     <- daydata[ !is.na(CM21value), .N ]
         daydata       <- daydata[ Global >= GLB_LOW_LIM ]
         NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
@@ -200,14 +201,15 @@ for (afile in input_files) {
 
 
 
-        ####    Calculate Dark    ##################################################
-        dark_day <- dark_calculations( dates    = daydata$Date,
-                                       values   = daydata$Global,
-                                       elevatio = daydata$Eleva,
-                                       darklim  = DARK_ELEV,
-                                       dstretch = DSTRETCH)
-
-        ####    Dark Correction    #################################################
+        ####    Calculate Dark    ##############################################
+        suppressWarnings(
+            dark_day <- dark_calculations( dates    = daydata$Date,
+                                           values   = daydata$Global,
+                                           elevatio = daydata$Eleva,
+                                           darklim  = DARK_ELEV,
+                                           dstretch = DSTRETCH        )
+        )
+        ####    Dark Correction    #############################################
 
         #### . Fill missing dark with running means of dark ####
         missingdark <- runningDark$DARK[ runningDark$Date == theday ]
@@ -229,23 +231,23 @@ for (afile in input_files) {
 
 
 
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
-            plot_norm2(daydata, test, tag)
-
-            ## Dark signal plot
-            if (all(is.na(todaysdark))) {
-                ## empty plot when no data
-                plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
-            } else {
-                plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
-                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-            }
-        dev.off()
+        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+        #     plot_norm2(daydata, test, tag)
+        #
+        #     ## Dark signal plot
+        #     if (all(is.na(todaysdark))) {
+        #         ## empty plot when no data
+        #         plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
+        #     } else {
+        #         plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
+        #         title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+        #     }
+        # dev.off()
 
 
 
         ## keep some statistics
-        day    = data.frame(Date    = theday,
+        day   <- data.frame(Date    = theday,
                             CMCF    = dayCMCF,
                             NAs     = sum(is.na(daydata$Global)),
                             SunUP   = sum(  daydata$Eleva >= 0 ),
@@ -337,7 +339,7 @@ capture.output(
     file = "/dev/null" )
 
 ## create pdf with all daily plots
-system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
+# system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
 
 
 
@@ -442,6 +444,15 @@ unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
 
 statist$Date[ which.min( statist$Mmed ) ]
 
+
+
+
+#' \scriptsize
+#'
+#' |          a |          b |          c |          d |          e |          f |          g |          h |       i |
+#' |-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|--------:|
+#' | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFG |
+#'
 
 
 
