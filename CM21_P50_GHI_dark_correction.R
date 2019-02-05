@@ -139,7 +139,7 @@ statist <- data.table()
 pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files[1]) {
+for (afile in input_files) {
 
 
     #### Get raw data ####
@@ -214,13 +214,15 @@ for (afile in input_files[1]) {
         #### . Fill missing dark with running means of dark ####
         missingdark <- runningDark$DARK[ runningDark$Date == theday ]
 
-        dark_line <-  dark_correction(dark_day    = dark_day,
-                                      DCOUNTLIM   = DCOUNTLIM,
-                                      type        = "median",
-                                      dd          = theday ,
-                                      test        = test,
-                                      missfiles   = missfiles,
-                                      missingdark = missingdark )
+        suppressWarnings(
+            dark_line <-  dark_correction(dark_day    = dark_day,
+                                          DCOUNTLIM   = DCOUNTLIM,
+                                          type        = "median",
+                                          dd          = theday ,
+                                          test        = test,
+                                          missfiles   = missfiles,
+                                          missingdark = missingdark )
+        )
 
         ####    Create dark signal for correction    ###############################
         todaysdark <- dark_line(daydata$Date)
@@ -231,18 +233,18 @@ for (afile in input_files[1]) {
 
 
 
-        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
-        #     plot_norm2(daydata, test, tag)
-        #
-        #     ## Dark signal plot
-        #     if (all(is.na(todaysdark))) {
-        #         ## empty plot when no data
-        #         plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
-        #     } else {
-        #         plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
-        #         title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-        #     }
-        # dev.off()
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+            plot_norm2(daydata, test, tag)
+
+            ## Dark signal plot
+            if (all(is.na(todaysdark))) {
+                ## empty plot when no data
+                plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
+            } else {
+                plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
+                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            }
+        dev.off()
 
 
 
@@ -348,14 +350,14 @@ capture.output(
 #'
 
 
-hist(statist$NAs,     main = "NAs",                  breaks = 50, xlab = "NA count" )
-hist(statist$MinVa,   main = "Minimum Value",        breaks = 50, xlab = "Min daily signal"  )
-hist(statist$MaxVa,   main = "Maximum Value",        breaks = 50, xlab = "Max daily signal"  )
-hist(statist$AvgVa,   main = "Average Value",        breaks = 50, xlab = "Mean daily signal"  )
-hist(statist$MinGL,   main = "Minimum Global",       breaks = 50, xlab = "Min daily global" )
-hist(statist$MaxGL,   main = "Maximum Global",       breaks = 50, xlab = "Max daily global" )
-hist(statist$AvgGL,   main = "Average Global",       breaks = 50, xlab = "Mean daily global" )
-hist(statist$sunMeas, main = "Sun measurements",     breaks = 50, xlab = "Data count with sun up"  )
+hist(statist$NAs,     main = "NAs",                  breaks = 50, xlab = "NA count"            )
+hist(statist$MinVa,   main = "Minimum Value",        breaks = 50, xlab = "Min daily signal"    )
+hist(statist$MaxVa,   main = "Maximum Value",        breaks = 50, xlab = "Max daily signal"    )
+hist(statist$AvgVa,   main = "Average Value",        breaks = 50, xlab = "Mean daily signal"   )
+hist(statist$MinGL,   main = "Minimum Global",       breaks = 50, xlab = "Min daily global"    )
+hist(statist$MaxGL,   main = "Maximum Global",       breaks = 50, xlab = "Max daily global"    )
+hist(statist$AvgGL,   main = "Average Global",       breaks = 50, xlab = "Mean daily global"     )
+hist(statist$sunMeas, main = "Sun measurements",     breaks = 50, xlab = "Data count with sun up"     )
 hist(statist$Mavg,    main = "Morning Average Dark", breaks = 50, xlab = "Morning mean dark"           )
 hist(statist$Mmed,    main = "Morning Median Dark",  breaks = 50, xlab = "Morning median dark"         )
 hist(statist$Mcnt,    main = "Morning count Dark",   breaks = 50, xlab = "Morning data count for dark" )
@@ -447,12 +449,12 @@ statist$Date[ which.min( statist$Mmed ) ]
 
 
 
-#' \scriptsize
-#'
-#' |          a |          b |          c |          d |          e |          f |          g |          h |       i |
-#' |-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|--------:|
-#' | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFG |
-#'
+# #' \scriptsize
+# #'
+# #' |          a |          b |          c |          d |          e |          f |          g |          h |       i |
+# #' |-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|--------:|
+# #' | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFG |
+# #'
 
 
 
