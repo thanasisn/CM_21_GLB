@@ -447,6 +447,25 @@ unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
 statist$Date[ which.min( statist$Mmed ) ]
 
 
+yearlyplots <- list.files( path       = REPORT_DIR,
+                           pattern    = "Daily_GHI_[0-9]{4}.pdf",
+                           full.names = T)
+yearlyplots <- sort(yearlyplots)
+
+FirstYear   <- regmatches(yearlyplots[1], regexpr( "[0-9]{4}", yearlyplots[1] ))
+CurrentYe   <- year(Sys.Date())
+## ignore current year
+yearlyplots <- grep(paste0("_",CurrentYe,".pdf"), yearlyplots, value = T , invert = T)
+LastYear    <- regmatches(yearlyplots[length(yearlyplots)], regexpr( "[0-9]{4}", yearlyplots[length(yearlyplots)] ))
+
+## colate pdfs
+system(
+    paste0("pdftk ",
+           paste(yearlyplots, collapse = " "),
+           " cat output ",
+           REPORT_DIR, "Daily_GHI_",FirstYear,"-",LastYear,".pdf" )
+)
+
 
 
 # #' \scriptsize
