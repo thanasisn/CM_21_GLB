@@ -84,12 +84,6 @@ Apply dark correction on days with missing dark.
 <img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-1.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-2.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-3.png" width="60%" style="display: block; margin: auto;" />
 
 ```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2007-03-20 20030706 No dark don't know what to do!! using
--6.94108183851353 for Dark!!
-```
-
-```
 Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
 returning Inf
 ```
@@ -170,9 +164,11 @@ returning -Inf
 <img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-9.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-10.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-11.png" width="60%" style="display: block; margin: auto;" />
 
 ```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2009-06-22 22060906 No dark don't know what to do!! using
--9.09173949968571 for Dark!!
+Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
+returning Inf
+
+Warning in min(daydata$Global, na.rm = T): no non-missing arguments to max;
+returning -Inf
 ```
 
 ```
@@ -186,12 +182,6 @@ returning -Inf
 ```
 
 ```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2009-07-03 03070906 No dark don't know what to do!! using
--8.60960880758431 for Dark!!
-```
-
-```
 Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
 returning Inf
 ```
@@ -199,28 +189,6 @@ returning Inf
 ```
 Warning in max(daydata$Global, na.rm = T): no non-missing arguments to max;
 returning -Inf
-```
-
-```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2009-07-07 07070906 No dark don't know what to do!! using
--8.72210253161443 for Dark!!
-```
-
-```
-Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
-returning Inf
-```
-
-```
-Warning in max(daydata$Global, na.rm = T): no non-missing arguments to max;
-returning -Inf
-```
-
-```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2009-07-08 08070906 No dark don't know what to do!! using
--8.78569783385263 for Dark!!
 ```
 
 ```
@@ -264,18 +232,10 @@ returning -Inf
 <img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-13.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-14.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-15.png" width="60%" style="display: block; margin: auto;" />
 
 ```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2010-08-02 02081006 No dark don't know what to do!! using
--8.49520315802927 for Dark!!
-```
-
-```
 Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
 returning Inf
-```
 
-```
-Warning in max(daydata$Global, na.rm = T): no non-missing arguments to max;
+Warning in min(daydata$Global, na.rm = T): no non-missing arguments to max;
 returning -Inf
 ```
 
@@ -547,18 +507,10 @@ returning -Inf
 <img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-45.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-46.png" width="60%" style="display: block; margin: auto;" /><img src="/home/athan/CM_21_GLB/REPORTS/CM21_P50_GHI_dark_correction_files/figure-html/unnamed-chunk-5-47.png" width="60%" style="display: block; margin: auto;" />
 
 ```
-Warning in dark_correction(dark_day = dark_day, DCOUNTLIM = DCOUNTLIM, type
-= "median", : 2018-12-07 07121806 No dark don't know what to do!! using
-0.320027528266754 for Dark!!
-```
-
-```
 Warning in min(daydata$Global, na.rm = T): no non-missing arguments to min;
 returning Inf
-```
 
-```
-Warning in max(daydata$Global, na.rm = T): no non-missing arguments to max;
+Warning in min(daydata$Global, na.rm = T): no non-missing arguments to max;
 returning -Inf
 ```
 
@@ -749,12 +701,12 @@ Date of length 0
 ```
 
 ```
-2019-02-05 21:54:12 sagan athan CM21_P50_GHI_dark_correcton.R  7.070285 mins
+2019-02-05 22:25:25 sagan athan CM21_P50_GHI_dark_correcton.R  20.188311 mins
 ```
 
 
 ---
 title: "CM21_P50_GHI_dark_correction.R"
 author: "athan"
-date: "Tue Feb  5 21:47:08 2019"
+date: "Tue Feb  5 22:05:14 2019"
 ---
