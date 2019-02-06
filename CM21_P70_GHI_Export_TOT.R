@@ -132,7 +132,7 @@ stopifnot(length(input_files) == length(yearstodo))
 pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files[1]) {
+for (afile in input_files) {
 
     #### Get raw data ####
     ayear        <- readRDS(afile)
@@ -144,7 +144,7 @@ for (afile in input_files[1]) {
     cat(paste("\\newpage\n\n"))
     cat(paste("## ",yyyy,"\n\n"))
 
-    cat('\\begin{multicols}{2}')
+    cat('\\begin{multicols}{3}')
     cat('\\scriptsize\n')
 
     ## create all minutes
@@ -201,7 +201,7 @@ for (afile in input_files[1]) {
 
         ## may skip output if day has no global data
         if (all(aday$Global == -9)) {
-            cat(paste(dateD," has no Global radiation data!   \n"))
+            cat("\\textbf{",paste0(dateD,": NO GHI DATA}\\\\\n"))
             # cat(paste(dateD,"\n"), file = missingday, append = T )
             ## skip output
             next()
@@ -251,7 +251,7 @@ for (afile in input_files[1]) {
                     eol = "\r\n")
 
         # cat(paste("Written: ", basename(filename), "\r"))
-        cat(paste("Written: ", basename(filename), "   \  "))
+        cat(paste0(dateD, ": ", basename(filename), " \\\\\n"))
     } #END of days
 
     cat('\\end{multicols}')
