@@ -19,6 +19,7 @@ SIGNAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_signal/"
 GLOBAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_global/"
 EXPORT_DIR = "/home/athan/DATA/cm21_data_validation/CM21_exports/"
 REPORT_DIR = "/home/athan/CM_21_GLB/REPORTS/"
+TOT_EXPORT = "/home/athan/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 
 
 ####  Parametric files ####
@@ -60,5 +61,7 @@ DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than 
 START_DAY  = as.POSIXct("2006-01-01 00:00:00 UTC")
 END_DAY    = as.POSIXct("2019-01-01 00:00:00 UTC")
 
-
+## date range to export for TOT and WRDC
+EXPORT_START = as.POSIXct("2010-01-01 00:00:00 UTC")
+EXPORT_STOP  = as.POSIXct("2019-01-01 00:00:00 UTC")
 
