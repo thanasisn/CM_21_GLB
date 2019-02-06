@@ -34,6 +34,9 @@
 
 #+ echo=F, include=T
 
+if (!exists("params")) {
+    params <- list()
+    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
