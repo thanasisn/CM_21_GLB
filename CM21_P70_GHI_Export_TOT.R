@@ -87,7 +87,10 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 
 
-
+zenangle <- function(YYYY,min,doy){
+    as.numeric(system(paste("./BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ), intern = T))
+}
+vzen <- Vectorize(zenangle, "min")
 
 
 #### .  . Export range  ####
@@ -187,9 +190,12 @@ for (afile in input_files) {
     dir.create( outputdir, showWarnings = F )
 
 
+
     ## export each day
     for (dd in alldays) {
         dateD = as.Date(dd, origin = "1970-01-01")
+        yyyy <- year(dateD)
+        doy  <- yday(dateD)
 
         aday <- ayear[ day == dateD ]
         if (nrow(aday) != 1440 ) {
@@ -221,10 +227,16 @@ for (afile in input_files) {
         TIME_UT <- as.numeric((aday$Date - as.POSIXct( dateD ) + 30) / 3600)
         SZA[ is.na(SZA) ] <- -999L
 
+        lapzen <- vzen(yyyy,1:1440,doy)
+
+        # plot(SZA)
+        # plot(lapzen)
+        # plot(SZA - lapzen)
 
         ## data to export
         output <- data.frame( TIME_UT = TIME_UT,
-                              SZA     = SZA,
+                              # SZA     = SZA,
+                              SZA     = lapzen,
                               Wm2     = round(aday$Global, digits = 3),
                               st.dev  = round(aday$GLstd,  digits = 3) )
 
@@ -233,9 +245,6 @@ for (afile in input_files) {
         cat(" TIME_UT    SZA    [W.m-2]   st.dev",
             file = filename,
             eol = "\r\n")
-
-        # write(" TIME_UT    SZA    [W.m-2]   st.dev",
-        #       file = paste0(newtotdir,filename))
 
         write.table(format( output,
                             digits    = 3,
@@ -249,6 +258,7 @@ for (afile in input_files) {
                     col.names = FALSE,
                     row.names = FALSE,
                     eol = "\r\n")
+
 
         # cat(paste("Written: ", basename(filename), "\r"))
         cat(paste0(dateD, ": ", basename(filename), " \\\\\n"))

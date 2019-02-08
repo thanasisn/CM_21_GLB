@@ -54,3 +54,14 @@ lines(SIR$sss, col = "green")
 
 
 tail(0.5:1440)
+
+
+zenangle <- function(YYYY,min,doy){
+    as.numeric(system(paste("./BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ), intern = T))
+}
+
+
+
+zenangle(2019,1:1440,10)
+vzen <- Vectorize(zenangle, "min")
+vzen(2019,1:1440,10)
