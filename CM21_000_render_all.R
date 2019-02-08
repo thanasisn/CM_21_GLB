@@ -73,40 +73,40 @@ OUTPUT_FORMAT = NULL
 #### output only pdfs with TOC
 
 
-system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
-
-source("./CM21_P00_Read_LAP.R")
-
-
-render("./CM21_P01_Inspect_data.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
-
-render("./CM21_P20_Import_Data_filtered.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
-
-render("./CM21_P30_GHI_daily_filtered.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
-
-render("./CM21_P40_missing_dark_reconstruction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
-
-render("./CM21_P50_GHI_dark_correction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
-
-render("./CM21_P60_GHI_Export_WRDC.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+# system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
+#
+# source("./CM21_P00_Read_LAP.R")
+#
+#
+# render("./CM21_P01_Inspect_data.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P20_Import_Data_filtered.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P30_GHI_daily_filtered.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P40_missing_dark_reconstruction.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P50_GHI_dark_correction.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P60_GHI_Export_WRDC.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
 
 render("./CM21_P70_GHI_Export_TOT.R",
        params = list( CACHE = F ),
