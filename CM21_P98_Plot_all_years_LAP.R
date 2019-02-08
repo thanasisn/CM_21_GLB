@@ -1,0 +1,123 @@
+#!/usr/bin/env Rscript
+#' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
+#'
+#' Read text files with CM_21 signal data
+#'
+
+## ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4
+
+
+
+
+####  Set environment  ####
+closeAllConnections()
+rm(list = (ls()[ls() != ""]))
+Sys.setenv(TZ = "UTC")
+tic = Sys.time()
+Script.Name = c("CM21_099")
+
+
+library(data.table)
+
+
+####  . . Variables  ####
+source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+
+
+tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+
+input_files <- list.files(TOT_EXPORT,
+                        recursive = T,
+                        include.dirs = F,
+                        full.names = T)
+
+CREATE_PDF = TRUE
+# CREATE_PDF = FALSE
+
+#### .  . Export range  ####
+start_year  =  2008
+end_year    =  2018
+yearstodo   <- seq( start_year, end_year )
+
+pdffile <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".pdf")
+
+
+tempfolder <- "/dev/shm/temp_daily"
+unlink(tempfolder, recursive = T, force = T)
+dir.create(tempfolder)
+
+
+## keep only input for desired output
+input_files <- input_files[
+    as.logical(
+        rowSums(
+            sapply(yearstodo, function(x) grepl(as.character(x), input_files ))
+        )
+    )]
+
+
+## found manualy
+Gl_max = 1417
+Gl_min = -11
+
+dayofyears = 366
+dayofyears = 2
+
+times <- hms::hms(hours = 1:24 )
+pretty((1:1440)/60)
+
+if (CREATE_PDF) { pdf( pdffile , onefile = TRUE ) }
+
+
+for (doy in 1:dayofyears) {
+    cat(paste(doy,"\n"))
+
+    this_day <- grep( sprintf("TOT%03d.*.DAT", doy), input_files, value = T )
+
+    par(mar = c(4,4,2,1))
+    par(mgp = c(2.2,1,0))
+
+
+    plot(1, type = 'n',
+         xlab = "UTC", ylab = expression( W/m^2),
+         pch = 19, cex = .1,
+         col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = c(Gl_min, Gl_max), xlim = c(2*60,19*60) )
+    abline(h = 0, col = "gray60")
+    axis(1, at = (0:24) * 60, labels = paste(0:24) )
+    abline(v   = (0:24) * 60 ,
+           col = "lightgray", lty = "dotted", lwd = par("lwd"))
+    ## sd under graph
+    for (afil in this_day) {
+        data <- fread(afil)
+        data$`[W.m-2]`[ "[W.m-2]" < -90 ] <- NA
+        points(data$st.dev, pch = "p", cex = .09, col = "red" )
+    }
+
+    ## global
+    for (afil in this_day) {
+        data <- fread(afil)
+        data$`[W.m-2]`[ "[W.m-2]" < -90 ] <- NA
+        # points(data$`[W.m-2]`, pch = "p", cex = .09, col = "blue" )
+        lines(data$`[W.m-2]`, lwd = 1.1, lty = 1, col = "blue")
+    }
+
+    title( main = paste(format(as.Date(doy-1, origin = "2016-01-01"), "%d %b" ),"  ",sprintf("(%03d)",doy)))
+
+    text(120, Gl_max, labels = tag, pos = 4, cex =.8 )
+
+}
+
+dev.off()
+
+
+stop("dddd")
+
+
+# pdf( paste0(REPRTD, "/P04 decate aggregation.pdf" ), onefile = TRUE )
+# png(file = "/home/athan/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png",width = 900, height = 900, units = "px", pointsize = 14)
+
+
+
+## END ##
+tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
+cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
