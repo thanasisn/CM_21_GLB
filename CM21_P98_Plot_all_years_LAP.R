@@ -32,7 +32,7 @@ input_files <- list.files(TOT_EXPORT,
                         full.names = T)
 
 CREATE_PDF = TRUE
-# CREATE_PDF = FALSE
+CREATE_PDF = FALSE
 
 #### .  . Export range  ####
 start_year  =  2008
@@ -40,7 +40,7 @@ end_year    =  2018
 yearstodo   <- seq( start_year, end_year )
 
 pdffile <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".pdf")
-
+mp4file <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".mp4")
 
 tempfolder <- "/dev/shm/temp_daily"
 unlink(tempfolder, recursive = T, force = T)
@@ -61,13 +61,21 @@ Gl_max = 1417
 Gl_min = -11
 
 dayofyears = 366
-dayofyears = 2
+# dayofyears = 20
+videodura  = 60
+framerate  = as.integer(dayofyears / videodura)
 
 times <- hms::hms(hours = 1:24 )
 pretty((1:1440)/60)
 
-if (CREATE_PDF) { pdf( pdffile , onefile = TRUE ) }
+if (CREATE_PDF) {
+    pdf( pdffile , onefile = TRUE )
+} else {
+    png(paste0(tempfolder,"/Agregate%03d.png"),width = 900, height = 900, units = "px", pointsize = 14)
+}
 
+
+# png(file = "/home/athan/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png")
 
 for (doy in 1:dayofyears) {
     cat(paste(doy,"\n"))
@@ -110,11 +118,29 @@ for (doy in 1:dayofyears) {
 dev.off()
 
 
-stop("dddd")
+if (!CREATE_PDF) {
+#     system(
+#         paste0("ffmpeg -y -framerate ", framerate, " -i ", paste0(tempfolder,"/Agregate%03d.png"),
+#                " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+#                mp4file)
+#     )
+#
+#
+# system(
+#     paste0("ffmpeg -y -framerate 15 -i ", paste0(tempfolder,"/Agregate%03d.png"),
+#            " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+#            mp4file)
+# )
 
+system(
+    paste0("ffmpeg -y -framerate 12 -i ", paste0(tempfolder,"/Agregate%03d.png"),
+           " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+           mp4file)
+)
+}
 
-# pdf( paste0(REPRTD, "/P04 decate aggregation.pdf" ), onefile = TRUE )
-# png(file = "/home/athan/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png",width = 900, height = 900, units = "px", pointsize = 14)
+# ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4
+
 
 
 
