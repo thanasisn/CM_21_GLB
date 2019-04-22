@@ -214,7 +214,7 @@ for (afile in input_files) {
         }
 
 
-        ## calculate SZA for the output
+        ## Calculate onother SZA for the output
         ## FIXME should use other algorithm for sza to be consistent with other instruments.
         SZA     <- -(aday$Eleva - 90)
 
@@ -227,6 +227,7 @@ for (afile in input_files) {
         TIME_UT <- as.numeric((aday$Date - as.POSIXct( dateD ) + 30) / 3600)
         SZA[ is.na(SZA) ] <- -999L
 
+        ## calculate zenith angles
         lapzen <- vzen(yyyy,1:1440,doy)
 
         # plot(SZA)
