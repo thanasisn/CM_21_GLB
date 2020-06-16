@@ -53,7 +53,7 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(fig.width  = 8       )
 knitr::opts_chunk$set(fig.height = 6       )
 
-knitr::opts_chunk$set(out.width  = "60%"    )
+knitr::opts_chunk$set(out.width  = "70%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 

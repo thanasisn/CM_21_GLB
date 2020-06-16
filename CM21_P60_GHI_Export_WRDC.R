@@ -53,7 +53,7 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(fig.width  = 8       )
 knitr::opts_chunk$set(fig.height = 6       )
 
-knitr::opts_chunk$set(out.width  = "60%"    )
+knitr::opts_chunk$set(out.width  = "70%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
@@ -88,7 +88,7 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 #### .  . Export range  ####
 start_year  =  2008
-end_year    =  2018
+end_year    =  2019
 yearstodo   <- seq( start_year, end_year )
 
 
@@ -156,8 +156,8 @@ for (afile in input_files) {
 
 
     #### run on all quarter of the hour #####################################
-    ayear$quarter   <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
-    qposic          <- as.POSIXct( ayear$quarter * (3600/4), origin = "1970-01-01" )
+    ayear$quarter <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
+    qposic        <- as.POSIXct( ayear$quarter * (3600/4), origin = "1970-01-01" )
 
     # qDates     = aggregate(ayear$Date30, by = list(qposic), FUN = min)
 
