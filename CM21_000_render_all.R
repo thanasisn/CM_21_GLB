@@ -17,14 +17,17 @@ setwd("/home/athan/CM_21_GLB/")
 
 OUTPUT_FORMAT = NULL
 
+
+## update raw data ####
+# system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
+source("./CM21_P00_Read_LAP.R")
+
+
+
+
 ### html to keep md for language tool
 ### but will not have TOC
 
-
-# system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
-#
-# source("./CM21_P00_Read_LAP.R")
-#
 #
 # render("./CM21_P01_Inspect_data.R",
 #        output_format     = c("html_document", "pdf_document"),
@@ -70,13 +73,10 @@ OUTPUT_FORMAT = NULL
 
 
 
+
+
+
 #### output only pdfs with TOC
-
-
-system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
-
-source("./CM21_P00_Read_LAP.R")
-
 
 render("./CM21_P01_Inspect_data.R",
        params = list( CACHE = F ),
@@ -114,3 +114,9 @@ render("./CM21_P70_GHI_Export_TOT.R",
        output_dir           = "/home/athan/CM_21_GLB/REPORTS")
 
 
+
+## some more nice plots
+
+source("./CM21_P98_Plot_all_years_LAP.R")
+
+source("./CM21_P99_Plot_all_daily_LAP.R")
