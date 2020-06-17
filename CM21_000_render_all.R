@@ -20,6 +20,7 @@ OUTPUT_FORMAT = NULL
 
 ## update raw data ####
 # system("/home/athan/Aerosols/BASH_help/update_data_from_sirena.sh")
+## read data into R
 source("./CM21_P00_Read_LAP.R")
 
 
