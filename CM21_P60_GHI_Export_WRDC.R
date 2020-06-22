@@ -87,7 +87,7 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 
 #### .  . Export range  ####
-start_year  =  2008
+start_year  =  2006
 end_year    =  2020
 yearstodo   <- seq( start_year, end_year )
 
