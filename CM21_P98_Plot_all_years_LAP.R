@@ -36,7 +36,7 @@ CREATE_PDF = FALSE
 
 #### .  . Export range  ####
 start_year  =  2008
-end_year    =  2018
+end_year    =  2019
 yearstodo   <- seq( start_year, end_year )
 
 pdffile <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".pdf")
