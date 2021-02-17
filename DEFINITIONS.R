@@ -8,23 +8,23 @@
 
 
 ## Project root folder
-BASED     = "/home/athan/CM_21_GLB/"
+BASED      = "~/CM_21_GLB/"
 
 
 ####  Data location  ####
-SUN_FOLDER = "/home/athan/DATA_RAW/SUN/PySolar_LAP/"
-SIRENA_DIR = "/home/athan/DATA_RAW/Bband/AC21_LAP.GLB/"
-RADMON_DIR = "/home/athan/DATA_RAW/Raddata/6"
-SIGNAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_signal/"
-GLOBAL_DIR = "/home/athan/DATA/cm21_data_validation/CM21_global/"
-EXPORT_DIR = "/home/athan/DATA/cm21_data_validation/CM21_exports/"
-REPORT_DIR = "/home/athan/CM_21_GLB/REPORTS/"
-TOT_EXPORT = "/home/athan/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
+SUN_FOLDER = "~/DATA_RAW/SUN/PySolar_LAP/"
+SIRENA_DIR = "~/DATA_RAW/Bband/AC21_LAP.GLB/"
+RADMON_DIR = "~/DATA_RAW/Raddata/6"
+SIGNAL_DIR = "~/DATA/cm21_data_validation/CM21_signal/"
+GLOBAL_DIR = "~/DATA/cm21_data_validation/CM21_global/"
+EXPORT_DIR = "~/DATA/cm21_data_validation/CM21_exports/"
+REPORT_DIR = "~/CM_21_GLB/REPORTS/"
+TOT_EXPORT = "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 
 
 ####  Parametric files ####
-TOO_BAD    = "/home/athan/CM_21_GLB/PARAMS/Too_bad_dates.dat"
-BAD_RANGES = "/home/athan/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
+TOO_BAD    = "~/CM_21_GLB/PARAMS/Too_bad_dates.dat"
+BAD_RANGES = "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
 
 DARKFILE  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
 
@@ -56,12 +56,11 @@ DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than 
 
 ####  Process Control  ####
 
-
 ## date range to process
 START_DAY  = as.POSIXct("2006-01-01 00:00:00 UTC")
-END_DAY    = as.POSIXct("2020-01-01 00:00:00 UTC")
+END_DAY    = as.POSIXct("2021-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
 EXPORT_START = as.POSIXct("2006-01-01 00:00:00 UTC")
-EXPORT_STOP  = as.POSIXct("2020-01-01 00:00:00 UTC")
+EXPORT_STOP  = as.POSIXct("2021-01-01 00:00:00 UTC")
 

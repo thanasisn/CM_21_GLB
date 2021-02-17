@@ -1,0 +1,3 @@
+22 22 fall in TOT
+218 22 not synchronized -too few measurements
+258 258 fall in tot
