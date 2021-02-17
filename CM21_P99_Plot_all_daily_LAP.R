@@ -17,9 +17,9 @@ library(data.table)
 
 
 ####  . . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
-source("/home/athan/CM_21_GLB/CM21_functions.R")
+source("~/CM_21_GLB/CM21_functions.R")
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 

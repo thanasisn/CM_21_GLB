@@ -30,7 +30,7 @@ library(data.table)
 
 
 ####  . . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
 
 

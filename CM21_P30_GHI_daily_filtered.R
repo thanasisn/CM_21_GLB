@@ -95,11 +95,11 @@ options(warn=-1)
 library(data.table, quietly = T)
 library(pander,     quietly = T)
 # library(RAerosols,  quietly = T)
-source("/home/athan/CM_21_GLB/CM21_functions.R")
+source("~/CM_21_GLB/CM21_functions.R")
 #'
 
 ####  . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
