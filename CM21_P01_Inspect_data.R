@@ -165,5 +165,5 @@ for (ff in signal_files) {
 
 
 ## END ##
-tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+tac = Sys.time();
+cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
