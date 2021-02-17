@@ -1,6 +1,6 @@
 
 ## Sirena files
-base_dir = "/home/athan/DATA/cm21_data_validation/AC21_lap.GLB_TOT/"
+base_dir = "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT/"
 
 
 YYYY = 2018

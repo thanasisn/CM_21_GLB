@@ -79,7 +79,7 @@ library(pander,     quietly = T)
 #'
 
 ####  . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -288,7 +288,7 @@ for (afile in input_files) {
 # ooooo$date <- as.POSIXct(paste0(ooooo$V1,"-",ooooo$V2,"-",ooooo$V3," ",ooooo$V4-0.5,":00") )
 #
 #
-# kkkk       <- read.table("/home/athan/Aerosols/CM21datavalidation/fwdatasubmissionthessaloniki/wrdc_lap_2017.dat")
+# kkkk       <- read.table("~/Aerosols/CM21datavalidation/fwdatasubmissionthessaloniki/wrdc_lap_2017.dat")
 # kkkk$date  <- as.POSIXct(paste0(kkkk$V1,"-",kkkk$V2,"-",kkkk$V3," ",kkkk$V4-0.5,":00") )
 #
 #

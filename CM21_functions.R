@@ -53,7 +53,7 @@ rm(calibration_data)
 
 
 
-## similar to RAersosols::get_dark_day
+## similar to RAersols::get_dark_day
 ## computes values to be used for dark correction
 dark_calculations <- function(elevatio, darklim, dates, dstretch, values) {
     ## find noun
@@ -245,5 +245,4 @@ countdownS <- function(seconds, type) {
 
 
 
-## Wrapper for  /home/athan/CM_21_GLB/BINARY/zenangle64
-
+## Wrapper for  ~/CM_21_GLB/BINARY/zenangle64

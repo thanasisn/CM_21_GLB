@@ -87,12 +87,12 @@ Script.Name = c("CM21_P20_Import_Data_filtered_LAP.R")
 library(data.table, quietly = T)
 library(pander,     quietly = T)
 library(RAerosols,  quietly = T)
-source("/home/athan/CM_21_GLB/CM21_functions.R")
+source("~/CM_21_GLB/CM21_functions.R")
 #'
 
 
 ####  . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
 ## Filter all data
 MINsgLIM      = -0.06      ## Lower signal limit (CF~3344.482  0.03V~100watt)

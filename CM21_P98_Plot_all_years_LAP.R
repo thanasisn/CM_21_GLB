@@ -21,7 +21,7 @@ library(data.table)
 
 
 ####  . . Variables  ####
-source("/home/athan/CM_21_GLB/DEFINITIONS.R")
+source("~/CM_21_GLB/DEFINITIONS.R")
 
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
@@ -75,7 +75,7 @@ if (CREATE_PDF) {
 }
 
 
-# png(file = "/home/athan/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png")
+# png(file = "~/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png")
 
 for (doy in 1:dayofyears) {
     cat(paste(doy,"\n"))

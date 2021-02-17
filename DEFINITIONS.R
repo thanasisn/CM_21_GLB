@@ -51,9 +51,6 @@ DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than 
 
 
 
-
-
-
 ####  Process Control  ####
 
 ## date range to process
