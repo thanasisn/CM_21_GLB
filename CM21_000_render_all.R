@@ -4,6 +4,11 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic1 = Sys.time()
+Script.Name = funr::sys.script()
+if(!interactive()) {
+    # pdf(file=sub("\\.R$",".pdf",Script.Name))
+    # sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+}
 
 
 library(rmarkdown)
@@ -121,3 +126,9 @@ render("./CM21_P70_GHI_Export_TOT.R",
 source("./CM21_P98_Plot_all_years_LAP.R")
 
 source("./CM21_P99_Plot_all_daily_LAP.R")
+
+
+
+## END ##
+tac = Sys.time()
+cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
