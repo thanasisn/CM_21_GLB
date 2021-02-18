@@ -48,12 +48,12 @@ knitr::opts_chunk$set(comment    = ""      )
 
 # pdf output is huge too many point to plot
 # knitr::opts_chunk$set(dev        = "pdf"   )
-# knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(dev        = "png"   )
 
 knitr::opts_chunk$set(fig.width  = 8       )
-knitr::opts_chunk$set(fig.height = 4       )
+knitr::opts_chunk$set(fig.height = 6       )
 
-knitr::opts_chunk$set(out.width  = "100%"    )
+knitr::opts_chunk$set(out.width  = "70%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
@@ -259,7 +259,7 @@ rmn  = 15
 
 
 #'
-#' **We will use running mean with a window of `r rmn` days**.
+#'  **We will use running mean with a window of `r rmn` days**.
 #'
 #' **and interpolate to get a daily value to fill the gaps**
 #'
@@ -305,5 +305,5 @@ save( darkmean, darkmedian, runningDark,
 
 
 ## END ##
-tac = Sys.time()
-cat(sprintf("\n%s %s %s %s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
+cat(sprintf("%s %s %s %s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))

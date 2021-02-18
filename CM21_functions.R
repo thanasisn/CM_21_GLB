@@ -5,7 +5,6 @@ require(xts)  ## index command
 ## check date function
 is.POSIXct <- function(x) inherits(x, "POSIXct")
 
-## Instrument calibration values
 ## values from CM21_caldata_06.txt
 ## define data
 calibration_data = matrix(

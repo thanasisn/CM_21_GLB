@@ -214,7 +214,7 @@ for (afile in input_files) {
         }
 
 
-        ## Calculate another SZA for the output
+        ## Calculate onother SZA for the output
         ## FIXME should use other algorithm for sza to be consistent with other instruments.
         SZA     <- -(aday$Eleva - 90)
 
@@ -242,11 +242,11 @@ for (afile in input_files) {
                               st.dev  = round(aday$GLstd,  digits = 3) )
 
 
-        ## custom header of the daily file
+        ## create the header of the daily file
         cat(" TIME_UT    SZA    [W.m-2]   st.dev",
             file = filename,
             eol = "\r\n")
-        ## write formated data to file
+
         write.table(format( output,
                             digits    = 3,
                             width     = 8,
