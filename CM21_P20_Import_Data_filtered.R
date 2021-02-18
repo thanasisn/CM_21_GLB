@@ -105,7 +105,7 @@ MAXsgLIMnight = +0.10      ## Higher signal limit when dark
 
 ## Negative limit
 SUN_ELEV      = +5         ## When sun is above that
-MINsunup      =  0          ## Exclude signal values below that
+MINsunup      =  0         ## Exclude signal values below that
 
 
 
@@ -313,5 +313,5 @@ for (afile in input_files) {
 
 
 ## END ##
-tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+tac = Sys.time()
+cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
