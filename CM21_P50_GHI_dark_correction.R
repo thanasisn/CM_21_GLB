@@ -119,7 +119,7 @@ input_files <- list.files( path       = GLOBAL_DIR,
 input_files <- sort(input_files)
 
 ## . get functions for missing dark resolution
-## were precomputed at the previus step
+## were precomputed at the previous step
 load(DARKFILE)
 
 
@@ -458,7 +458,7 @@ CurrentYe   <- year(Sys.Date())
 yearlyplots <- grep(paste0("_",CurrentYe,".pdf"), yearlyplots, value = T , invert = T)
 LastYear    <- regmatches(yearlyplots[length(yearlyplots)], regexpr( "[0-9]{4}", yearlyplots[length(yearlyplots)] ))
 
-## colate pdfs
+## collate pdfs
 system(
     paste0("pdftk ",
            paste(yearlyplots, collapse = " "),
