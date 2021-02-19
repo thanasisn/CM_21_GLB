@@ -2,9 +2,12 @@
 Data processing of CM-21 data to produce Total Irradiance data.
 ================================================================================
 
+From CM_21 instrument signal data to Global Irradiance.
+The output files will replace the automatically created files in sirena.
+This product have to be considered as "level 0". No quality assurance is applied in this stage.
+
 A lot of the processes here are created similar to those for Direct irradiance.
 
-The output files will replace the automatically created files in sirena.
 
 
 This is used to:
@@ -18,3 +21,4 @@ TO RUN:
 - Run `~/Aerosols/BASH_help/update_data_from_sirena.sh` first to get the data from sirena.
 - Change date ranges in `DEFINITIONS.R`
 - Run the main script that hopefully will do all the work.
+
