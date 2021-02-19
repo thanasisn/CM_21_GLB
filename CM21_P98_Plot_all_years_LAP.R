@@ -27,17 +27,19 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 input_files <- list.files(TOT_EXPORT,
-                        recursive = T,
-                        include.dirs = F,
-                        full.names = T)
+                          recursive = T,
+                          include.dirs = F,
+                          full.names = T)
 
+## run twice
 CREATE_PDF = TRUE
-CREATE_PDF = FALSE
+# CREATE_PDF = FALSE
 
 #### .  . Export range  ####
-start_year  =  2008
-end_year    =  2019
+start_year  <- year(EXPORT_START)
+end_year    <- year(EXPORT_STOP)
 yearstodo   <- seq( start_year, end_year )
+
 
 pdffile <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".pdf")
 mp4file <- paste0(REPORT_DIR,"All_daily_", start_year,"-",end_year,".mp4")
@@ -56,8 +58,8 @@ input_files <- input_files[
     )]
 
 
-## found manualy
-Gl_max = 1417
+## found manually for plot only
+Gl_max = 1420
 Gl_min = -11
 
 dayofyears = 366
