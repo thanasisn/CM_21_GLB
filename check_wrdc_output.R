@@ -1,6 +1,6 @@
 
 
-file = "~/DATA/cm21_data_validation/CM21_exports/sumbit_to_WRDC_2018.dat"
+file = "~/DATA/cm21_data_validation/CM21_exports/sumbit_to_WRDC_2020.dat"
 
 library(data.table)
 
