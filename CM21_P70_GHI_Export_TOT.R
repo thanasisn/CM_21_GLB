@@ -1,4 +1,4 @@
-# /* #!/usr/bin/env Rscript */
+#!/usr/bin/env Rscript 
 # /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
 #' ---
