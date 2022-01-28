@@ -55,9 +55,8 @@ DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than 
 
 ## date range to process
 START_DAY  = as.POSIXct("2006-01-01 00:00:00 UTC")
-END_DAY    = as.POSIXct("2021-01-01 00:00:00 UTC")
+END_DAY    = as.POSIXct("2022-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
 EXPORT_START = as.POSIXct("2006-01-01 00:00:00 UTC")
-EXPORT_STOP  = as.POSIXct("2021-01-01 00:00:00 UTC")
-
+EXPORT_STOP  = as.POSIXct("2022-01-01 00:00:00 UTC")
