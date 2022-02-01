@@ -73,7 +73,12 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM21_P50_GHI_dark_correcton.R")
+Script.Name = funr::sys.script()
+if(!interactive()) {
+    pdf(file=sub("\\.R$",".pdf",Script.Name))
+    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+}
+
 
 ## FIXME this is for pdf output
 # options(warn=-1) ## hide warnigs
@@ -468,17 +473,8 @@ system(
 
 
 
-# #' \scriptsize
-# #'
-# #' |          a |          b |          c |          d |          e |          f |          g |          h |       i |
-# #' |-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|--------:|
-# #' | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFGHIJ | ABCDEFG |
-# #'
-
-
-
 
 
 ## END ##
 tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %s %s %s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

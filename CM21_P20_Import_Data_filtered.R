@@ -81,7 +81,13 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM21_P20_Import_Data_filtered_LAP.R")
+Script.Name = funr::sys.script()
+if(!interactive()) {
+    pdf(file=sub("\\.R$",".pdf",Script.Name))
+    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+}
+
+
 
 #+ echo=F, include=F
 library(data.table, quietly = T)
@@ -314,4 +320,4 @@ for (afile in input_files) {
 
 ## END ##
 tac = Sys.time()
-cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

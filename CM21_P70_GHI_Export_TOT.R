@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
 #' ---
@@ -72,7 +72,12 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = c("CM21_P70_GHI_Export_TOT.R")
+Script.Name = funr::sys.script()
+if(!interactive()) {
+    pdf(file=sub("\\.R$",".pdf",Script.Name))
+    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+}
+
 
 
 #+ echo=F, include=F
@@ -274,5 +279,5 @@ for (afile in input_files) {
 
 
 ## END ##
-tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
-cat(sprintf("%s %s %s %s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+tac = Sys.time()
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
