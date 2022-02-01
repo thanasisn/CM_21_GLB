@@ -1,10 +1,10 @@
 
 Data processing of CM-21 data to produce Total Irradiance data.
-================================================================================
+================================================================
 
-From CM_21 instrument signal data to Global Irradiance.
+Convert from CM-21 instrument signal data to Global Irradiance.
 The output files will replace the automatically created files in sirena.
-This product have to be considered as "level 0". No quality assurance is applied in this stage.
+This product has to be considered as "level 0". No quality assurance is applied in this stage.
 
 A lot of the processes here are created similar to those for Direct irradiance.
 
