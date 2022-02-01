@@ -74,10 +74,10 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
-if(!interactive()) {
-    pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-}
+#~ if(!interactive()) {
+#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
+#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+#~ }
 
 
 ## FIXME this is for pdf output
@@ -99,10 +99,10 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 
 ## PATHS
-missfiles  = paste0(BASED, "LOGS/", Script.Name ,"_missingfilelist.dat" )
-tmpfolder  = paste0("/dev/shm/", sub(pattern = "\\..*", "" , Script.Name))
-dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , Script.Name), "_daily.pdf")
-daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , Script.Name),"_stats")
+missfiles  = paste0(BASED, "LOGS/", basename(Script.Name),"_missingfilelist.dat" )
+tmpfolder  = paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
+dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
+daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , basename(Script.Name)),"_stats")
 
 
 
