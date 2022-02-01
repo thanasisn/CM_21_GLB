@@ -20,10 +20,10 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
-if(!interactive()) {
-    pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-}
+#~ if(!interactive()) {
+#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
+#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+#~ }
 
 
 library(data.table)
@@ -148,4 +148,4 @@ for ( YYYY in years_to_do ) {
 
 ## END ##
 tac = Sys.time()
-cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

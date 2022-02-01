@@ -131,4 +131,4 @@ source("./CM21_P99_Plot_all_daily_LAP.R")
 
 ## END ##
 tac = Sys.time()
-cat(sprintf("\n%s %10s %10s %25s  %f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
