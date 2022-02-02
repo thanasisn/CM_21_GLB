@@ -22,3 +22,6 @@ TO RUN:
 - Change date ranges in `DEFINITIONS.R`
 - Run the main script that hopefully will do all the work.
 
+
+Check diff between old and new radiation data
+Copy to sirena
