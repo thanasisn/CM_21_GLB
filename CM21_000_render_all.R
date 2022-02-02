@@ -19,10 +19,12 @@ setwd("~/CM_21_GLB/")
 OUTPUT_FORMAT = NULL
 
 
-## update raw data ####
+## 1 update raw data ####
 # system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
-## read data into R
-source("./CM21_P00_Read_LAP.R")
+
+
+## 2 read data into R
+# source("./CM21_P00_Read_LAP.R")
 
 
 
@@ -80,30 +82,30 @@ source("./CM21_P00_Read_LAP.R")
 
 #### output only pdfs with TOC
 
-render("./CM21_P01_Inspect_data.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
-
-render("./CM21_P20_Import_Data_filtered.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
-
-render("./CM21_P30_GHI_daily_filtered.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
-
-render("./CM21_P40_missing_dark_reconstruction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
-
-render("./CM21_P50_GHI_dark_correction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+# render("./CM21_P01_Inspect_data.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P20_Import_Data_filtered.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P30_GHI_daily_filtered.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P40_missing_dark_reconstruction.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+# render("./CM21_P50_GHI_dark_correction.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./CM21_P60_GHI_Export_WRDC.R",
        params = list( CACHE = F ),
@@ -124,6 +126,9 @@ source("./CM21_P98_Plot_all_years_LAP.R")
 source("./CM21_P99_Plot_all_daily_LAP.R")
 
 
+
+cat(paste("\n\n IS YOU SEE THIS: \n", Script.Name," GOT TO THE END!! \n"))
+cat(paste("\n EVERYTHING SHOULD BE FINE \n"))
 
 ## END ##
 tac = Sys.time()
