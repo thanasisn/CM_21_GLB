@@ -1,8 +1,6 @@
 #!/usr/bin/env Rscript
 #' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
 #'
-#' Read text files with CM_21 signal data
-#'
 
 ## ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4
 
@@ -28,6 +26,14 @@ library(data.table)
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
+## run twice !!
+
+## for pdf only
+CREATE_PDF = TRUE
+
+## for video
+# CREATE_PDF = FALSE
+
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -36,13 +42,11 @@ input_files <- list.files(TOT_EXPORT,
                           include.dirs = F,
                           full.names = T)
 
-## run twice
-CREATE_PDF = TRUE
-# CREATE_PDF = FALSE
+
 
 #### .  . Export range  ####
 start_year  <- year(EXPORT_START)
-end_year    <- year(EXPORT_STOP)
+end_year    <- year(EXPORT_STOP) - 1
 yearstodo   <- seq( start_year, end_year )
 
 
