@@ -43,7 +43,7 @@ if (!exists("params")) {
 ####_  Document options _####
 
 knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = FALSE    )
+knitr::opts_chunk$set(cache      = params$CACHE    )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -62,28 +62,21 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 ####_ Notes _####
 
-#
-# this script substitutes CM_P04_Export_TOT.R
-#
-
-
 
 ####  Set environment  ####
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = funr::sys.script()
+Script.Name = "CM21_P70_GHI_Export_TOT.R"
 #~ if(!interactive()) {
 #~     pdf(file=sub("\\.R$",".pdf",Script.Name))
 #~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
 #~ }
 
-
-
-#+ echo=F, include=F
 library(data.table, quietly = T)
 library(pander,     quietly = T)
-#'
+setwd("~/CM_21_GLB/")
+
 
 ####  . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
