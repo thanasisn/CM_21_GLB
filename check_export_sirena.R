@@ -23,29 +23,30 @@ rdsfile <- "~/DATA/cm21_data_validation/export_all_tot_dat.Rds"
 folder  <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
 files <- list.files(folder,
-                    pattern = "[0-9]*\\TOT.*.dat",
-                    recursive = T,
+                    pattern     = "[0-9]*\\TOT.*.dat",
+                    recursive   = T,
                     ignore.case = T,
-                    full.names = T)
-max(file.mtime(files))
-file.mtime(rdsfile)
-
-gather <- data.table()
-for (af in files) {
-    temp      <- fread(af)
-    partdate  <- sub(".dat", "", sub(".*TOT","",af), ignore.case = T)
-    date      <- as.POSIXct(strptime(partdate, "%j%y" ))
-    temp$Date <- date
-    temp$file <- af
-    gather    <- rbind(gather, temp)
-    print(date)
+                    full.names  = T)
+## check if we have to read
+if (max(file.mtime(files)) > file.mtime(rdsfile)) {
+    gather <- data.table()
+    for (af in files) {
+        temp      <- fread(af)
+        partdate  <- sub(".dat", "", sub(".*TOT","",af), ignore.case = T)
+        date      <- as.POSIXct(strptime(partdate, "%j%y" ))
+        temp$Date <- date
+        temp$file <- af
+        gather    <- rbind(gather, temp)
+        print(date)
+    }
+    gather[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
+    myRtools::writeDATA(gather, rdsfile)
+} else {
+    gather <- readRDS(rdsfile)
 }
-gather[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
-myRtools::writeDATA(gather, rdsfile)
 
 
-
-
+gather[ gather$Date == "2019-03-07" ]
 
 
 
