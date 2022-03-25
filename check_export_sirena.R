@@ -117,6 +117,37 @@ gather$file    <- NULL
 gather$TIME_UT <- NULL
 names(gather)[names(gather) == "[W.m-2]"] <- "wattGLB"
 
+
+perc    <- 0.99999
+uplim   <- quantile(gather$wattGLB, na.rm = T, probs = perc)
+datespp <- gather[wattGLB > uplim, unique(as.Date(Date)) ]
+length(datespp)
+
+cat("There are", length(datespp),
+    "days with more than", uplim,
+    "watts, representing", perc * 100, "% of data\n")
+
+
+for (ad in datespp ) {
+    pp <- gather[ as.Date(Date) == ad ]
+
+    plot(pp$Date, pp$wattGLB, "l", col = "green")
+    points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
+
+    title(as.Date(ad, origin = "1970-01-01"))
+}
+
+
+pp <- gather[ as.Date(Date) %in% datespp ]
+
+plot(pp$Date, pp$wattGLB, "l", col = "green")
+points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
+
+
+
+
+
+
 myRtools::writeDATA(gather,
                     "~/DATA/cm21_data_validation/export_all_total.dat",
                     contact = "natsisthanasis@gmail.com",
