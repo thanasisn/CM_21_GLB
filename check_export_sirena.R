@@ -18,7 +18,8 @@
 #'
 #' output:
 #'   html_document:
-#'     keep_md:          yes
+#'     toc:              yes
+#'     keep_md:          no
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -59,7 +60,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Undefined R script name!!") })
+                            return("check_export_sirena.R") })
 if(!interactive()) {
     pdf(file=sub("\\.R$",".pdf",Script.Name))
     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
@@ -93,11 +94,15 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
         DT    <- rbind(DT, temp)
         print(date)
     }
-    DT[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
     myRtools::writeDATA(DT, rdsfile)
 } else {
     DT <- readRDS(rdsfile)
 }
+
+#+ echo=T, include=F
+DT[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
+DT[  st.dev   < -8,  st.dev   := NA ]
+
 
 
 #'
@@ -184,38 +189,37 @@ perc    <- 0.99999
 uplim   <- quantile(DT$wattGLB, na.rm = T, probs = perc)
 datespp <- DT[wattGLB > uplim, unique(as.Date(Date)) ]
 
-#+ echo=F, include=T, results='asis"
+
+#' ## Too high values
+#+ echo=F, include=T, results='asis'
 cat("There are", length(datespp),
     "days with more than", uplim,
-    "watts, representing", (1-perc) * 100, "% of data\n")
+    "watts, representing", (1-perc) * 100,
+    "% of the data.\n")
 #'
 
 
+for (ad in datespp ) {
+    pp <- DT[ as.Date(Date) == ad ]
 
-# for (ad in datespp ) {
-#     pp <- data[ as.Date(Date) == ad ]
-#
-#     plot(pp$Date, pp$wattGLB, "l", col = "green")
-#     points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
-#
-#     title(as.Date(ad, origin = "1970-01-01"))
-# }
-#
-#
-# pp <- data[ as.Date(Date) %in% datespp ]
-#
-# plot(pp$Date, pp$wattGLB, "l", col = "green")
-# points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
-#
-#
-#
-#
-#
-# #
-# # myRtools::writeDATA(data,
-# #                     datfile,
-# #                     contact = "natsisthanasis@gmail.com",
-# #                     type = "dat")
+    plot(  pp$Date, pp$wattGLB, "l", col = "green")
+    points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
+    title(as.Date(ad, origin = "1970-01-01"))
+}
+
+
+
+pp <- DT[ as.Date(Date) %in% datespp ]
+
+plot(pp$Date, pp$wattGLB, "l", col = "green")
+points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
+
+
+
+# myRtools::writeDATA(data,
+#                     datfile,
+#                     contact = "natsisthanasis@gmail.com",
+#                     type = "dat")
 
 tac = Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
