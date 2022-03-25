@@ -24,6 +24,7 @@
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'   odt_document:  default
@@ -105,9 +106,12 @@ DT[  st.dev   < -8,  st.dev   := NA ]
 
 
 
+
 #'
 #' ## Files read by year
 #'
+#' Unique files: `r length(unique(DT$file))`
+#' Unique days:  {{length(unique(DT$Date))}}
 DT[ TIME_UT %/% 1 == 24, .N, by = year(Date)]
 
 
@@ -116,7 +120,7 @@ DT[ TIME_UT %/% 1 == 24, .N, by = year(Date)]
 #'
 #+ echo=T, include=T
 table(DT$TIME_UT %/% 1)
-hist( DT$TIME_UT %/% 1, breaks = 25)
+# hist( DT$TIME_UT %/% 1, breaks = 25)
 #'
 
 #' ## Data points by minute
@@ -132,10 +136,11 @@ DT$Date <- as.POSIXct( strptime(dateess, "%F %H %M") )
 setorder(DT,Date)
 
 
-#+ echo=T
 #' ## Drop some data
+#+ echo=T, include=T
 DT <- DT[ !is.na(`[W.m-2]`), ]
 DT <- DT[ `[W.m-2]` > -5   , ]
+#'
 
 
 #+ echo=F
@@ -175,7 +180,7 @@ temp$Date <- as.POSIXct(strptime( paste( temp$year, temp$month, "1"), "%Y %m %d"
 
 plot(temp$Date, temp$Mean,   "l", main = "Monthly Mean")
 plot(temp$Date, temp$Max,    "l", main = "Monthly Max")
-plot(temp$Date, temp$Min,    "l", main = "Monthly Min")
+# plot(temp$Date, temp$Min,    "l", main = "Monthly Min")
 plot(temp$Date, temp$Median, "l", main = "Monthly Median")
 
 
@@ -192,10 +197,11 @@ datespp <- DT[wattGLB > uplim, unique(as.Date(Date)) ]
 
 #' ## Too high values
 #+ echo=F, include=T, results='asis'
-cat("There are", length(datespp),
+options(digits = 10)
+cat(paste("There are", length(datespp),
     "days with more than", uplim,
     "watts, representing", (1-perc) * 100,
-    "% of the data.\n")
+    "% of the data.\n"))
 #'
 
 
