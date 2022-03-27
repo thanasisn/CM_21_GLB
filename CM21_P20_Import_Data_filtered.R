@@ -28,8 +28,6 @@
 #'   odt_document:  default
 #'   word_document: default
 #'
-#' params:
-#'   CACHE: true
 #' ---
 
 #+ echo=F, include=T
@@ -37,8 +35,8 @@
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = params$CACHE    )
+knitr::opts_chunk$set(echo       = FALSE   )
+knitr::opts_chunk$set(cache      = FALSE   )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -57,9 +55,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 ####_ Notes _####
 
-#
-# this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
-#
 #
 # Read all yearly data and create
 # database of all data
@@ -310,7 +305,7 @@ for (afile in input_files) {
     cat('\n')
 
     capture.output(
-        write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
+        myRtools::write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
         file = "/dev/null" )
 
 }

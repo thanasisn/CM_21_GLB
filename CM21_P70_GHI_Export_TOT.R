@@ -30,20 +30,15 @@
 #'   odt_document:  default
 #'   word_document: default
 #'
-#' params:
-#'   CACHE: true
 #' ---
 
 #+ echo=F, include=T
 
-if (!exists("params")) {
-    params <- list()
-    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = params$CACHE    )
+knitr::opts_chunk$set(echo       = FALSE   )
+knitr::opts_chunk$set(cache      = FALSE   )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -187,13 +182,16 @@ for (afile in input_files) {
     outputdir <- paste0(TOT_EXPORT, yyyy, "/")
     dir.create( outputdir, showWarnings = F )
 
+    ## plot the whole year before output
+    plot(ayear$Date, ayear$Global, main = paste(yyyy, "GLOBAL"))
+    plot(ayear$Date, ayear$GLstd,, main = paste(yyyy, "Global SD")  )
 
 
     ## export each day
     for (dd in alldays) {
-        dateD = as.Date(dd, origin = "1970-01-01")
-        yyyy <- year(dateD)
-        doy  <- yday(dateD)
+        dateD <- as.Date(dd, origin = "1970-01-01")
+        yyyy  <- year(dateD)
+        doy   <- yday(dateD)
 
         aday <- ayear[ day == dateD ]
         if (nrow(aday) != 1440 ) {
@@ -207,7 +205,6 @@ for (afile in input_files) {
         if (all(aday$Global == -9)) {
             cat("\\textbf{",paste0(dateD,": NO GHI DATA}\\\\\n"))
             # cat(paste(dateD,"\n"), file = missingday, append = T )
-            ## skip output
             next()
         }
 
@@ -243,7 +240,7 @@ for (afile in input_files) {
         ## custom header of the daily file
         cat(" TIME_UT    SZA    [W.m-2]   st.dev",
             file = filename,
-            eol = "\r\n")
+            eol  = "\r\n")
         ## write formated data to file
         write.table(format( output,
                             digits    = 3,
