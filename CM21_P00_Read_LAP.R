@@ -19,7 +19,7 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = funr::sys.script()
+Script.Name <- funr::sys.script()
 #~ if(!interactive()) {
 #~     pdf(file=sub("\\.R$",".pdf",Script.Name))
 #~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
@@ -136,9 +136,9 @@ for ( YYYY in years_to_do ) {
 
     ####  Save data to file  ####
 
-    outfile = paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
+    outfile <- paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
 
-    RAerosols::write_RDS(year_data, outfile )
+    myRtools::write_RDS(year_data, outfile )
 
     system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
 }
