@@ -14,13 +14,7 @@
 ## all day ranges
 From;                Until;               Comment
 
-2015-02-18 10:40;    2015-02-19 14:57;    disconnection
-2015-04-17 07:55;    2015-04-17 18:30;    some recording problem
-2015-04-18 07:04;    2015-04-18 21:36;    extreme values
-2015-04-20 09:15;    2015-04-20 13:06;    extreme values
-2015-04-21 05:59;    2015-04-21 09:33;    extreme values
-2015-05-11 00:00;    2015-05-11 07:48;    disconnection
-2015-11-05 08:41;    2015-11-05 08:42;    extreme values
+
 
 
 
@@ -300,7 +294,13 @@ From;                Until;               Comment
 2014-10-01 00:01;    2014-10-01 23:59;    missing file
 
 2015-01-22 00:01;    2015-01-22 23:59;    missing file
+2015-02-18 10:40;    2015-02-19 14:57;    disconnection
+2015-04-17 07:55;    2015-04-17 18:30;    some recording problem
+2015-04-18 07:04;    2015-04-18 21:36;    extreme values
+2015-04-20 09:15;    2015-04-20 13:06;    extreme values
+2015-04-21 05:59;    2015-04-21 09:33;    extreme values
 2015-05-10 00:01;    2015-05-10 23:59;    missing file
+2015-05-11 00:00;    2015-05-11 07:48;    disconnection
 2015-05-22 00:01;    2015-05-22 23:59;    missing file
 2015-05-23 00:01;    2015-05-23 23:59;    missing file
 2015-05-24 00:01;    2015-05-24 23:59;    missing file
@@ -320,6 +320,7 @@ From;                Until;               Comment
 2015-06-07 00:01;    2015-06-07 23:59;    missing file
 2015-06-08 00:01;    2015-06-08 23:59;    missing file
 2015-06-09 00:01;    2015-06-09 23:59;    missing file
+2015-11-05 08:41;    2015-11-05 08:42;    extreme values
 2015-12-22 00:01;    2015-12-22 23:59;    missing file
 2015-12-23 00:01;    2015-12-23 23:59;    missing file
 2015-12-24 00:01;    2015-12-24 23:59;    missing file
