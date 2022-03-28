@@ -100,7 +100,7 @@ options(warn=-1)
 #+ echo=F, include=F
 library(data.table, quietly = T)
 library(pander,     quietly = T)
-# library(RAerosols,  quietly = T)
+library(RAerosols,  quietly = T)
 source("~/CM_21_GLB/CM21_functions.R")
 #'
 

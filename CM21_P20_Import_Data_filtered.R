@@ -134,8 +134,10 @@ ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 
 ## test valid ranges
 ranges[ ranges$From > ranges$Until, ]
-stopifnot(all(ranges$From < ranges$Until))
-ranges$Until - ranges$From
+stopifnot(!all(ranges$From < ranges$Until))
+hist(as.numeric(ranges$Until - ranges$From)/3600)
+ranges[ ranges$Until - ranges$From > 24*3600 , ]
+
 
 
 #'
@@ -175,12 +177,15 @@ ranges$Until - ranges$From
 ## loop all input files
 
 #+ include=TRUE, echo=F, results="asis"
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 for (afile in input_files) {
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
     rawdata$day    <- as.Date(rawdata$Date)
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
+    yyyy           <- year(rawdata$day[1])
 
     ## drop NA signal
     rawdata <- rawdata[ !is.na(CM21value) ]
@@ -199,13 +204,55 @@ for (afile in input_files) {
     for ( i in 1:nrow(ranges) ) {
         lower <- ranges$From[  i ]
         upper <- ranges$Until[ i ]
-        ## select to remove
+        ## remove bad regions of data
         select  <- rawdata$Date >= lower & rawdata$Date <= upper
         rawdata <- rawdata[ ! select ]
         rm(select)
     }
     NR_bad_ranges <- pre_count - rawdata[ !is.na(CM21value), .N ]
     ######################################################################
+
+
+    cat('\n')
+
+    yearlims <- data.table()
+    for (an in grep("CM21",names(rawdata),value = T)){
+        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+        low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
+        upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
+
+        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+
+        test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
+        if ( nrow(test) > 0 ) {
+            cat('\n')
+            cat(paste("### Suspects after removing bad data from log.\n\n"))
+            cat('\n')
+            cat(pander(test))
+        }
+    }
+
+    cat('\n')
+
+
+    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
+         main = paste("CM21 signal ", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal" )
+    abline( h = yearlims[ an == "CM21value", low], col = "red")
+    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+
+    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
+         main = paste("CM21 signal SD", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal Standard Deviations")
+    abline( h = yearlims[ an == "CM21sd", low], col = "red")
+    abline( h = yearlims[ an == "CM21sd", upe], col = "red")
+
+
+    cat('\n')
+    cat('\n')
 
 
 
@@ -248,7 +295,7 @@ for (afile in input_files) {
 
     tempout <- data.frame()
 
-    yyyy = year(rawdata$day[1])
+
     cat(paste("\\newpage\n\n"))
     cat(paste("## ",yyyy,"\n\n"))
 
@@ -276,8 +323,7 @@ for (afile in input_files) {
     # cat(paste0( "Remaining **",
     #             rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
 
-    panderOptions('table.alignment.default', 'right')
-    panderOptions('table.split.table',        120   )
+
 
     cat('\\scriptsize\n')
 

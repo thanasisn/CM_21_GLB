@@ -6,34 +6,38 @@ require(xts)  ## index command
 
 ## similar to RAersols::get_dark_day
 ## computes values to be used for dark correction
-dark_calculations <- function(elevatio, darklim, dates, dstretch, values) {
-    ## find noun
-    nounindex  = match( max(elevatio), elevatio )
-    ## split day
-    selectmorn = elevatio < darklim & index(elevatio) < nounindex
-    selecteven = elevatio < darklim & index(elevatio) > nounindex
+dark_calculations <- function(elevatio,
+                              darklim, 
+                              dates,
+                              dstretch,
+                              values) {
+    ## find local noun
+    nounindex    <- match( max(elevatio), elevatio )
+    ## split day in half
+    selectmorn   <- elevatio < darklim & zoo::index(elevatio) < nounindex
+    selecteven   <- elevatio < darklim & zoo::index(elevatio) > nounindex
     ## all morning and evening dates
-    morning    = dates[selectmorn]
-    evening    = dates[selecteven]
+    morning      <- dates[selectmorn]
+    evening      <- dates[selecteven]
 
     ## morning selection with time limit
-    mornigend   = morning[max(index(morning))]
-    mornigstart = mornigend - dstretch
+    mornigend    <- morning[max(zoo::index(morning))]
+    mornigstart  <- mornigend - dstretch
     ## selection for morning dark
-    morningdark = selectmorn & dates <= mornigend & mornigstart < dates
+    morningdark  <- selectmorn & dates <= mornigend & mornigstart < dates
 
     ## evening selection with time limit
-    eveningstart  = evening[min(index(evening))]
-    eveningend    = eveningstart + dstretch
+    eveningstart <- evening[min(zoo::index(evening))]
+    eveningend   <- eveningstart + dstretch
     ## selection for evening dark
-    eveningdark = selecteven & dates >= eveningstart & dates < eveningend
+    eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
 
     ## Morning Dark
-    datavalues_M = values[morningdark]
-    datedates_M  = dates[ morningdark]
+    datavalues_M <- values[morningdark]
+    datedates_M  <- dates[ morningdark]
     ## Evening Dark
-    datavalues_E = values[eveningdark]
-    datedates_E  = dates[ eveningdark]
+    datavalues_E <- values[eveningdark]
+    datedates_E  <- dates[ eveningdark]
 
     return(list( Mavg = mean(   datavalues_M,  na.rm = TRUE ),
                  Mmed = median( datavalues_M,  na.rm = TRUE ),

@@ -71,6 +71,8 @@ library(pander)
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
+cex.up <- 1.1
+cex.dn <- 0.9
 
 #'
 #' ## Info
@@ -86,13 +88,26 @@ signal_files <- list.files(path        = SIGNAL_DIR,
 signal_files <- sort(signal_files)
 
 
-all_data <- data.table()
+all_data     <- data.table()
 
 
 #+ include=TRUE, echo=F, results="asis"
 for (ff in signal_files) {
-    dyear <- readRDS(ff)
-    yyyy = format(dyear$Date[1], "%Y")
+    dyear <- data.table(readRDS(ff))
+    yyyy  <- format(dyear$Date[1], "%Y")
+
+
+    suppressWarnings({
+        yearlims <- data.table()
+        for (an in grep("CM21",names(dyear),value = T)){
+            daily <- dyear[ , .( dmin =  min(get(an),na.rm = T),
+                                 dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+            low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
+            upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
+
+            yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+        }
+    })
 
     cat(paste("\\newpage\n"))
     cat(paste("## ",yyyy,"\n"))
@@ -116,16 +131,19 @@ for (ff in signal_files) {
          main = paste("CM21 signal ", yyyy ),
          xlab = "Elevation",
          ylab = "CM21 signal" )
+    abline( h = yearlims[ an == "CM21value", low], col = "red")
+    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+
 
     plot(dyear$Elevat, dyear$CM21sd,    pch = 19, cex = .8,
          main = paste("CM21 signal SD", yyyy ),
          xlab = "Elevation",
          ylab = "CM21 signal Standard Deviations")
+    abline( h = yearlims[ an == "CM21sd", low], col = "red")
+    abline( h = yearlims[ an == "CM21sd", upe], col = "red")
 
     cat('\n')
     cat('\n')
-
-
 }
 #'
 

@@ -40,10 +40,10 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 #        clean                = T  ,
 #        output_dir           = "~/CM_21_GLB/REPORTS")
 
-# render("./CM21_P20_Import_Data_filtered.R",
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
+render("./CM21_P20_Import_Data_filtered.R",
+       params = list( CACHE = F ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./CM21_P30_GHI_daily_filtered.R",
        params = list( CACHE = F ),
