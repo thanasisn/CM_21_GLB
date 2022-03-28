@@ -2,15 +2,16 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
 #' Read text files with CM_21 signal data
-#'   - from Sirena
-#'   - from Radmon
+#'
+#'   - list Sirena files
+#'   - list Radmon files
 #'   - add sun position
 #'   - all minutes of year
 #'   - NO FILTERING
-#' Store as .Rds binaries files for further use
-#' Works for a set date range
-#' based on level_0_CM21_x8
-#' Reads from Sirena only
+#'   - Store as .Rds binaries files for further use
+#'   - Works for a set date range
+#'   - based on level_0_CM21_x8
+#'   - Reads data from Sirena only
 #'
 
 #+ include=FALSE, echo=FALSE

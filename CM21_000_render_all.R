@@ -28,23 +28,22 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 
 
 
-
 #### output only pdfs with TOC
-render("./CM21_P00_Read_LAP.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+# render("./CM21_P00_Read_LAP.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
 
 
-render("./CM21_P01_Inspect_data.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+# render("./CM21_P01_Inspect_data.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
 
-render("./CM21_P20_Import_Data_filtered.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+# render("./CM21_P20_Import_Data_filtered.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./CM21_P30_GHI_daily_filtered.R",
        params = list( CACHE = F ),
