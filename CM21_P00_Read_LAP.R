@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
-#' Read text files with CM_21 signal data
+#' Read text files with CM_21 signal data to rds
 #'
 #'   - list Sirena files
 #'   - list Radmon files
@@ -103,7 +103,8 @@ for ( YYYY in years_to_do ) {
             stop("Found more file than we should") }
         if ( length(found) == 0 ) {
             cat(paste0("Missing file: ", YYYY,"/", format(aday, "%d%m%y06"), "\n"))
-            cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n", file = MISSING_INP, append = T )
+            cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n",
+                file = MISSING_INP, append = T )
             next()
         }
 
