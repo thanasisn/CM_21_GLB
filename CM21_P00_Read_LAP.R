@@ -84,6 +84,9 @@ rm(rad_names, radmon_files)
 
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
 
+
+stop()
+
 ## one output file per year
 ## we assume the files are in the correct folder
 for ( YYYY in years_to_do ) {
