@@ -28,20 +28,15 @@
 #'   odt_document:  default
 #'   word_document: default
 #'
-#' params:
-#'   CACHE: true
 #' ---
 
 #+ echo=F, include=T
 
-if (!exists("params")) {
-    params <- list()
-    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = params$CACHE    )
+knitr::opts_chunk$set(echo       = FALSE   )
+knitr::opts_chunk$set(cache      = FALSE   )
 # knitr::opts_chunk$set(include    = FALSE   )
 knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
@@ -60,9 +55,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 ####_ Notes _####
 
-#
-# this script substitutes CM_P04_Export_Data_v3.R
-#
 
 
 
@@ -70,7 +62,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = funr::sys.script()
+Script.Name <- funr::sys.script()
 #~ if(!interactive()) {
 #~     pdf(file=sub("\\.R$",".pdf",Script.Name))
 #~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
@@ -92,7 +84,7 @@ tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y
 
 
 #### .  . Export range  ####
-yearstodo  <- seq( year(EXPORT_START), year(EXPORT_STOP) )
+yearstodo   <- seq( year(EXPORT_START), year(EXPORT_STOP) )
 
 
 
@@ -365,6 +357,6 @@ for (afile in input_files) {
 
 
 
-## END ##
-tac = Sys.time(); cat(paste("\n  --  ",  Script.Name, " DONE  --  \n"))
+#' **END**
+tac = Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
