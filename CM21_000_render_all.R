@@ -20,7 +20,7 @@ OUTPUT_FORMAT = NULL
 
 
 ## 1 update raw data ####
-# system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
+system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 
 
 ## 2 read data into R
@@ -29,58 +29,12 @@ OUTPUT_FORMAT = NULL
 
 
 
-### html to keep md for language tool
-### but will not have TOC
-
-#
-# render("./CM21_P01_Inspect_data.R",
-#        output_format     = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-# render("./CM21_P20_Import_Data_filtered.R",
-#        output_format     = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-# render("./CM21_P30_GHI_daily_filtered.R",
-#        output_format     = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-# render("./CM21_P40_missing_dark_reconstruction.R",
-#        output_format        = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-# render("./CM21_P50_GHI_dark_correction.R",
-#        output_format        = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-# render("./CM21_P60_GHI_Export_WRDC.R",
-#        output_format        = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-
-# render("./CM21_P70_GHI_Export_TOT.R",
-#        output_format        = c("html_document", "pdf_document"),
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-
-
-
-
-
-
 #### output only pdfs with TOC
+render("./CM21_P00_Read_LAP.R",
+       params = list( CACHE = F ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
+
 
 render("./CM21_P01_Inspect_data.R",
        params = list( CACHE = F ),
