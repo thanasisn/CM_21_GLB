@@ -132,6 +132,10 @@ ranges       <- read.table( BAD_RANGES,
 ranges$From  <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
 ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 
+## test valid ranges
+ranges[ ranges$From > ranges$Until, ]
+stopifnot(all(ranges$From < ranges$Until))
+ranges$Until - ranges$From
 
 
 #'
