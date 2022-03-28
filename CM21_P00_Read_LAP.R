@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-#' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #'
 #' Read text files with CM_21 signal data
 #'   - from Sirena
@@ -13,9 +13,9 @@
 #' Reads from Sirena only
 #'
 
+#+ include=FALSE, echo=FALSE
 
 ####  Set environment  ####
-closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
@@ -33,7 +33,15 @@ library(data.table)
 source("~/CM_21_GLB/DEFINITIONS.R")
 
 
+ALL_YEARS = TRUE
 
+## Get shell arguments
+args <- commandArgs( trailingOnly = TRUE )
+## override test from shell
+if ( length(args) > 0 ) {
+    # if ( any(args == "NOTEST") ) { TEST      = FALSE }
+    if ( any(args == "NOTALL") ) { ALL_YEARS = FALSE }
+}
 
 
 ####  Files for import  ####
@@ -60,9 +68,6 @@ sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
-
-# sir_names[ ! sir_names %in% rad_names ]
-
 cat(paste("There are ",
           length(missing_from_sir) ,
           " files on Radmon that are missing from Sirena\n"))
@@ -70,6 +75,8 @@ if ( length(missing_from_sir) > 0 ) {
     cat(paste(missing_from_sir),sep = "\n")
     warning(paste("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena"))
 }
+rm(rad_names, radmon_files)
+
 
 
 ####  Read files of all years  ####
@@ -78,7 +85,6 @@ years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
 
 ## one output file per year
 ## we assume the files are in the correct folder
-
 for ( YYYY in years_to_do ) {
     yy = substr(YYYY, 3,4)
 
@@ -87,10 +93,10 @@ for ( YYYY in years_to_do ) {
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
 
     for ( aday in days_of_year ) {
-        aday  = as.Date(aday, origin = "1970-01-01")
-        sunfl = paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
+        aday  <- as.Date(aday, origin = "1970-01-01")
+        sunfl <- paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
 
-        found = grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
+        found <- grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
         ## check file names
         if ( length(found) > 1 ) {
             stop("Found more file than we should") }
@@ -110,9 +116,11 @@ for ( YYYY in years_to_do ) {
         #### . . Read SUN file  ####
         if ( !file.exists( sunfl ) ) stop(cat(paste("Missing:", sunfl, "\nRun:   Sun_vector_constraction_cron.py?\n")))
         sun_temp <- read.table( sunfl,
-                                sep = ";",
-                                header = TRUE,
-                                na.strings = "None" ,strip.white = TRUE,  as.is = TRUE)
+                                sep         = ";",
+                                header      = TRUE,
+                                na.strings  = "None",
+                                strip.white = TRUE,
+                                as.is       = TRUE)
 
         #### . . Day table to save  ####
         day_data <- data.table( Date        = D_minutes,      # Date of the data point
@@ -126,26 +134,21 @@ for ( YYYY in years_to_do ) {
 
     }
 
-    #### . . All the minutes of year ####
-    all_min <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
-                   as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
-    all_min <- data.frame(Date = all_min)
-
+    #### . . Add all the minutes of year ####
+    all_min   <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
+                     as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
+    all_min   <- data.frame(Date = all_min)
     year_data <- merge(year_data, all_min, all = T)
 
 
     ####  Save data to file  ####
-
     outfile <- paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
-
     myRtools::write_RDS(year_data, outfile )
-
-    system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
 }
+## sort list of missing files
+system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
 
 
-
-
-## END ##
-tac = Sys.time()
+#' **END**
+tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

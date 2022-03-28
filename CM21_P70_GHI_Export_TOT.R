@@ -1,6 +1,5 @@
-#!/usr/bin/env Rscript
-# /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
-#'
+# /* #!/usr/bin/env Rscript */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title: "CM21 export GHI data for Sirena."
 #' author: "Natsis Athanasios"
@@ -50,7 +49,7 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(fig.width  = 8       )
 knitr::opts_chunk$set(fig.height = 6       )
 
-knitr::opts_chunk$set(out.width  = "60%"    )
+knitr::opts_chunk$set(out.width  = "70%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
@@ -62,12 +61,13 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
-Script.Name = "CM21_P70_GHI_Export_TOT.R"
+Script.Name <- funr::sys.script()
 #~ if(!interactive()) {
 #~     pdf(file=sub("\\.R$",".pdf",Script.Name))
 #~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
 #~ }
 
+#+ echo=F, include=F
 library(data.table, quietly = T)
 library(pander,     quietly = T)
 setwd("~/CM_21_GLB/")
@@ -268,6 +268,6 @@ for (afile in input_files) {
 
 
 
-## END ##
-tac = Sys.time()
+#' **END**
+tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
