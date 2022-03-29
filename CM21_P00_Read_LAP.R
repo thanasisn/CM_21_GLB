@@ -70,8 +70,7 @@ if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
 
-paste(params$ALL_YEARS)
-cat(params$ALL_YEARS)
+
 
 
 ####  Files for import  ####
