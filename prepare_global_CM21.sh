@@ -20,7 +20,7 @@ info "Try to get new files"
 
 info "Read raw files to Rds"
 
-Rscript "$(dirname "$0")/CM21_P00_Read_LAP.R"
+Rscript "$(dirname "$0")/CM21_P10_Read_LAP.R"
 
 
 ## end coding

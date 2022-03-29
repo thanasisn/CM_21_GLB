@@ -143,12 +143,12 @@ if (!params$ALL_YEARS) {
                     sub("06\\.lap","", basename(newfiles), ignore.case = T),
                     "%d%m%y")))
         new_to_do <- years_to_do[years_to_do %in% newyears]
-        NEWDATA <- TRUE
+        NEWDATA   <- TRUE
     }
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
-        years_to_do <- sort(unique(missing_years,new_to_do))
+        years_to_do <- sort(unique(c(missing_years,new_to_do)))
     } else {
         stop("NO new data! NO need to parse!")
     }
