@@ -376,7 +376,7 @@ for (afile in input_files) {
 
     ## write this years data
     capture.output(
-        RAerosols::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
+        myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
         file = "/dev/null" )
 
 }
@@ -384,7 +384,7 @@ for (afile in input_files) {
 
 ## write statistics on data
 capture.output(
-    RAerosols::write_RDS(statist, daylystat),
+    myRtools::write_RDS(statist, daylystat),
     file = "/dev/null" )
 
 ## create pdf with all daily plots

@@ -3,9 +3,10 @@
 
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic1 = Sys.time()
-Script.Name = funr::sys.script()
-
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
+                            return("CM21_000_") })
 
 library(rmarkdown)
 library(knitr)
@@ -29,11 +30,11 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 
 
 #### output only pdfs with TOC
-# render("./CM21_P00_Read_LAP.R",
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
+render("./CM21_P00_Read_LAP.R",
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
 
+stop()
 
 # render("./CM21_P01_Inspect_data.R",
 #        params = list( CACHE = F ),
