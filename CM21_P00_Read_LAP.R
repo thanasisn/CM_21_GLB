@@ -43,7 +43,6 @@
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
@@ -70,6 +69,9 @@ ALL_YEARS = FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
+
+paste(params$ALL_YEARS)
+cat(params$ALL_YEARS)
 
 
 ####  Files for import  ####
@@ -125,13 +127,12 @@ if (!params$ALL_YEARS) {
     last_storage_date  <- max(file.mtime(storagefiles))
     newfiles           <- sirena_files[sirena_files_dates > last_storage_date]
 
+    ## check years stored
     storage_years <- as.numeric(
         sub(".rds", "",
             sub(".*_SIG_","",
                 basename(storagefiles),),ignore.case = T))
     missing_years <- years_to_do[!years_to_do %in% storage_years]
-
-
 
     ## check new data
     new_to_do <- c()
@@ -146,6 +147,7 @@ if (!params$ALL_YEARS) {
         NEWDATA <- TRUE
     }
 
+    ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
         years_to_do <- sort(unique(missing_years,new_to_do))
     } else {
