@@ -85,12 +85,11 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
+                            return("CM21_P30_") })
+
 
 
 
@@ -198,6 +197,12 @@ for (afile in input_files) {
     NR_extreme_SD = 0
     NR_min_global = 0
 
+
+    yyyy    <- year(rawdata$day[1])
+    cat(paste("\\newpage\n\n"))
+    cat(paste("## ",yyyy,"\n\n"))
+
+
     for (ddd in daystodo) {
 
         theday      <- as.POSIXct( as.Date(ddd), origin = "1970-01-01")
@@ -226,9 +231,15 @@ for (afile in input_files) {
 
 
         ####  Filter Standard deviation extremes  ##############################
+        ## SD can not be greater than the signal
         pre_count     <- daydata[ !is.na(CM21value), .N ]
         daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
         NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
+        if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
+            cat('\n')
+            cat(paste(theday, "SKIP: No data left after extreme SD filtering!!"),"\n")
+            next()
+        }
         ########################################################################
 
 
@@ -272,8 +283,8 @@ for (afile in input_files) {
 
 
 
-
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+        ## plot to external pdf
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             plot_norm2(daydata, test, tag)
 
             ## Dark signal plot
@@ -325,10 +336,6 @@ for (afile in input_files) {
 
 
     tempout <- data.frame()
-    yyyy    <- year(globaldata$day[1])
-
-    cat(paste("\\newpage\n\n"))
-    cat(paste("## ",yyyy,"\n\n"))
 
     tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
     tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
