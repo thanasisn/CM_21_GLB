@@ -43,6 +43,7 @@
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
 ####  Set environment  ####
+rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
@@ -108,7 +109,7 @@ rm(rad_names, radmon_files)
 
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
-years_to_do <- c(2021,2022)
+
 
 #'
 #' Allowed years to do: `r years_to_do`
@@ -116,14 +117,24 @@ years_to_do <- c(2021,2022)
 #+ include=TRUE, echo=FALSE
 
 if (!params$ALL_YEARS) {
+    NEWDATA <- FALSE
 
     sirena_files_dates <- file.mtime(sirena_files)
 
-    storagefiles      <- list.files(SIGNAL_DIR, "LAP_CM21H_SIG.*.rds", full.names = T, ignore.case = T)
-    last_storage_date <- max(file.mtime(storagefiles))
-    newfiles          <- sirena_files[sirena_files_dates > last_storage_date]
+    storagefiles       <- list.files(SIGNAL_DIR, "LAP_CM21_H_SIG.*.rds", full.names = T, ignore.case = T)
+    last_storage_date  <- max(file.mtime(storagefiles))
+    newfiles           <- sirena_files[sirena_files_dates > last_storage_date]
+
+    storage_years <- as.numeric(
+        sub(".rds", "",
+            sub(".*_SIG_","",
+                basename(storagefiles),),ignore.case = T))
+    missing_years <- years_to_do[!years_to_do %in% storage_years]
+
+
 
     ## check new data
+    new_to_do <- c()
     if (length(newfiles)>0) {
         ## find years to do
         newyears <- unique(
@@ -131,12 +142,16 @@ if (!params$ALL_YEARS) {
                 strptime(
                     sub("06\\.lap","", basename(newfiles), ignore.case = T),
                     "%d%m%y")))
-        years_to_do <- years_to_do[years_to_do %in% newyears]
+        new_to_do <- years_to_do[years_to_do %in% newyears]
+        NEWDATA <- TRUE
+    }
+
+    if (length(missing_years) != 0 | NEWDATA) {
+        years_to_do <- sort(unique(missing_years,new_to_do))
     } else {
-        stop("NO NEW DATA TO PARSE")
+        stop("NO new data! NO need to parse!")
     }
 }
-
 #'
 #' Years to do: `r years_to_do`
 #'
@@ -298,33 +313,8 @@ for ( YYYY in years_to_do ) {
     title(main = paste("Azimuth by month", YYYY) )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ####  Save data to file  ####
-    outfile <- paste0(SIGNAL_DIR,"/LAP_CM21H_SIG_",YYYY,".Rds")
+    outfile <- paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds")
     write_RDS(year_data, outfile )
 }
 ## sort list of missing files

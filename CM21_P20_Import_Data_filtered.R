@@ -122,9 +122,6 @@ input_files <- sort(input_files)
 
 ## . load exclusion list ####
 
-too_bad_days <- read.table( TOO_BAD, as.is = TRUE, comment.char = "#" )
-too_bad_days <- as.Date(too_bad_days$V1, format = "%Y-%m-%d")
-
 ranges       <- read.table( BAD_RANGES,
                             sep = ";",
                             colClasses = "character",
@@ -189,13 +186,6 @@ for (afile in input_files) {
 
     ## drop NA signal
     rawdata <- rawdata[ !is.na(CM21value) ]
-
-
-
-    ####  Filter too bad days  ###########################################
-    NR_too_bad_days <- rawdata[ day %in% too_bad_days & !is.na(CM21value), .N ]
-    rawdata <- rawdata[ ! day %in% too_bad_days ]
-    ######################################################################
 
 
 
