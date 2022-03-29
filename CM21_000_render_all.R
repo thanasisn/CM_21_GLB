@@ -31,6 +31,7 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 
 #### output only pdfs with TOC
 render("./CM21_P00_Read_LAP.R",
+       params = list( ALL_YEARS = TRUE ),
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS")
 
