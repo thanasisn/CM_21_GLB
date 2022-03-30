@@ -1,13 +1,12 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title: "CM21 signal filtering."
-#' author: "Natsis Athanasios"
-#' institute: "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract: "Combine raw data from CM21 to yearly data sets.
-#'            Problematic data are filter out the output is written
-#'            as R binary (.Rds) file."
+#' title:         "CM21 signal filtering."
+#' author:        "Natsis Athanasios"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
+#' abstract:      "Read signal data and write level 0 data.
+#'                 Marks or remove problematic data."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -35,18 +34,13 @@
 #' ---
 
 #'
-#' Read all yearly data and create
-#' database of all data
-#' pdf of all days
-#' pdf of suspects
-#' statistic on days
+#' Read all yearly **signal** data and create **Level 0** data
 #'
-#' - IGNORING   too bad days
-#'  - FILTERING  date ranges
-#'  - FILTERING  positive signal limits
-#'  - FILTERING  negative signal limits
-#'  - FILTERING  positive night signal limits
-#'  - FILTERING  negative night signal limits
+#'  - REMOVE data for bad time ranges
+#'  - MARKS  positive signal limits
+#'  - MARKS  negative signal limits
+#'  - MARKS  positive night signal limits
+#'  - MARKS  negative night signal limits
 #'
 #+ echo=F, include=T
 
@@ -82,7 +76,7 @@ library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 
-source("~/CM_21_GLB/CM21_functions.R")
+# source("~/CM_21_GLB/CM21_functions.R")
 
 ALL_YEARS = FALSE
 if (!exists("params")){
@@ -215,8 +209,8 @@ if (!params$ALL_YEARS) {
 #'
 #+ include=T, echo=F
 
-# ##test
-# years_to_do <- 2021
+##test
+years_to_do <- 2021
 
 
 
@@ -242,7 +236,8 @@ for ( yyyy in years_to_do) {
     rawdata        <- readRDS(afile)
     rawdata[ , day := as.Date(Date) ]
 
-    cat( "\n## Year:", yyyy, "\n" )
+    cat("\\newpage\n\n")
+    cat("\n## Year:", yyyy, "\n" )
 
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
 
@@ -287,7 +282,7 @@ for ( yyyy in years_to_do) {
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
         if ( nrow(test) > 0 ) {
             cat('\n\n')
-            cat(paste("### Remaining Suspects after removing bad data from log.\n\n"))
+            cat(paste("#### Remaining Suspects after removing bad data from log.\n\n"))
             cat('\n\n')
             cat(pander(test))
             cat('\n\n')
@@ -335,78 +330,57 @@ for ( yyyy in years_to_do) {
 
     rawdata[, FlagP20 := "" ]
 
-    ####   Mark signal physical limits    ######################################
+
+
+    ####    Mark signal physical limits    #####################################
     rawdata[ CM21value <  MINsgLIM, FlagP20 := "sgLIM_hit" ]
     rawdata[ CM21value >  MAXsgLIM, FlagP20 := "sgLIM_hit" ]
     NR_signal_limit    <- rawdata[ FlagP20 == "sgLIM_hit", .N ]
-    ######################################################################
-
-
-    ####    Filter night signal possible limits    #############################
-#     pre_count <- rawdata[ !is.na(CM21value), .N ]
-#     getnight  <- rawdata$Eleva < DARK_ELEV
-#     ## drop too negative signal values
-#     toolowsgDark <- rawdata$CM21value < MINsgLIMnight & getnight
-#     rawdata$CM21value[ toolowsgDark ]  <- NA
-#     rawdata$CM21sd[    toolowsgDark ]  <- NA
-#     ## drop too positive signal values
-#     toohighsgDark <- rawdata$CM21value > MAXsgLIMnight & getnight
-#     rawdata$CM21value[ toohighsgDark ] <- NA
-#     rawdata$CM21sd[    toohighsgDark ] <- NA
-#     rm(toohighsgDark,toolowsgDark,getnight)
-#     NR_signal_night_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
-#     ######################################################################
+    ############################################################################
 
 
 
-#     ####  Filter negative values when sun is up  #########################
-#     pre_count <- rawdata[ !is.na(CM21value), .N ]
-#     neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
-#     rawdata$CM21value[ neg_sun ]  <- NA
-#     rawdata$CM21sd[    neg_sun ]  <- NA
-#     rm( neg_sun )
-#     NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
-#     ######################################################################
-#
-#
-#
-#     tempout <- data.frame()
-#
-#
-#     cat(paste("\\newpage\n\n"))
-#     cat(paste("## ",yyyy,"\n\n"))
-#
-#     tempout <- rbind( tempout, data.frame(Name = "Initial data",           Data_points = NR_loaded) )
-#     tempout <- rbind( tempout, data.frame(Name = "Too bad days",           Data_points = NR_too_bad_days) )
-#     tempout <- rbind( tempout, data.frame(Name = "Bad date ranges",        Data_points = NR_bad_ranges) )
-#     tempout <- rbind( tempout, data.frame(Name = "Signal physical limits", Data_points = NR_signal_limit) )
-#     tempout <- rbind( tempout, data.frame(Name = "Signal night limits",    Data_points = NR_signal_night_limit) )
-#     tempout <- rbind( tempout, data.frame(Name = "Negative daytime",       Data_points = NR_negative_daytime) )
-#     tempout <- rbind( tempout, data.frame(Name = "Remaining data",         Data_points = rawdata[ !is.na(CM21value), .N ]) )
-#
-#
+    ####    Mark night signal possible limits    ###############################
+    getnight  <- rawdata$Elevat < DARK_ELEV
+    ## mark too negative signal values
+    rawdata[ CM21value < MINsgLIMnight & Elevat < DARK_ELEV, FlagP20 := "ToolowDark" ]
+    ## drop too positive signal values
+    rawdata[ CM21value > MAXsgLIMnight & Elevat < DARK_ELEV, FlagP20 := "ToohigDark" ]
+    NR_signal_night_limit <- rawdata[FlagP20 %in% c("ToolowDark","ToohigDark"), .N ]
+    ############################################################################
+
+
+
+# #    ####    Mark negative values when sun is up    #############################
+# #    neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
+# #    rawdata$CM21value[ neg_sun ]  <- NA
+# #    rawdata$CM21sd[    neg_sun ]  <- NA
+# #
+# #    rawdata[ Elevat <= SUN_ELEV & CM21value > MINsunup ]
+# #    hist (rawdata[ Elevat <= SUN_ELEV & CM21value < 0 , CM21value])
+# #    rm( neg_sun )
+# #    NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
+# #    ############################################################################
+
+
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
     cat(paste0( "**",
                 NR_bad_ranges, "** points markded as bad data ranges\n\n" ))
-#     # cat(paste0( "\"Signal physical limits\" removed *",
-#     #             NR_signal_limit, "* data points\n\n" ))
-#     # cat(paste0( "\"Signal night limits\" removed *",
-#     #             NR_signal_night_limit, "* data points\n\n" ))
-#     # cat(paste0( "\"Negative daytime\" removed *",
-#     #             NR_negative_daytime, "* data points\n\n" ))
-#     # cat(paste0( "Remaining **",
-#     #             rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
-#
-#
-#
+    cat(paste0( "**",
+                NR_signal_limit, "** posisble singal error\n\n" ))
+    cat(paste0( "**",
+                NR_signal_night_limit, "** posible extreme night values\n\n" ))
+# #     cat(paste0( "\"Negative daytime\" removed *",
+# #             NR_negative_daytime, "* data points\n\n" ))
+    cat(paste0( "**",
+                rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n" ))
+
+
+
 #     cat('\\scriptsize\n')
 #
 #     # cat('\\footnotesize\n')
-#
-#     cat(pander( tempout ))
-#
-#     cat(pander( summary(rawdata[,!c("Date","Azimuth")]) ))
 #
 #     cat('\\normalsize\n')
 #
@@ -427,11 +401,14 @@ for ( yyyy in years_to_do) {
 #          ylab = "CM21 signal Standard Deviations")
 #
 #     cat('\n')
-#     cat('\n')
 #
-#     capture.output(
 #         myRtools::write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
 #         file = "/dev/null" )
+
+
+    ####  Save signal data to file  ####
+    write_RDS(object = year_data,
+              file   =  paste0(SIGNAL_DIR,"/LAP_CM21_H_L0_",YYYY,".Rds") )
 
 }
 #'

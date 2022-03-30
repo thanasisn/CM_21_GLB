@@ -1,13 +1,11 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:  "Read raw CM21 data."
-#' author: "Natsis Athanasios"
-#' institute: "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract: "Combine raw data from CM21 to yearly data sets.
-#'            Problematic data are filter out the output is written
-#'            as R binary (.Rds) file."
+#' title:         "Read raw CM21 data."
+#' author:        "Natsis Athanasios"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
+#' abstract:      "Combine raw data from CM21 to yearly data sets."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -67,7 +65,7 @@ if(!interactive()) {
 
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(myRtools)
+library(myRtools,   quietly = T, warn.conflicts = F)
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 knitr::opts_chunk$set(fig.align  = "center" )
@@ -177,7 +175,8 @@ for ( YYYY in years_to_do ) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
 
-    cat( "\n## Year:", YYYY, "\n" )
+    cat("\\newpage\n\n")
+    cat("\n## Year:", YYYY, "\n" )
 
     missing_files <- c()
     for ( aday in days_of_year ) {
@@ -323,9 +322,9 @@ for ( YYYY in years_to_do ) {
     title(main = paste("Azimuth by month", YYYY) )
     cat('\n\n')
 
-    ####  Save data to file  ####
-    outfile <- paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds")
-    write_RDS(year_data, outfile )
+    ####  Save signal data to file  ####
+    write_RDS(object = year_data,
+              file   =  paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
 }
 ## sort list of missing files
 system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
