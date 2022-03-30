@@ -73,6 +73,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
+OutliersPlot <- 4
 
 ALL_YEARS = FALSE
 if (!exists("params")){
@@ -205,7 +206,7 @@ for ( YYYY in years_to_do ) {
         stopifnot( dim(lap)[1] == 1440 )
 
         #### . . Read SUN file  ####
-        if ( !file.exists( sunfl ) ) stop(cat(paste("Missing:", sunfl, "\nRun:   Sun_vector_constraction_cron.py?\n")))
+        if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_constraction_cron.py\n")))
         sun_temp <- read.table( sunfl,
                                 sep         = ";",
                                 header      = TRUE,
@@ -234,31 +235,22 @@ for ( YYYY in years_to_do ) {
     all_min   <- data.frame(Date = all_min)
     year_data <- merge(year_data, all_min, all = T)
 
-    ####  Proper date at the middle of minute  ####
-    year_data[, Date30 := Date + 30 ]
-
-
 
     ####  Do some plots for this year before filtering  ####
-
     suppressWarnings({
+        ## Try to find outliers
         yearlims <- data.table()
         for (an in grep("CM21",names(year_data),value = T)){
             daily <- year_data[ , .( dmin =  min(get(an),na.rm = T),
                                      dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-            low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
-            upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
-
+            low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
+            upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
             yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
         }
     })
 
-
-
     # cat('\\scriptsize\n')
-    #
     # cat(pander( summary(year_data[,-c('Date','Azimuth')]) ))
-    #
     # cat('\\normalsize\n')
 
     cat('\n\n')
@@ -287,7 +279,7 @@ for ( YYYY in years_to_do ) {
 
 
     par(mar = c(2,4,2,1))
-    month_vec <- strftime(  year_data$Date30 , format = "%m")
+    month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
                             list(month_vec), FUN = summary, digits = 6 )
 
