@@ -270,7 +270,7 @@ for ( YYYY in years_to_do ) {
     hist(year_data$CM21sd,    breaks = 50, main = paste("CM21 signal SD",YYYY ) )
     cat('\n\n')
 
-    plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .8,
+    plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .5,
          main = paste("CM21 signal ", YYYY ),
          xlab = "Elevation",
          ylab = "CM21 signal" )
@@ -278,7 +278,7 @@ for ( YYYY in years_to_do ) {
     abline( h = yearlims[ an == "CM21value", upe], col = "red")
     cat('\n\n')
 
-    plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .8,
+    plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
          main = paste("CM21 signal SD", YYYY ),
          xlab = "Elevation",
          ylab = "CM21 signal Standard Deviations")
