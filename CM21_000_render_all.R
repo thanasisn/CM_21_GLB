@@ -20,12 +20,8 @@ setwd("~/CM_21_GLB/")
 OUTPUT_FORMAT = NULL
 
 
-## 1 update raw data ####
+####  update raw data  ####
 system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
-
-
-## 2 read data into R
-# source("./CM21_P00_Read_LAP.R")
 
 
 
