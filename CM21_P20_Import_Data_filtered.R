@@ -77,13 +77,16 @@ if(!interactive()) {
 }
 
 
-
 #+ echo=F, include=F
-library(data.table, quietly = T)
-library(pander,     quietly = T)
-library(RAerosols,  quietly = T)
+library(data.table, quietly = T, warn.conflicts = F)
+library(pander,     quietly = T, warn.conflicts = F)
+library(RAerosols,  quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/CM21_functions.R")
-#'
+
+ALL_YEARS = FALSE
+if (!exists("params")){
+    params <- list( ALL_YEARS = ALL_YEARS)
+}
 
 
 ####  . Variables  ####
@@ -105,11 +108,6 @@ MINsunup      =  0         ## Exclude signal values below that
 
 
 
-## . get data input files ####
-input_files <- list.files( path    = SIGNAL_DIR,
-                           pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
-                           full.names = T )
-input_files <- sort(input_files)
 
 
 
@@ -127,6 +125,61 @@ ranges[ ranges$From > ranges$Until, ]
 stopifnot(!all(ranges$From < ranges$Until))
 hist(as.numeric(ranges$Until - ranges$From)/3600)
 ranges[ ranges$Until - ranges$From > 24*3600 , ]
+
+
+
+
+
+
+
+## . get data input files ####
+input_files <- list.files( path    = SIGNAL_DIR,
+                           pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
+                           full.names = T )
+input_years <- as.numeric(
+    sub(".rds", "",
+        sub(".*_SIG_","",
+            basename(input_files),),ignore.case = T))
+
+
+## . get storage files ####
+output_files <- list.files( path    = SIGNAL_DIR,
+                            pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
+                            full.names = T )
+
+
+
+#'
+#' Allowed years to do: `r input_years`
+#'
+#+ include=TRUE, echo=FALSE
+
+if (!params$ALL_YEARS) {
+    years_to_do <- c()
+    for (ay in input_years) {
+        inp <- grep(ay, input_files,  value = T)
+        out <- grep(ay, output_files, value = T)
+        if ( length(out) == 0 ) {
+            ## do if not there
+            years_to_do <- c(years_to_do,ay)
+        } else {
+            ## do if newer data
+            if (file.mtime(inp) > file.mtime(out))
+                years_to_do <- c(years_to_do,ay)
+        }
+        years_to_do <- sort(unique(years_to_do))
+    }
+} else {
+    years_to_do <- sort(unique(input_years))
+}
+
+
+#'
+#' Years to do: `r years_to_do`
+#'
+#+ include=TRUE, echo=FALSE, results="asis"
+
+
 
 
 
@@ -161,7 +214,7 @@ ranges[ ranges$Until - ranges$From > 24*3600 , ]
 
 
 
-stop()
+if (FALSE){
 
 
 ## loop all input files
@@ -344,7 +397,7 @@ for (afile in input_files) {
 }
 #'
 
-
+}
 
 ## END ##
 tac = Sys.time()
