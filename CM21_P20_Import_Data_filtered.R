@@ -34,23 +34,22 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
-
-#` Read all yearly data and create
-#` database of all data
-#` pdf of all days
-#` pdf of suspects
-#` statistic on days
-#`
-#` - IGNORING   too bad days
-#`  - FILTERING  date ranges
-#`  - FILTERING  positive signal limits
-#`  - FILTERING  negative signal limits
-#`  - FILTERING  positive night signal limits
-#`  - FILTERING  negative night signal limits
-#`
-
-
+#'
+#' Read all yearly data and create
+#' database of all data
+#' pdf of all days
+#' pdf of suspects
+#' statistic on days
+#'
+#' - IGNORING   too bad days
+#'  - FILTERING  date ranges
+#'  - FILTERING  positive signal limits
+#'  - FILTERING  negative signal limits
+#'  - FILTERING  positive night signal limits
+#'  - FILTERING  negative night signal limits
+#'
 #+ echo=F, include=T
+
 
 
 ####_  Document options _####
@@ -108,8 +107,10 @@ MINsunup      =  0         ## Exclude signal values below that
 
 
 
-
-
+#'
+#' ## Check bad ranges
+#'
+#+ include=T, echo=F
 
 ## . load exclusion list ####
 
@@ -120,13 +121,25 @@ ranges       <- read.table( BAD_RANGES,
 ranges$From  <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
 ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 
-## test valid ranges
-ranges[ ranges$From > ranges$Until, ]
+#'
+#' Check inverted time ranges
+#'
+#+ include=T, echo=F
+pander(
+    ranges[ ranges$From > ranges$Until, ]
+)
 stopifnot(!all(ranges$From < ranges$Until))
+
+#'
+#' Check time ranges span in hours
+#'
+#+ include=T, echo=F
 hist(as.numeric(ranges$Until - ranges$From)/3600)
-ranges[ ranges$Until - ranges$From > 24*3600 , ]
-
-
+cat('\n')
+pander(
+    ranges[ ranges$Until - ranges$From > 24*3600 , ]
+)
+cat('\n')
 
 
 
@@ -149,10 +162,7 @@ output_files <- list.files( path    = SIGNAL_DIR,
 
 
 
-#'
-#' Allowed years to do: `r input_years`
-#'
-#+ include=TRUE, echo=FALSE
+
 
 if (!params$ALL_YEARS) {
     years_to_do <- c()
@@ -174,47 +184,48 @@ if (!params$ALL_YEARS) {
 }
 
 
-#'
-#' Years to do: `r years_to_do`
-#'
-#+ include=TRUE, echo=FALSE, results="asis"
-
-
-
 
 
 #'
-#' ## Info
+#' ## Process CM21 data
 #'
 #' Apply filtering from measurements log files and
 #' signal limitations.
 #'
-#' ### Too bad days.
+#' #### Drop any data with NA signal.
 #'
-#' Exclude days from file '`r basename(TOO_BAD)`'.
-#' These were determined with manual inspection and logging.
-#'
-#' ### Bad day ranges.
+#' #### Bad day ranges.
 #'
 #' Exclude date ranges from file '`r basename(BAD_RANGES)`'.
 #' These were determined with manual inspection and logging.
 #'
-#' ### Filter of possible signal values.
+#' #### Filter of possible signal values.
 #'
 #' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` Volts is possible to be recorded normaly.
 #'
-#' ### Filter of possible night signal.
+#' #### Filter of possible night signal.
 #'
 #' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow a signal range of `r paste0("[",MINsgLIMnight,", " ,MAXsgLIMnight,"]")` to remove various inconsistencies.
 #'
-#' ### Filter negative signal when sun is up.
+#' #### Filter negative signal when sun is up.
 #'
 #' When sun elevation `r paste(">",SUN_ELEV)` ignore CM-21 signal `r paste("<",MINsunup)`.
 #'
+#+ include=T, echo=F
+
+##test
+years_to_do <- 2021
 
 
 
-if (FALSE){
+#'
+#' Allowed years to do: `r input_years`
+#'
+#'
+#' Years to do: `r years_to_do`
+#'
+#+ include=T, echo=F
+
 
 
 ## loop all input files
@@ -222,13 +233,17 @@ if (FALSE){
 #+ include=TRUE, echo=F, results="asis"
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
-for (afile in input_files) {
+for ( yyyy in years_to_do) {
 
     #### Get raw data ####
+    afile <- grep(yyyy, input_files,  value = T)
     rawdata        <- readRDS(afile)
-    rawdata$day    <- as.Date(rawdata$Date)
+    rawdata[ , day := as.Date(Date) ]
+
+    cat( "\n## Year:", yyyy, "\n" )
+
+
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
-    yyyy           <- year(rawdata$day[1])
 
     ## drop NA signal
     rawdata <- rawdata[ !is.na(CM21value) ]
@@ -237,167 +252,169 @@ for (afile in input_files) {
 
     ####  Filter bad date ranges  ########################################
     pre_count <- rawdata[ !is.na(CM21value), .N ]
+    rawdata$Bad_ranges <- NA
     for ( i in 1:nrow(ranges) ) {
         lower <- ranges$From[  i ]
         upper <- ranges$Until[ i ]
-        ## remove bad regions of data
+        ## mark bad regions of data
         select  <- rawdata$Date >= lower & rawdata$Date <= upper
         rawdata <- rawdata[ ! select ]
+
         rm(select)
     }
     NR_bad_ranges <- pre_count - rawdata[ !is.na(CM21value), .N ]
     ######################################################################
 
 
-    cat('\n')
-
-    yearlims <- data.table()
-    for (an in grep("CM21",names(rawdata),value = T)){
-        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-        low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
-        upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
-
-        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
-
-        test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
-        if ( nrow(test) > 0 ) {
-            cat('\n')
-            cat(paste("### Suspects after removing bad data from log.\n\n"))
-            cat('\n')
-            cat(pander(test))
-        }
-    }
-
-    cat('\n')
-
-
-    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
-         main = paste("CM21 signal ", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 signal" )
-    abline( h = yearlims[ an == "CM21value", low], col = "red")
-    abline( h = yearlims[ an == "CM21value", upe], col = "red")
-
-    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
-         main = paste("CM21 signal SD", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 signal Standard Deviations")
-    abline( h = yearlims[ an == "CM21sd", low], col = "red")
-    abline( h = yearlims[ an == "CM21sd", upe], col = "red")
-
-
-    cat('\n')
-    cat('\n')
-
-
-
-    ####  Filter signal physical limits  #################################
-    pre_count <- rawdata[ !is.na(CM21value), .N ]
-    rawdata <- rawdata[ CM21value >= MINsgLIM ]
-    rawdata <- rawdata[ CM21value <= MAXsgLIM ]
-    NR_signal_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
-    ######################################################################
-
-
-
-    ####  Filter night signal possible limits  ###########################
-    pre_count <- rawdata[ !is.na(CM21value), .N ]
-    getnight  <- rawdata$Eleva < DARK_ELEV
-    ## drop too negative signal values
-    toolowsgDark <- rawdata$CM21value < MINsgLIMnight & getnight
-    rawdata$CM21value[ toolowsgDark ]  <- NA
-    rawdata$CM21sd[    toolowsgDark ]  <- NA
-    ## drop too positive signal values
-    toohighsgDark <- rawdata$CM21value > MAXsgLIMnight & getnight
-    rawdata$CM21value[ toohighsgDark ] <- NA
-    rawdata$CM21sd[    toohighsgDark ] <- NA
-    rm(toohighsgDark,toolowsgDark,getnight)
-    NR_signal_night_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
-    ######################################################################
-
-
-
-    ####  Filter negative values when sun is up  #########################
-    pre_count <- rawdata[ !is.na(CM21value), .N ]
-    neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
-    rawdata$CM21value[ neg_sun ]  <- NA
-    rawdata$CM21sd[    neg_sun ]  <- NA
-    rm( neg_sun )
-    NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
-    ######################################################################
-
-
-
-    tempout <- data.frame()
-
-
-    cat(paste("\\newpage\n\n"))
-    cat(paste("## ",yyyy,"\n\n"))
-
-    tempout <- rbind( tempout, data.frame(Name = "Initial data",           Data_points = NR_loaded) )
-    tempout <- rbind( tempout, data.frame(Name = "Too bad days",           Data_points = NR_too_bad_days) )
-    tempout <- rbind( tempout, data.frame(Name = "Bad date ranges",        Data_points = NR_bad_ranges) )
-    tempout <- rbind( tempout, data.frame(Name = "Signal physical limits", Data_points = NR_signal_limit) )
-    tempout <- rbind( tempout, data.frame(Name = "Signal night limits",    Data_points = NR_signal_night_limit) )
-    tempout <- rbind( tempout, data.frame(Name = "Negative daytime",       Data_points = NR_negative_daytime) )
-    tempout <- rbind( tempout, data.frame(Name = "Remaining data",         Data_points = rawdata[ !is.na(CM21value), .N ]) )
-
-
-    # cat(paste0( "Initial **",
-    #             NR_loaded, "** data points loaded\n\n" ))
-    # cat(paste0( "\"Too bad days\" removed *",
-    #             NR_too_bad_days, "* data points\n\n" ))
-    # cat(paste0( "\"Bad date ranges\" removed *",
-    #             NR_bad_ranges, "* data points\n\n" ))
-    # cat(paste0( "\"Signal physical limits\" removed *",
-    #             NR_signal_limit, "* data points\n\n" ))
-    # cat(paste0( "\"Signal night limits\" removed *",
-    #             NR_signal_night_limit, "* data points\n\n" ))
-    # cat(paste0( "\"Negative daytime\" removed *",
-    #             NR_negative_daytime, "* data points\n\n" ))
-    # cat(paste0( "Remaining **",
-    #             rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
-
-
-
-    cat('\\scriptsize\n')
-
-    # cat('\\footnotesize\n')
-
-    cat(pander( tempout ))
-
-    cat(pander( summary(rawdata[,!c("Date","Azimuth")]) ))
-
-    cat('\\normalsize\n')
-
-    cat('\n')
-
-    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
-
-    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
-
-    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
-         main = paste("CM21 signal ", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 signal" )
-
-    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
-         main = paste("CM21 signal SD", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 signal Standard Deviations")
-
-    cat('\n')
-    cat('\n')
-
-    capture.output(
-        myRtools::write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
-        file = "/dev/null" )
+#     cat('\n')
+#
+#     yearlims <- data.table()
+#     for (an in grep("CM21",names(rawdata),value = T)){
+#         daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+#                                dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+#         low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
+#         upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
+#
+#         yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+#
+#         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
+#         if ( nrow(test) > 0 ) {
+#             cat('\n')
+#             cat(paste("### Suspects after removing bad data from log.\n\n"))
+#             cat('\n')
+#             cat(pander(test))
+#         }
+#     }
+#
+#     cat('\n')
+#
+#
+#     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
+#          main = paste("CM21 signal ", yyyy ),
+#          xlab = "Elevation",
+#          ylab = "CM21 signal" )
+#     abline( h = yearlims[ an == "CM21value", low], col = "red")
+#     abline( h = yearlims[ an == "CM21value", upe], col = "red")
+#
+#     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
+#          main = paste("CM21 signal SD", yyyy ),
+#          xlab = "Elevation",
+#          ylab = "CM21 signal Standard Deviations")
+#     abline( h = yearlims[ an == "CM21sd", low], col = "red")
+#     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
+#
+#
+#     cat('\n')
+#     cat('\n')
+#
+#
+#
+#     ####  Filter signal physical limits  #################################
+#     pre_count <- rawdata[ !is.na(CM21value), .N ]
+#     rawdata <- rawdata[ CM21value >= MINsgLIM ]
+#     rawdata <- rawdata[ CM21value <= MAXsgLIM ]
+#     NR_signal_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
+#     ######################################################################
+#
+#
+#
+#     ####  Filter night signal possible limits  ###########################
+#     pre_count <- rawdata[ !is.na(CM21value), .N ]
+#     getnight  <- rawdata$Eleva < DARK_ELEV
+#     ## drop too negative signal values
+#     toolowsgDark <- rawdata$CM21value < MINsgLIMnight & getnight
+#     rawdata$CM21value[ toolowsgDark ]  <- NA
+#     rawdata$CM21sd[    toolowsgDark ]  <- NA
+#     ## drop too positive signal values
+#     toohighsgDark <- rawdata$CM21value > MAXsgLIMnight & getnight
+#     rawdata$CM21value[ toohighsgDark ] <- NA
+#     rawdata$CM21sd[    toohighsgDark ] <- NA
+#     rm(toohighsgDark,toolowsgDark,getnight)
+#     NR_signal_night_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
+#     ######################################################################
+#
+#
+#
+#     ####  Filter negative values when sun is up  #########################
+#     pre_count <- rawdata[ !is.na(CM21value), .N ]
+#     neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
+#     rawdata$CM21value[ neg_sun ]  <- NA
+#     rawdata$CM21sd[    neg_sun ]  <- NA
+#     rm( neg_sun )
+#     NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
+#     ######################################################################
+#
+#
+#
+#     tempout <- data.frame()
+#
+#
+#     cat(paste("\\newpage\n\n"))
+#     cat(paste("## ",yyyy,"\n\n"))
+#
+#     tempout <- rbind( tempout, data.frame(Name = "Initial data",           Data_points = NR_loaded) )
+#     tempout <- rbind( tempout, data.frame(Name = "Too bad days",           Data_points = NR_too_bad_days) )
+#     tempout <- rbind( tempout, data.frame(Name = "Bad date ranges",        Data_points = NR_bad_ranges) )
+#     tempout <- rbind( tempout, data.frame(Name = "Signal physical limits", Data_points = NR_signal_limit) )
+#     tempout <- rbind( tempout, data.frame(Name = "Signal night limits",    Data_points = NR_signal_night_limit) )
+#     tempout <- rbind( tempout, data.frame(Name = "Negative daytime",       Data_points = NR_negative_daytime) )
+#     tempout <- rbind( tempout, data.frame(Name = "Remaining data",         Data_points = rawdata[ !is.na(CM21value), .N ]) )
+#
+#
+    cat(paste0( "**",
+                NR_loaded, "** non NA data points loaded\n\n" ))
+#     # cat(paste0( "\"Too bad days\" removed *",
+#     #             NR_too_bad_days, "* data points\n\n" ))
+#     # cat(paste0( "\"Bad date ranges\" removed *",
+#     #             NR_bad_ranges, "* data points\n\n" ))
+#     # cat(paste0( "\"Signal physical limits\" removed *",
+#     #             NR_signal_limit, "* data points\n\n" ))
+#     # cat(paste0( "\"Signal night limits\" removed *",
+#     #             NR_signal_night_limit, "* data points\n\n" ))
+#     # cat(paste0( "\"Negative daytime\" removed *",
+#     #             NR_negative_daytime, "* data points\n\n" ))
+#     # cat(paste0( "Remaining **",
+#     #             rawdata[ !is.na(CM21value), .N ], "** data points\n\n" ))
+#
+#
+#
+#     cat('\\scriptsize\n')
+#
+#     # cat('\\footnotesize\n')
+#
+#     cat(pander( tempout ))
+#
+#     cat(pander( summary(rawdata[,!c("Date","Azimuth")]) ))
+#
+#     cat('\\normalsize\n')
+#
+#     cat('\n')
+#
+#     hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy ) )
+#
+#     hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+#
+#     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
+#          main = paste("CM21 signal ", yyyy ),
+#          xlab = "Elevation",
+#          ylab = "CM21 signal" )
+#
+#     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
+#          main = paste("CM21 signal SD", yyyy ),
+#          xlab = "Elevation",
+#          ylab = "CM21 signal Standard Deviations")
+#
+#     cat('\n')
+#     cat('\n')
+#
+#     capture.output(
+#         myRtools::write_RDS(rawdata, sub(".Rds", "_L1.Rds", afile)),
+#         file = "/dev/null" )
 
 }
 #'
 
-}
+
 
 ## END ##
 tac = Sys.time()
