@@ -1,18 +1,28 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:  "LEVEL 0 CM21 data processing report."
+#' title:  "Read raw CM21 data."
 #' author: "Natsis Athanasios"
 #' institute: "AUTH"
 #' affiliation: "Laboratory of Atmospheric Physics"
 #' abstract: "Combine raw data from CM21 to yearly data sets.
 #'            Problematic data are filter out the output is written
 #'            as R binary (.Rds) file."
+#' documentclass: article
+#' classoption:   a4paper,oneside
+#' fontsize:      11pt
+#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#'
 #' output:
 #'   html_document:
 #'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 6
+#'     fig_width:  7.5
+#'     fig_height: 5
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -39,6 +49,7 @@
 #'   - Reads data from Sirena only
 #'
 
+####_  Document options _####
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
@@ -47,15 +58,15 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_P00_") })
+                            return("CM21_P10_") })
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
     filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
 }
 
-library(data.table)
-library(pander)
+library(data.table, quietly = T)
+library(pander,     quietly = T)
 library(myRtools)
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )

@@ -37,10 +37,10 @@ render("./CM21_P10_Read_LAP.R",
 
 
 
-# render("./CM21_P20_Import_Data_filtered.R",
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
+render("./CM21_P20_Import_Data_filtered.R",
+       params = list( ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
 
 
 stop()
