@@ -77,9 +77,11 @@ if(!interactive()) {
 
 
 #+ echo=F, include=F
+library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(RAerosols,  quietly = T, warn.conflicts = F)
+library(myRtools,   quietly = T, warn.conflicts = F)
+
 source("~/CM_21_GLB/CM21_functions.R")
 
 ALL_YEARS = FALSE
@@ -115,9 +117,11 @@ MINsunup      =  0         ## Exclude signal values below that
 ## . load exclusion list ####
 
 ranges       <- read.table( BAD_RANGES,
-                            sep = ";",
-                            colClasses = "character",
-                            header = TRUE, comment.char = "#" )
+                            sep         = ";",
+                            colClasses  = "character",
+                            strip.white = TRUE,
+                            header      = TRUE,
+                            comment.char = "#" )
 ranges$From  <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
 ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 
@@ -136,9 +140,9 @@ stopifnot(!all(ranges$From < ranges$Until))
 #+ include=T, echo=F
 hist(as.numeric(ranges$Until - ranges$From)/3600)
 cat('\n')
-pander(
-    ranges[ ranges$Until - ranges$From > 24*3600 , ]
-)
+temp <- ranges[ ranges$Until - ranges$From > 24*3600 , ]
+row.names(temp) <- NULL
+pander( temp )
 cat('\n')
 
 
@@ -159,8 +163,6 @@ input_years <- as.numeric(
 output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
                             full.names = T )
-
-
 
 
 
@@ -242,50 +244,55 @@ for ( yyyy in years_to_do) {
 
     cat( "\n## Year:", yyyy, "\n" )
 
-
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
 
     ## drop NA signal
     rawdata <- rawdata[ !is.na(CM21value) ]
 
-
-
-    ####  Filter bad date ranges  ########################################
-    pre_count <- rawdata[ !is.na(CM21value), .N ]
-    rawdata$Bad_ranges <- NA
-    for ( i in 1:nrow(ranges) ) {
-        lower <- ranges$From[  i ]
-        upper <- ranges$Until[ i ]
+    ####  Mark bad date ranges  ########################################
+    rawdata[ , Bad_ranges := "" ]
+    ## loop only relevant
+    rangestemp <- ranges
+    rangestemp <- rangestemp[ year(rangestemp$From)  >= yyyy &
+                                  year(rangestemp$Until) <= yyyy, ]
+    for ( i in 1:nrow(rangestemp) ) {
+        lower <- rangestemp$From[    i ]
+        upper <- rangestemp$Until[   i ]
+        comme <- rangestemp$Comment[ i ]
         ## mark bad regions of data
-        select  <- rawdata$Date >= lower & rawdata$Date <= upper
-        rawdata <- rawdata[ ! select ]
-
-        rm(select)
+        rawdata[ Date >= lower & Date <= upper, Bad_ranges := comme ]
     }
-    NR_bad_ranges <- pre_count - rawdata[ !is.na(CM21value), .N ]
+    NR_bad_ranges <- rawdata[ Bad_ranges != "", .N ]
+
+    ## remove bad ranges data
+    write_dat( object = rawdata[ Bad_ranges != "",  ],
+               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",yyyy,"_bad_ranges"),
+               clean  = TRUE)
+
+    rawdata <- rawdata[ Bad_ranges == "",  ]
+    rawdata[, Bad_ranges := NULL ]
     ######################################################################
 
+    ## Plot with some checks after bad regions
 
-#     cat('\n')
-#
-#     yearlims <- data.table()
-#     for (an in grep("CM21",names(rawdata),value = T)){
-#         daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-#                                dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-#         low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
-#         upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
-#
-#         yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
-#
-#         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
-#         if ( nrow(test) > 0 ) {
-#             cat('\n')
-#             cat(paste("### Suspects after removing bad data from log.\n\n"))
-#             cat('\n')
-#             cat(pander(test))
-#         }
-#     }
-#
+    yearlims <- data.table()
+    for (an in grep("CM21",names(rawdata),value = T)){
+        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+        low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
+        upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
+
+        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+
+        test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
+        if ( nrow(test) > 0 ) {
+            cat('\n')
+            cat(paste("### Remaining Suspects after removing bad data from log.\n\n"))
+            cat('\n')
+            cat(pander(test))
+        }
+    }
+
 #     cat('\n')
 #
 #
@@ -363,10 +370,8 @@ for ( yyyy in years_to_do) {
 #
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
-#     # cat(paste0( "\"Too bad days\" removed *",
-#     #             NR_too_bad_days, "* data points\n\n" ))
-#     # cat(paste0( "\"Bad date ranges\" removed *",
-#     #             NR_bad_ranges, "* data points\n\n" ))
+    cat(paste0( "**",
+                NR_bad_ranges, "** points markded as bad data ranges\n\n" ))
 #     # cat(paste0( "\"Signal physical limits\" removed *",
 #     #             NR_signal_limit, "* data points\n\n" ))
 #     # cat(paste0( "\"Signal night limits\" removed *",
