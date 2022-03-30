@@ -18,16 +18,18 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:  8
+#'     fig_height: 5
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
@@ -44,14 +46,12 @@
 #'
 #+ echo=F, include=T
 
-
-
 ####_  Document options _####
 
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "70%"    )
+knitr::opts_chunk$set(out.width  = "100%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
@@ -75,8 +75,13 @@ library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 
-# source("~/CM_21_GLB/CM21_functions.R")
+####  . . Variables  ####
+source("~/CM_21_GLB/DEFINITIONS.R")
+
+OutliersPlot <- 5
 
 ALL_YEARS = FALSE
 if (!exists("params")){
@@ -84,10 +89,8 @@ if (!exists("params")){
 }
 
 
-####  . Variables  ####
-source("~/CM_21_GLB/DEFINITIONS.R")
 
-OutliersPlot <- 5
+
 
 
 #'
@@ -120,12 +123,13 @@ stopifnot(!all(ranges$From < ranges$Until))
 #'
 #+ include=T, echo=F
 hist(as.numeric(ranges$Until - ranges$From)/3600)
-cat('\n')
+cat('\n\n')
 temp <- ranges[ ranges$Until - ranges$From > 24*3600 , ]
 row.names(temp) <- NULL
 pander( temp )
-cat('\n')
-
+cat('\n\n')
+pander(data.table(table(ranges$Comment)))
+cat('\n\n')
 
 
 

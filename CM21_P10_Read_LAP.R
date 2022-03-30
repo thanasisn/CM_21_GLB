@@ -17,21 +17,22 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:  8
+#'     fig_height: 5
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
 #' ---
-
 
 #'
 #' Read text files with CM_21 signal data to rds
@@ -46,8 +47,18 @@
 #'   - based on level_0_CM21_x8
 #'   - Reads data from Sirena only
 #'
+#+ echo=F, include=T
 
 ####_  Document options _####
+
+
+knitr::opts_chunk$set(comment    = ""      )
+# knitr::opts_chunk$set(dev        = "pdf"   )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"    )
+knitr::opts_chunk$set(fig.align  = "center" )
+# knitr::opts_chunk$set(fig.pos    = '!h'     )
+
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
@@ -68,7 +79,7 @@ library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
-knitr::opts_chunk$set(fig.align  = "center" )
+
 
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
@@ -316,7 +327,7 @@ for ( YYYY in years_to_do ) {
 
     ####  Save signal data to file  ####
     write_RDS(object = year_data,
-              file   =  paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
 }
 ## sort list of missing files
 system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
