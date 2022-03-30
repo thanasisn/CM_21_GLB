@@ -262,13 +262,13 @@ for ( YYYY in years_to_do ) {
     #
     # cat('\\normalsize\n')
 
-    cat('\n')
+    cat('\n\n')
 
     hist(year_data$CM21value, breaks = 50, main = paste("CM21 signal ",  YYYY ) )
-    cat('\n')
+    cat('\n\n')
 
     hist(year_data$CM21sd,    breaks = 50, main = paste("CM21 signal SD",YYYY ) )
-    cat('\n')
+    cat('\n\n')
 
     plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .8,
          main = paste("CM21 signal ", YYYY ),
@@ -276,7 +276,7 @@ for ( YYYY in years_to_do ) {
          ylab = "CM21 signal" )
     abline( h = yearlims[ an == "CM21value", low], col = "red")
     abline( h = yearlims[ an == "CM21value", upe], col = "red")
-    cat('\n')
+    cat('\n\n')
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .8,
          main = paste("CM21 signal SD", YYYY ),
@@ -284,7 +284,7 @@ for ( YYYY in years_to_do ) {
          ylab = "CM21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
-    cat('\n')
+    cat('\n\n')
 
 
     par(mar = c(2,4,2,1))
@@ -309,20 +309,19 @@ for ( YYYY in years_to_do ) {
 
     boxplot(year_data$CM21value ~ month_vec )
     title(main = paste("CM21value by month", YYYY) )
-    cat('\n')
+    cat('\n\n')
 
     boxplot(year_data$CM21sd ~ month_vec )
     title(main = paste("CM21sd by month", YYYY) )
-    cat('\n')
+    cat('\n\n')
 
     boxplot(year_data$Elevat ~ month_vec )
     title(main = paste("Elevation by month", YYYY) )
-    cat('\n')
+    cat('\n\n')
 
     boxplot(year_data$Azimuth ~ month_vec )
     title(main = paste("Azimuth by month", YYYY) )
-    cat('\n')
-    cat('\n')
+    cat('\n\n')
 
     ####  Save data to file  ####
     outfile <- paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds")
