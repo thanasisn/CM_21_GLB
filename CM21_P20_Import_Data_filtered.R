@@ -55,38 +55,26 @@
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE   )
-knitr::opts_chunk$set(cache      = FALSE   )
-# knitr::opts_chunk$set(include    = FALSE   )
-knitr::opts_chunk$set(include    = TRUE    )
 knitr::opts_chunk$set(comment    = ""      )
-
-# pdf output is huge too many point to plot
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
-
-knitr::opts_chunk$set(fig.width  = 8       )
-knitr::opts_chunk$set(fig.height = 6       )
-
 knitr::opts_chunk$set(out.width  = "70%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
-####_ Notes _####
-
-
-
 
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
+                            return("CM21_P20_") })
+if(!interactive()) {
+    pdf(  file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink( file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+}
 
 
 
@@ -119,11 +107,10 @@ MINsunup      =  0         ## Exclude signal values below that
 
 ## . get data input files ####
 input_files <- list.files( path    = SIGNAL_DIR,
-                           pattern = "LAP_CM21H_SIG_[0-9]{4}.Rds",
+                           pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
                            full.names = T )
 input_files <- sort(input_files)
 
-stop()
 
 
 ## . load exclusion list ####
@@ -174,7 +161,7 @@ ranges[ ranges$Until - ranges$From > 24*3600 , ]
 
 
 
-
+stop()
 
 
 ## loop all input files
