@@ -65,12 +65,12 @@ if(!interactive()) {
     filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
 }
 
-library(data.table, quietly = T)
-library(pander,     quietly = T)
+library(data.table, quietly = T, warn.conflicts = F)
+library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools)
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
-
+knitr::opts_chunk$set(fig.align  = "center" )
 
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
@@ -265,11 +265,9 @@ for ( YYYY in years_to_do ) {
     cat('\n')
 
     hist(year_data$CM21value, breaks = 50, main = paste("CM21 signal ",  YYYY ) )
-
     cat('\n')
 
     hist(year_data$CM21sd,    breaks = 50, main = paste("CM21 signal SD",YYYY ) )
-
     cat('\n')
 
     plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .8,
@@ -278,7 +276,6 @@ for ( YYYY in years_to_do ) {
          ylab = "CM21 signal" )
     abline( h = yearlims[ an == "CM21value", low], col = "red")
     abline( h = yearlims[ an == "CM21value", upe], col = "red")
-
     cat('\n')
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .8,
@@ -287,8 +284,6 @@ for ( YYYY in years_to_do ) {
          ylab = "CM21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
-
-    cat('\n')
     cat('\n')
 
 
@@ -314,16 +309,20 @@ for ( YYYY in years_to_do ) {
 
     boxplot(year_data$CM21value ~ month_vec )
     title(main = paste("CM21value by month", YYYY) )
+    cat('\n')
 
     boxplot(year_data$CM21sd ~ month_vec )
     title(main = paste("CM21sd by month", YYYY) )
+    cat('\n')
 
     boxplot(year_data$Elevat ~ month_vec )
     title(main = paste("Elevation by month", YYYY) )
+    cat('\n')
 
     boxplot(year_data$Azimuth ~ month_vec )
     title(main = paste("Azimuth by month", YYYY) )
-
+    cat('\n')
+    cat('\n')
 
     ####  Save data to file  ####
     outfile <- paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds")
