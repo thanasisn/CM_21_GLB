@@ -215,8 +215,8 @@ if (!params$ALL_YEARS) {
 #'
 #+ include=T, echo=F
 
-##test
-years_to_do <- 2021
+# ##test
+# years_to_do <- 2021
 
 
 
@@ -249,7 +249,7 @@ for ( yyyy in years_to_do) {
     ## drop NA signal
     rawdata <- rawdata[ !is.na(CM21value) ]
 
-    ####  Mark bad date ranges  ########################################
+    ####    Mark bad date ranges    ############################################
     rawdata[ , Bad_ranges := "" ]
     ## loop only relevant
     rangestemp <- ranges
@@ -271,61 +271,78 @@ for ( yyyy in years_to_do) {
 
     rawdata <- rawdata[ Bad_ranges == "",  ]
     rawdata[, Bad_ranges := NULL ]
-    ######################################################################
+    ############################################################################
+
 
     ## Plot with some checks after bad regions
-
     yearlims <- data.table()
     for (an in grep("CM21",names(rawdata),value = T)){
         daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
                                dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-        low <- daily[ !is.infinite(dmin) , mean(dmin) - 4 * sd(dmin)]
-        upe <- daily[ !is.infinite(dmax) , mean(dmax) + 4 * sd(dmax)]
+        low <- daily[ !is.infinite(dmin) , mean(dmin) - 5 * sd(dmin)]
+        upe <- daily[ !is.infinite(dmax) , mean(dmax) + 5 * sd(dmax)]
 
         yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(day) ]))
         if ( nrow(test) > 0 ) {
-            cat('\n')
+            cat('\n\n')
             cat(paste("### Remaining Suspects after removing bad data from log.\n\n"))
-            cat('\n')
+            cat('\n\n')
             cat(pander(test))
+            cat('\n\n')
         }
     }
 
-#     cat('\n')
-#
-#
-#     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .8,
-#          main = paste("CM21 signal ", yyyy ),
-#          xlab = "Elevation",
-#          ylab = "CM21 signal" )
-#     abline( h = yearlims[ an == "CM21value", low], col = "red")
-#     abline( h = yearlims[ an == "CM21value", upe], col = "red")
-#
-#     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .8,
-#          main = paste("CM21 signal SD", yyyy ),
-#          xlab = "Elevation",
-#          ylab = "CM21 signal Standard Deviations")
-#     abline( h = yearlims[ an == "CM21sd", low], col = "red")
-#     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
-#
-#
-#     cat('\n')
-#     cat('\n')
-#
-#
-#
-#     ####  Filter signal physical limits  #################################
-#     pre_count <- rawdata[ !is.na(CM21value), .N ]
-#     rawdata <- rawdata[ CM21value >= MINsgLIM ]
-#     rawdata <- rawdata[ CM21value <= MAXsgLIM ]
-#     NR_signal_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
-#     ######################################################################
-#
-#
-#
-#     ####  Filter night signal possible limits  ###########################
+    cat('\n\n')
+
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
+    cat('\n\n')
+
+    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    cat('\n\n')
+
+    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
+         main = paste("CM21 signal ", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal" )
+    abline( h = yearlims[ an == "CM21value", low], col = "red")
+    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+    cat('\n\n')
+
+    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
+         main = paste("CM21 signal SD", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal Standard Deviations")
+    abline( h = yearlims[ an == "CM21sd", low], col = "red")
+    abline( h = yearlims[ an == "CM21sd", upe], col = "red")
+    cat('\n\n')
+
+
+    par(mar = c(2,4,2,1))
+    month_vec <- strftime(  rawdata$Date30 , format = "%m")
+    dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
+                            list(month_vec), FUN = summary, digits = 6 )
+
+    boxplot(rawdata$CM21value ~ month_vec )
+    title(main = paste("CM21value by month", yyyy) )
+    cat('\n\n')
+
+    boxplot(rawdata$CM21sd ~ month_vec )
+    title(main = paste("CM21sd by month", yyyy) )
+    cat('\n\n')
+
+
+    rawdata[, FlagP20 := "" ]
+
+    ####   Mark signal physical limits    ######################################
+    rawdata[ CM21value <  MINsgLIM, FlagP20 := "sgLIM_hit" ]
+    rawdata[ CM21value >  MAXsgLIM, FlagP20 := "sgLIM_hit" ]
+    NR_signal_limit    <- rawdata[ FlagP20 == "sgLIM_hit", .N ]
+    ######################################################################
+
+
+    ####    Filter night signal possible limits    #############################
 #     pre_count <- rawdata[ !is.na(CM21value), .N ]
 #     getnight  <- rawdata$Eleva < DARK_ELEV
 #     ## drop too negative signal values
@@ -339,9 +356,9 @@ for ( yyyy in years_to_do) {
 #     rm(toohighsgDark,toolowsgDark,getnight)
 #     NR_signal_night_limit <- pre_count - rawdata[ !is.na(CM21value), .N ]
 #     ######################################################################
-#
-#
-#
+
+
+
 #     ####  Filter negative values when sun is up  #########################
 #     pre_count <- rawdata[ !is.na(CM21value), .N ]
 #     neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
