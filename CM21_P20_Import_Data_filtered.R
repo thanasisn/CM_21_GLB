@@ -87,24 +87,11 @@ if (!exists("params")){
 ####  . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
-## Filter all data
-MINsgLIM      = -0.06      ## Lower signal limit (CF~3344.482  0.03V~100watt)
-MAXsgLIM      = +0.5       ## Higher signal limit (from hardware limitations)
-
-## Filter when dark (sun below DARK_ELEV )
-DARK_ELEV     = -10        ## sun elevation limit
-MINsgLIMnight = -0.02      ## Lower signal limit when dark
-MAXsgLIMnight = +0.10      ## Higher signal limit when dark
-
-## Negative limit
-SUN_ELEV      = +5         ## When sun is above that
-MINsunup      =  0         ## Exclude signal values below that
-
 
 
 
 #'
-#' ## Check bad ranges
+#' ## Check bad ranges input
 #'
 #+ include=T, echo=F
 
@@ -208,9 +195,6 @@ if (!params$ALL_YEARS) {
 #' When sun elevation `r paste(">",SUN_ELEV)` ignore CM-21 signal `r paste("<",MINsunup)`.
 #'
 #+ include=T, echo=F
-
-##test
-years_to_do <- 2021
 
 
 
@@ -379,9 +363,7 @@ for ( yyyy in years_to_do) {
 
 
 #     cat('\\scriptsize\n')
-#
 #     # cat('\\footnotesize\n')
-#
 #     cat('\\normalsize\n')
 #
 #     cat('\n')
@@ -407,14 +389,14 @@ for ( yyyy in years_to_do) {
 
 
     ####  Save signal data to file  ####
-    write_RDS(object = year_data,
-              file   =  paste0(SIGNAL_DIR,"/LAP_CM21_H_L0_",YYYY,".Rds") )
+    write_RDS(object = rawdata,
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_L0_",yyyy,".Rds") )
 
 }
 #'
 
 
 
-## END ##
-tac = Sys.time()
+#' **END**
+tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

@@ -15,7 +15,7 @@ BASED      = "~/CM_21_GLB/"
 SUN_FOLDER = "~/DATA_RAW/SUN/PySolar_LAP/"
 SIRENA_DIR = "~/DATA_RAW/Bband/AC21_LAP.GLB/"
 RADMON_DIR = "~/DATA_RAW/Raddata/6"
-SIGNAL_DIR = "~/DATA/Broad_Band/CM21_H/"
+SIGNAL_DIR = "~/DATA/Broad_Band/CM21_H_signal/"
 GLOBAL_DIR = "~/DATA/cm21_data_validation/CM21_global/"
 EXPORT_DIR = "~/DATA/cm21_data_validation/CM21_exports/"
 REPORT_DIR = "~/CM_21_GLB/REPORTS/"
@@ -60,3 +60,21 @@ END_DAY    = as.POSIXct("2022-01-01 00:00:00 UTC")
 ## date range to export for TOT and WRDC
 EXPORT_START = as.POSIXct("2006-01-01 00:00:00 UTC")
 EXPORT_STOP  = as.POSIXct("2022-01-01 00:00:00 UTC")
+
+
+
+#### Signal to L0 variables  #####
+
+## mark all data
+MINsgLIM      = -0.06      ## Lower signal limit (CF~3344.482  0.03V~100watt)
+MAXsgLIM      = +0.5       ## Higher signal limit (from hardware limitations)
+
+## mark when dark (sun below DARK_ELEV )
+DARK_ELEV     = -10        ## sun elevation limit
+MINsgLIMnight = -0.02      ## Lower signal limit when dark
+MAXsgLIMnight = +0.10      ## Higher signal limit when dark
+
+## mark limit (not used)
+SUN_ELEV      = +5         ## When sun is above that
+MINsunup      =  0         ## Exclude signal values below that
+
