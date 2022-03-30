@@ -1,11 +1,13 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
-#'
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title: "CM21 signal filtering."
 #' author: "Natsis Athanasios"
-#' date: "`r format(Sys.time(), '%B %d, %Y')`"
-#' keywords: "CM21, CM21 data validation, global irradiance"
+#' institute: "AUTH"
+#' affiliation: "Laboratory of Atmospheric Physics"
+#' abstract: "Combine raw data from CM21 to yearly data sets.
+#'            Problematic data are filter out the output is written
+#'            as R binary (.Rds) file."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -17,18 +19,36 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  9
+#'     fig_height: 6
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   html_document:
-#'     keep_md:          yes
-#'   odt_document:  default
-#'   word_document: default
-#'
+#' date: "`r format(Sys.time(), '%F')`"
+#' params:
+#'    ALL_YEARS: TRUE
 #' ---
+
+
+#` Read all yearly data and create
+#` database of all data
+#` pdf of all days
+#` pdf of suspects
+#` statistic on days
+#`
+#` - IGNORING   too bad days
+#`  - FILTERING  date ranges
+#`  - FILTERING  positive signal limits
+#`  - FILTERING  negative signal limits
+#`  - FILTERING  positive night signal limits
+#`  - FILTERING  negative night signal limits
+#`
+
 
 #+ echo=F, include=T
 
@@ -55,20 +75,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 ####_ Notes _####
 
-#
-# Read all yearly data and create
-# database of all data
-# pdf of all days
-# pdf of suspects
-# statistic on days
-#
-#  - IGNORING   too bad days
-#  - FILTERING  date ranges
-#  - FILTERING  positive signal limits
-#  - FILTERING  negative signal limits
-#  - FILTERING  positive night signal limits
-#  - FILTERING  negative night signal limits
-#
 
 
 
