@@ -117,7 +117,7 @@ input_files <- list.files( path    = SIGNAL_DIR,
                            full.names = T )
 input_files <- sort(input_files)
 
-
+stop()
 
 
 ## . load exclusion list ####
