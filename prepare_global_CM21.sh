@@ -18,9 +18,11 @@ info "START :: $0 :: $* ::"
 info "Try to get new files"
 "$HOME/Aerosols/BASH_help/update_data_from_sirena.sh"
 
-info "Read raw files to Rds"
-
+info "Read raw files to SIG"
 Rscript "$(dirname "$0")/CM21_P10_Read_LAP.R"
+
+info "Filter raw data to L0"
+Rscript "$(dirname "$0")/CM21_P20_Import_Data_filtered.R"
 
 
 ## end coding
