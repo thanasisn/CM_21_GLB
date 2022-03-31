@@ -142,6 +142,8 @@ if (file.exists(DARKSTORE)) {
 }
 
 
+#test
+input_files <- grep("2015",input_files, value = T)
 
 
 #'
@@ -201,6 +203,8 @@ for (afile in input_files) {
     cat(paste("## ",yyyy,"\n\n"))
 
 
+
+
     for (ddd in daystodo) {
 
         theday      <- as.POSIXct( as.Date(ddd), origin = "1970-01-01")
@@ -220,17 +224,20 @@ for (afile in input_files) {
         if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
 
 
-        ## get valid daily data
+        ## get valid day data
+
+        ## all vars
+        wholeday    <- rawdata[ day == as.Date(theday) ]
+        ## only valid data
         daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
 
-        daydata
 
-        rawdata[ !is.na(QFlag_1), .I ]
+        # stopifnot(wholeday[! is.na(QFlag_1), .N ]==0)
 
-        ## add all minutes for nicer graphs
+
+        ## fill all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)
         daydata$day <- as.Date(daydata$Date)
-
 
 
         ####  Filter Standard deviation extremes  ##############################
@@ -238,6 +245,7 @@ for (afile in input_files) {
         pre_count     <- daydata[ !is.na(CM21value), .N ]
         daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
         NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
+        stopifnot(NR_extreme_SD == 0)
         if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
             cat('\n')
             cat(paste(theday, "SKIP: No data left after extreme SD filtering!!"),"\n")
@@ -336,8 +344,8 @@ for (afile in input_files) {
         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
 
     } #END loop of days
-stop()
 
+if(FALSE){
     tempout <- data.frame()
 
     tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
@@ -381,7 +389,7 @@ stop()
     # capture.output(
     #     myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
     #     file = "/dev/null" )
-
+}
 }
 #'
 
