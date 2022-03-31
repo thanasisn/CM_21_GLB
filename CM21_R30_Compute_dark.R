@@ -220,8 +220,8 @@ for (afile in input_files) {
         if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
 
 
-        ## get daily data
-        daydata     <- rawdata[ day == as.Date(theday) & is.na(FlagP20) ]
+        ## get valid daily data
+        daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
 
         daydata
 
@@ -284,7 +284,7 @@ for (afile in input_files) {
         ####    Apply dark correction    ###########################################
         daydata$Global  <-  daydata$Global  -  todaysdark
 
-stop()
+
 
         # ## plot to external pdf
         # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
@@ -336,7 +336,7 @@ stop()
         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
 
     } #END loop of days
-
+stop()
 
     tempout <- data.frame()
 
@@ -385,10 +385,12 @@ stop()
 }
 #'
 
+
+stop()
 ## write statistics on data
-capture.output(
-    myRtools::write_RDS(statist, daylystat),
-    file = "/dev/null" )
+# capture.output(
+#     myRtools::write_RDS(statist, daylystat),
+#     file = "/dev/null" )
 
 ## create pdf with all daily plots
 system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
