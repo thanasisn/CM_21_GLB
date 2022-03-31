@@ -62,7 +62,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_P20_") })
+                            return("CM21_R20_") })
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
@@ -98,7 +98,7 @@ if (!exists("params")){
 #'
 #+ include=T, echo=F
 
-## . load exclusion list ####
+## . Load exclusion list ####
 
 ranges       <- read.table( BAD_RANGES,
                             sep         = ";",
@@ -134,7 +134,7 @@ cat('\n\n')
 
 
 
-## . get data input files ####
+## . Get data input files ####
 input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
                            full.names = T )
@@ -144,7 +144,7 @@ input_years <- as.numeric(
             basename(input_files),),ignore.case = T))
 
 
-## . get storage files ####
+## . Get storage files ####
 output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
                             full.names = T )
@@ -191,7 +191,7 @@ if (length(years_to_do) == 0 ) {
 #'
 #' #### Filter of possible signal values.
 #'
-#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` Volts is possible to be recorded normaly.
+#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` Volts is possible to be recorded normally.
 #'
 #' #### Filter of possible night signal.
 #'
@@ -356,11 +356,11 @@ for ( yyyy in years_to_do) {
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
     cat(paste0( "**",
-                NR_bad_ranges, "** points markded as bad data ranges\n\n" ))
+                NR_bad_ranges, "** points marked as bad data ranges\n\n" ))
     cat(paste0( "**",
-                NR_signal_limit, "** posisble singal error\n\n" ))
+                NR_signal_limit, "** possible signal error\n\n" ))
     cat(paste0( "**",
-                NR_signal_night_limit, "** posible extreme night values\n\n" ))
+                NR_signal_night_limit, "** possible extreme night values\n\n" ))
     # #     cat(paste0( "\"Negative daytime\" removed *",
     # #             NR_negative_daytime, "* data points\n\n" ))
     cat(paste0( "**",

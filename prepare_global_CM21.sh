@@ -2,7 +2,7 @@
 ## created on 2022-03-29
 
 #### This is for daily usage.
-## For building reports there is another scirpt
+## For building reports there is an R scirpt
 
 
 info() { echo ; echo "$(date +%F_%T) :: $* " >&1; }
@@ -19,10 +19,13 @@ info "Try to get new files"
 "$HOME/Aerosols/BASH_help/update_data_from_sirena.sh"
 
 info "Read raw files to SIG"
-Rscript "$(dirname "$0")/CM21_P10_Read_LAP.R"
+Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
 
 info "Filter raw data to L0"
-Rscript "$(dirname "$0")/CM21_P20_Import_Data_filtered.R"
+Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R"
+
+
+
 
 
 ## end coding
