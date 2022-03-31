@@ -225,7 +225,7 @@ for (afile in input_files) {
 
         daydata
 
-        rawdata[ day == as.Date(theday) & is.na(FlagP20), .I ]
+        rawdata[ !is.na(QFlag_1), .I ]
 
         ## add all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)

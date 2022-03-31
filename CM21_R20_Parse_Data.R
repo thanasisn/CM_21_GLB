@@ -226,6 +226,7 @@ for ( yyyy in years_to_do) {
     afile <- grep(yyyy, input_files,  value = T)
     rawdata        <- readRDS(afile)
 
+    cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n" )
 
@@ -259,6 +260,9 @@ for ( yyyy in years_to_do) {
     ############################################################################
 
 
+    cat('\n\n')
+    cat(paste("### Remaining Suspects after removing bad data from log.\n\n"))
+
     ## Plot with some checks after bad regions
     yearlims <- data.table()
     for (an in grep("CM21",names(rawdata),value = T)){
@@ -271,8 +275,6 @@ for ( yyyy in years_to_do) {
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
         if ( nrow(test) > 0 ) {
-            cat('\n\n')
-            cat(paste("#### Remaining Suspects after removing bad data from log.\n\n"))
             cat('\n\n')
             cat(pander(test))
             cat('\n\n')
@@ -391,6 +393,79 @@ for ( yyyy in years_to_do) {
     ####  Save signal data to file  ####
     write_RDS(object = rawdata,
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_L0_",yyyy,".Rds") )
+
+
+
+    cat("\\FloatBarrier\n\n")
+    cat('\n\n')
+    cat(paste("### Only un flaged data.\n\n"))
+    cat('\n\n')
+
+
+
+    rawdata <- rawdata[ is.na(QFlag_1) ]
+
+    ## Plot with some checks after bad regions
+    yearlims <- data.table()
+    for (an in grep("CM21",names(rawdata),value = T)){
+        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+        low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
+        upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
+
+        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+
+        test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
+        # if ( nrow(test) > 0 ) {
+        #     cat('\n\n')
+        #     cat(paste("#### Remaining Suspects after removing bad data from log.\n\n"))
+        #     cat('\n\n')
+        #     cat(pander(test))
+        #     cat('\n\n')
+        # }
+    }
+
+    cat('\n\n')
+
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
+    cat('\n\n')
+
+    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    cat('\n\n')
+
+    plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
+         main = paste("CM21 signal ", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal" )
+    abline( h = yearlims[ an == "CM21value", low], col = "red")
+    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+    cat('\n\n')
+
+    plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
+         main = paste("CM21 signal SD", yyyy ),
+         xlab = "Elevation",
+         ylab = "CM21 signal Standard Deviations")
+    abline( h = yearlims[ an == "CM21sd", low], col = "red")
+    abline( h = yearlims[ an == "CM21sd", upe], col = "red")
+    cat('\n\n')
+
+
+    par(mar = c(2,4,2,1))
+    month_vec <- strftime(  rawdata$Date, format = "%m")
+    dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
+                            list(month_vec), FUN = summary, digits = 6 )
+
+    boxplot(rawdata$CM21value ~ month_vec )
+    title(main = paste("CM21value by month", yyyy) )
+    cat('\n\n')
+
+    boxplot(rawdata$CM21sd ~ month_vec )
+    title(main = paste("CM21sd by month", yyyy) )
+    cat('\n\n')
+
+
+
+
 }
 #'
 
