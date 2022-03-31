@@ -128,7 +128,7 @@ TEST      = FALSE
 
 ## . get data input files ####
 input_files <- list.files( path    = SIGNAL_DIR,
-                           pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
+                           pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                            full.names = T )
 input_files <- sort(input_files)
 
@@ -141,7 +141,7 @@ if (file.exists(DARKSTORE)) {
 
 
 #test
-input_files <- grep("2015",input_files, value = T)
+# input_files <- grep("2015",input_files, value = T)
 
 
 #'
@@ -259,9 +259,6 @@ for (afile in input_files) {
 
 
 
-
-
-
         ####    Calculate Dark signal   ########################################
         dark_day <- dark_calculations( dates      = daydata$Date,
                                        values     = daydata$CM21value,
@@ -275,82 +272,93 @@ for (afile in input_files) {
             dark_day <- NA
         } else {
 
-        ####    Dark Correction function   #####################################
-        dark_generator <- dark_function(dark_day    = dark_day,
-                                        DCOUNTLIM   = DCOUNTLIM,
-                                        type        = "median",
-                                        adate       = theday ,
-                                        test        = test,
-                                        missfiles   = missfiles,
-                                        missingdark = NA )
+            ####    Dark Correction function   #####################################
+            dark_generator <- dark_function(dark_day    = dark_day,
+                                            DCOUNTLIM   = DCOUNTLIM,
+                                            type        = "median",
+                                            adate       = theday ,
+                                            test        = test,
+                                            missfiles   = missfiles,
+                                            missingdark = NA )
 
 
-        ####    Create dark signal for correction    ###########################
-        todays_dark_correction <- dark_generator(daydata$Date)
+            ####    Create dark signal for correction    ###########################
+            todays_dark_correction <- dark_generator(daydata$Date)
 
 
-        ####    Apply dark correction    #######################################
-        daydata[, CM21valueWdark := CM21value  -  todays_dark_correction ]
-
-
-
-# # # #        ##TODO move that ####
-# # # #
-# # # #        ####  Convert to irradiance  ###########################################
-# # # #        daydata$Global <- daydata$CM21value * dayCMCF
-# # # #        daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-# # # #        ########################################################################
-# # # #
-# # # #
-# # # #
-# # # #        #### Filter too low Global values  #####################################
-# # # #        pre_count     <- daydata[ !is.na(CM21value), .N ]
-# # # #        daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-# # # #        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-# # # #        ########################################################################
+            ####    Apply dark correction    #######################################
+            daydata[, CM21valueWdark := CM21value  -  todays_dark_correction ]
 
 
 
+            # # # #        ##TODO move that ####
+            # # # #
+            # # # #        ####  Convert to irradiance  ###########################################
+            # # # #        daydata$Global <- daydata$CM21value * dayCMCF
+            # # # #        daydata$GLstd  <- daydata$CM21sd    * dayCMCF
+            # # # #        ########################################################################
+            # # # #
+            # # # #
+            # # # #
+            # # # #        #### Filter too low Global values  #####################################
+            # # # #        pre_count     <- daydata[ !is.na(CM21value), .N ]
+            # # # #        daydata       <- daydata[ Global >= GLB_LOW_LIM ]
+            # # # #        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
+            # # # #        ########################################################################
 
-        ## plot to external pdf
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+
+
+
+            ## plot to external pdf
+            pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             if (any(grepl( "CM21valueWdark", names(daydata)))) {
                 somedata <- daydata[ Elevat < 1 ]
                 ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
                 plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
-                       xlab = "CHP1 Signal V", ylab = "", ylim = ylim)
+                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
                 points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
                 abline(h=0,col="orange")
                 title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
             }
-        dev.off()
+            dev.off()
 
-}
+        }
 
-        #### Day stats #######################3
+        ####    Day stats    ###################################################
         day = data.frame(Date    = theday,
                          CMCF    = dayCMCF,
                          NAs     = sum(is.na(daydata$CM21value)),
                          SunUP   = sum(      daydata$Eleva >= 0 ),
                          Dmean   = mean(     todays_dark_correction,na.rm = T),
                          sunMeas = sum(      daydata$Eleva >= 0 &
-                                             !is.na(daydata$CM21value)),
+                                                 !is.na(daydata$CM21value)),
                          CalcDate = Sys.time()
         )
         darkDT <- rbind( darkDT, cbind(day, dark_day), fill=T)
 
 
-        daydata <- merge( daydata, wholeday, by = intersect(names(daydata),names(wholeday)), all = T)
 
-        ## gather data
+        ####    Get processed and unprocessed data    ##########################
+        daydata   <- merge( daydata, wholeday,
+                            by = intersect(names(daydata),names(wholeday)), all = T)
+
         globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
-        ## gather day statistics
-        statist    <- rbind(statist, cbind(day,dark_day), fill = TRUE)
 
-        # rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
+        rm( theday, dayCMCF, todays_dark_correction, dark_line, day, daydata )
 
     } #END loop of days
+
+    ## write this years data
+    write_RDS(object = globaldata,
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
+
+
+
+
+    ## create pdf with all daily plots
+    system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")) )
+
 
 if(FALSE){
     tempout <- data.frame()
@@ -394,13 +402,6 @@ if(FALSE){
 }
 
 
-    ## write this years data
-    # capture.output(
-    #     myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
-    #     file = "/dev/null" )
-
-    ## create pdf with all daily plots
-    system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", paste0(DAILYgrDIR,"Daily_Dark_",yyyy,".pdf")) )
 
 
 

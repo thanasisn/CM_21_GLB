@@ -392,7 +392,7 @@ for ( yyyy in years_to_do) {
 
     ####  Save signal data to file  ####
     write_RDS(object = rawdata,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_L0_",yyyy,".Rds") )
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S0_",yyyy,".Rds") )
 
 
 
