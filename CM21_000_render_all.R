@@ -25,13 +25,13 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 
 
 
-render("./CM21_P10_Read_LAP.R",
+render("./CM21_R10_Read_raw_LAP.R",
        params = list( ALL_YEARS = TRUE ),
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS")
 
 
-render("./CM21_P20_Import_Data_filtered.R",
+render("./CM21_R20_Parse_Data.R",
        params = list( ALL_YEARS = TRUE ),
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS")

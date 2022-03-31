@@ -67,7 +67,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_P10_") })
+                            return("CM21_R10_") })
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
@@ -102,6 +102,8 @@ sirena_files <- list.files( path        = SIRENA_DIR,
                             ignore.case = TRUE,
                             full.names  = TRUE )
 cat("\n**Found:",paste(length(sirena_files), "files from Sirena**\n"))
+## just in case, there are nested folders with more lap files in Sirens
+sirena_files <-grep("OLD", sirena_files, ignore.case = T, invert = T, value = T )
 
 
 radmon_files <- list.files( path        = RADMON_DIR,
@@ -188,7 +190,7 @@ for ( YYYY in years_to_do ) {
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
 
     cat("\\newpage\n\n")
-    cat("\n## Year:", YYYY, "\n" )
+    cat("\n## Year:", YYYY, "\n\n" )
 
     missing_files <- c()
     for ( aday in days_of_year ) {
@@ -217,7 +219,7 @@ for ( YYYY in years_to_do ) {
         stopifnot( dim(lap)[1] == 1440 )
 
         #### . . Read SUN file  ####
-        if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_constraction_cron.py\n")))
+        if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_construction_cron.py\n")))
         sun_temp <- read.table( sunfl,
                                 sep         = ";",
                                 header      = TRUE,
@@ -236,7 +238,7 @@ for ( YYYY in years_to_do ) {
         year_data <- rbind( year_data, day_data )
     }
 
-    cat("\n**Missing files:**\n\n")
+    cat("\n**Missing whole day files:**\n\n")
     cat(missing_files,sep = "\n\n")
 
 
