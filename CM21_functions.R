@@ -5,7 +5,7 @@ Sys.setenv(TZ = "UTC")
 
 
 
-#' Title
+#' Calculate dark statistics for a day
 #'
 #' @param elevatio   Vector record of sun elevation
 #' @param nightlimit Sun elevation limit to consider night time
@@ -56,29 +56,29 @@ dark_calculations <- function(elevatio,
             Ecnt = sum(!is.na(values[eveningdark]))
         )
     )
-
-    #
-    # return(list( Mavg = mean(      datavalues_M,  na.rm = TRUE ),
-    #              Mmed = median(    datavalues_M,  na.rm = TRUE ),
-    #              Msta = max(       datedates_M,   na.rm = TRUE ),
-    #              Mend = min(       datedates_M,   na.rm = TRUE ),
-    #              Mcnt = sum(!is.na(datavalues_M)),
-    #              Eavg = mean(      datavalues_E,  na.rm = TRUE ),
-    #              Emed = median(    datavalues_E,  na.rm = TRUE ),
-    #              Esta = min(       datedates_E,   na.rm = TRUE ),
-    #              Eend = max(       datedates_E,   na.rm = TRUE ),
-    #              Ecnt = sum(!is.na(datavalues_E))
-    # ))
-
 }
 
 
 
 
+#' Create dark correction offset signal
+#'
+#' @param dark_day     Data.frame from `dark_calculations`
+#' @param DCOUNTLIM    Minimum number of points for a valid dark calculation.
+#' @param type         Use  "median" or "mean" method for dark calculation
+#' @param adate        Date for message
+#' @param test         Message text to insert
+#' @param missfiles    File for message
+#' @param missingdark  Use this value when no dark can be calculated
+#'
+#' @return
+#' @export
+#'
+#' @examples
 dark_function <- function( dark_day,
                            DCOUNTLIM,
                            type,
-                           dd,
+                           adate,
                            test,
                            missfiles,
                            missingdark) {
@@ -123,7 +123,7 @@ dark_function <- function( dark_day,
 
     ## with out dark should break!
     if ( sum(is.na( dar_y )) >= 2 ) {
-        text = paste( as.POSIXct(dd, origin = "1970-01-01" ), test, "No dark don't know what to do!! using ", missingdark, " for Dark!!" )
+        text = paste( as.POSIXct(adate, origin = "1970-01-01" ), test, "No dark don't know what to do!! using ", missingdark, " for Dark!!" )
         # cat(text, sep = "\n\n")
         warning(text)
         cat(text, sep = "\n", file = missfiles, append = TRUE)
@@ -134,15 +134,12 @@ dark_function <- function( dark_day,
         }
 
         ## create dummy dark signal for correction
-        ####FIXME this can change to a set value after processing from statistics -----
         dark_line = approxfun(x = dar_x,
                               y = c(missingdark, missingdark),
                               rule = 2,
                               method = "linear")
 
-        # stop("\n",message, "\nFunction:\nfdfsf\n")
     }
-
     return(dark_line)
 }
 
