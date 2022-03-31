@@ -128,10 +128,10 @@ dark_function <- function( dark_day,
         warning(text)
         cat(text, sep = "\n", file = missfiles, append = TRUE)
 
-        ## protect from empty variable
-        if (is.na(missingdark)) {
-            stop("no value for dark given")
-        }
+        # ## protect from empty variable
+        # if (is.na(missingdark)) {
+        #     stop("no value for dark given")
+        # }
 
         ## create dummy dark signal for correction
         dark_line = approxfun(x = dar_x,
