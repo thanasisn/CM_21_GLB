@@ -20,7 +20,7 @@ GLOBAL_DIR = "~/DATA/cm21_data_validation/CM21_global/"
 EXPORT_DIR = "~/DATA/cm21_data_validation/CM21_exports/"
 REPORT_DIR = "~/CM_21_GLB/REPORTS/"
 TOT_EXPORT = "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
-
+DAILYgrDIR = "~/CM_21_GLB/REPORTS/DAILY/"
 
 ####  Parametric files ####
 BAD_RANGES = "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
