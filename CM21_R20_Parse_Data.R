@@ -319,13 +319,13 @@ for ( yyyy in years_to_do) {
 
 
     ## start flags columns
-    rawdata[, FlagP20 := as.factor(NA)]
+    rawdata[, QFlag_1 := as.factor(NA)]
 
 
     ####    Mark signal physical limits    #####################################
-    rawdata[ CM21value <  MINsgLIM, FlagP20 := "sgLIM_hit" ]
-    rawdata[ CM21value >  MAXsgLIM, FlagP20 := "sgLIM_hit" ]
-    NR_signal_limit    <- rawdata[  FlagP20 == "sgLIM_hit", .N ]
+    rawdata[ CM21value <  MINsgLIM, QFlag_1 := "sgLIM_hit" ]
+    rawdata[ CM21value >  MAXsgLIM, QFlag_1 := "sgLIM_hit" ]
+    NR_signal_limit    <- rawdata[  QFlag_1 == "sgLIM_hit", .N ]
     ############################################################################
 
 
@@ -333,10 +333,10 @@ for ( yyyy in years_to_do) {
     ####    Mark night signal possible limits    ###############################
     getnight  <- rawdata$Elevat < DARK_ELEV
     ## mark too negative signal values
-    rawdata[ CM21value < MINsgLIMnight & Elevat < DARK_ELEV, FlagP20 := "ToolowDark" ]
+    rawdata[ CM21value < MINsgLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark" ]
     ## drop too positive signal values
-    rawdata[ CM21value > MAXsgLIMnight & Elevat < DARK_ELEV, FlagP20 := "ToohigDark" ]
-    NR_signal_night_limit <- rawdata[FlagP20 %in% c("ToolowDark","ToohigDark"), .N ]
+    rawdata[ CM21value > MAXsgLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark" ]
+    NR_signal_night_limit <- rawdata[QFlag_1 %in% c("ToolowDark","ToohigDark"), .N ]
     ############################################################################
 
 
