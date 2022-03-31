@@ -1,21 +1,31 @@
 
 Sys.setenv(TZ = "UTC")
-require(xts)  ## index command
+# require(xts)  ## index command
 
 
 
-## similar to RAersols::get_dark_day
-## computes values to be used for dark correction
+
+#' Title
+#'
+#' @param elevatio   Vector record of sun elevation
+#' @param nightlimit Sun elevation limit to consider night time
+#' @param dates      Vector record of dates
+#' @param dstretch   Duration of dark signal sample
+#' @param values     Vector of signal values
+#'
+#' @return           Data frame with dark signal statistical values
+#' @export
+#'
 dark_calculations <- function(elevatio,
-                              darklim, 
+                              nightlimit,
                               dates,
                               dstretch,
                               values) {
     ## find local noun
     nounindex    <- match( max(elevatio), elevatio )
     ## split day in half
-    selectmorn   <- elevatio < darklim & zoo::index(elevatio) < nounindex
-    selecteven   <- elevatio < darklim & zoo::index(elevatio) > nounindex
+    selectmorn   <- elevatio < nightlimit & zoo::index(elevatio) < nounindex
+    selecteven   <- elevatio < nightlimit & zoo::index(elevatio) > nounindex
     ## all morning and evening dates
     morning      <- dates[selectmorn]
     evening      <- dates[selecteven]
@@ -32,31 +42,46 @@ dark_calculations <- function(elevatio,
     ## selection for evening dark
     eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
 
-    ## Morning Dark
-    datavalues_M <- values[morningdark]
-    datedates_M  <- dates[ morningdark]
-    ## Evening Dark
-    datavalues_E <- values[eveningdark]
-    datedates_E  <- dates[ eveningdark]
+    return(
+        data.frame(
+            Mavg = mean(      values[morningdark],  na.rm = TRUE ),
+            Mmed = median(    values[morningdark],  na.rm = TRUE ),
+            Msta = max(       dates[ morningdark],  na.rm = TRUE ),
+            Mend = min(       dates[ morningdark],  na.rm = TRUE ),
+            Mcnt = sum(!is.na(values[morningdark])),
+            Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
+            Emed = median(    values[eveningdark],  na.rm = TRUE ),
+            Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
+            Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
+            Ecnt = sum(!is.na(values[eveningdark]))
+        )
+    )
 
-    return(list( Mavg = mean(   datavalues_M,  na.rm = TRUE ),
-                 Mmed = median( datavalues_M,  na.rm = TRUE ),
-                 Msta = max(    datedates_M,   na.rm = TRUE ),
-                 Mend = min(    datedates_M,   na.rm = TRUE ),
-                 Mcnt = sum(!is.na(datavalues_M)),
-                 Eavg = mean(   datavalues_E,  na.rm = TRUE ),
-                 Emed = median( datavalues_E,  na.rm = TRUE ),
-                 Esta = min(    datedates_E,   na.rm = TRUE ),
-                 Eend = max(    datedates_E,   na.rm = TRUE ),
-                 Ecnt = sum(!is.na(datavalues_E))
-    ))
+    #
+    # return(list( Mavg = mean(      datavalues_M,  na.rm = TRUE ),
+    #              Mmed = median(    datavalues_M,  na.rm = TRUE ),
+    #              Msta = max(       datedates_M,   na.rm = TRUE ),
+    #              Mend = min(       datedates_M,   na.rm = TRUE ),
+    #              Mcnt = sum(!is.na(datavalues_M)),
+    #              Eavg = mean(      datavalues_E,  na.rm = TRUE ),
+    #              Emed = median(    datavalues_E,  na.rm = TRUE ),
+    #              Esta = min(       datedates_E,   na.rm = TRUE ),
+    #              Eend = max(       datedates_E,   na.rm = TRUE ),
+    #              Ecnt = sum(!is.na(datavalues_E))
+    # ))
 
 }
 
 
 
-## similar to RAersosols::linear_dark_function
-dark_correction <- function(dark_day, DCOUNTLIM, type, dd, test, missfiles, missingdark) {
+
+dark_function <- function( dark_day,
+                           DCOUNTLIM,
+                           type,
+                           dd,
+                           test,
+                           missfiles,
+                           missingdark) {
     ## ignore dark signal if too low counts
     if (dark_day$Mcnt < DCOUNTLIM) { dark_day$Mmed = dark_day$Mavg = NA }
     if (dark_day$Ecnt < DCOUNTLIM) { dark_day$Emed = dark_day$Eavg = NA }

@@ -103,7 +103,8 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 ## Standard deviation filter (apply after other filters)
-STD_relMAX    =  1          ## Standard deviation can not be > STD_relMAX * MAX(daily value)
+STD_ret_ap_for = 10   ## apply rule when there are enough data points
+STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
 
 ## PATHS
@@ -243,15 +244,54 @@ for (afile in input_files) {
         ####  Filter Standard deviation extremes  ##############################
         ## SD can not be greater than the signal
         pre_count     <- daydata[ !is.na(CM21value), .N ]
-        daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
-        NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
-        stopifnot(NR_extreme_SD == 0)
-        if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
-            cat('\n')
-            cat(paste(theday, "SKIP: No data left after extreme SD filtering!!"),"\n")
-            next()
+        ## apply rule if there are enough data
+        if (pre_count > STD_ret_ap_for) {
+            daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
+            NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
+            if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
+                cat('\n')
+                cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n")
+                next()
+            }
         }
         ########################################################################
+
+
+
+
+
+
+
+        ####    Calculate Dark signal   ########################################
+        dark_day <- dark_calculations( dates      = daydata$Date,
+                                       values     = daydata$CM21value,
+                                       elevatio   = daydata$Eleva,
+                                       nightlimit = DARK_ELEV,
+                                       dstretch   = DSTRETCH)
+
+        ####    Dark Correction function   #####################################
+        dark_function <- dark_function(dark_day    = dark_day,
+                                       DCOUNTLIM   = DCOUNTLIM,
+                                       type        = "median",
+                                       dd          = theday ,
+                                       test        = test,
+                                       missfiles   = missfiles,
+                                       missingdark = 0 )
+
+        ####    Create dark signal for correction    ###############################
+        todays_dark_correction <- dark_function(daydata$Date)
+
+        plot(daydata$CM21value,type = "l")
+        lines(daydata$CM21value + todays_dark_signal,type = "l",col=2)
+
+        plot(daydata$CM21value[daydata$Elevat < 5],type = "l")
+        lines(daydata$CM21value[daydata$Elevat < 5] - todays_dark_signal[daydata$Elevat < 5],type = "l",col=2)
+
+
+        ####    Apply dark correction    ###########################################
+        daydata$Global  <-  daydata$Global  -  todaysdark
+
+
 
 
 
@@ -268,6 +308,7 @@ for (afile in input_files) {
         NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
         ########################################################################
 
+        stopifnot(NR_min_global == 0)
 
 
         ####    Calculate Dark    ##################################################
