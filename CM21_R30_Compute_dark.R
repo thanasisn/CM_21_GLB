@@ -52,9 +52,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####_ Notes _####
 
 #
-# this script substitutes 'CM_P02_Import_Data_wo_bad_days_v3.R'
-# and some functionality of 'CM_P02_Explore_Data.R'
-#
 #
 # Read all yearly data and create
 # database of all data
@@ -137,6 +134,13 @@ input_files <- list.files( path    = SIGNAL_DIR,
                            full.names = T )
 input_files <- sort(input_files)
 
+## Keep record of dark signal
+if (file.exists(DARKSTORE)) {
+    darkDT <- readRDS(DARKSTORE)
+} else {
+    darkDT <- data.table()
+}
+
 
 
 
@@ -217,7 +221,12 @@ for (afile in input_files) {
 
 
         ## get daily data
-        daydata     <- rawdata[ day == as.Date(theday) ]
+        daydata     <- rawdata[ day == as.Date(theday) & is.na(FlagP20) ]
+
+        daydata
+
+        rawdata[ day == as.Date(theday) & is.na(FlagP20), .I ]
+
         ## add all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)
         daydata$day <- as.Date(daydata$Date)
@@ -275,21 +284,21 @@ for (afile in input_files) {
         ####    Apply dark correction    ###########################################
         daydata$Global  <-  daydata$Global  -  todaysdark
 
+stop()
 
-
-        ## plot to external pdf
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-            plot_norm2(daydata, test, tag)
-
-            ## Dark signal plot
-            if (all(is.na(todaysdark))) {
-                ## empty plot when no data
-                plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
-            } else {
-                plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
-                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-            }
-        dev.off()
+        # ## plot to external pdf
+        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        #     plot_norm2(daydata, test, tag)
+        #
+        #     ## Dark signal plot
+        #     if (all(is.na(todaysdark))) {
+        #         ## empty plot when no data
+        #         plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
+        #     } else {
+        #         plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
+        #         title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+        #     }
+        # dev.off()
 
 
 
@@ -369,9 +378,9 @@ for (afile in input_files) {
     cat('\n')
 
     ## write this years data
-    capture.output(
-        myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
-        file = "/dev/null" )
+    # capture.output(
+    #     myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
+    #     file = "/dev/null" )
 
 }
 #'

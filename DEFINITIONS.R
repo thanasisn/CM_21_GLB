@@ -27,7 +27,7 @@ BAD_RANGES = "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
 
 DARKFILE  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
 
-
+DARKSTORE <- paste0(dirname(SIGNAL_DIR), "/Dark_data.Rds")
 
 ####  Log files  ####
 MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")

@@ -237,12 +237,26 @@ for ( YYYY in years_to_do ) {
         #### . . Gather data  ####
         year_data <- rbind( year_data, day_data )
     }
+    ## order data
+    setorder(year_data,Date)
 
+    ## check there are not duplicate dates read from raw
+    testsanity <- year_data[, .N , by = as.Date(Date)]
+    if (!all( testsanity$N == 1440 )) {
+        cat("\n**There are days with not exactly 1440 minutes**\n\n")
+        cat('\n\n')
+        pander(testsanity[ N != 1440])
+        cat('\n\n')
+    } else {
+        cat("\n**All days have exactly 1440 minutes**\n\n")
+    }
+
+    ## print missing files
     cat("\n**Missing whole day files:**\n\n")
     cat(missing_files,sep = "\n\n")
 
 
-    #### . . Add all the minutes of year ####
+    #### . . Add all the minutes of the year ####
     all_min   <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
                      as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
     all_min   <- data.frame(Date = all_min)
