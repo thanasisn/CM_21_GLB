@@ -269,11 +269,6 @@ for (afile in input_files) {
                                        nightlimit = DARK_ELEV,
                                        dstretch   = DSTRETCH)
 
-        dark_day$Mmed <- 0.001
-        dark_day$Emed <- 0.001
-        dark_day$Mavg <- 0.001
-        dark_day$Eavg <- 0.001
-        dark_day$Msta <- 100
 
         daydata
 
