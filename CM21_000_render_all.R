@@ -37,11 +37,12 @@ render("./CM21_R20_Parse_Data.R",
        output_dir           = "~/CM_21_GLB/REPORTS")
 
 
-stop()
 render("./CM21_P30_GHI_daily_filtered.R",
        params = list( CACHE = F ),
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS")
+
+stop()
 
 render("./CM21_P40_missing_dark_reconstruction.R",
        params = list( CACHE = F ),
