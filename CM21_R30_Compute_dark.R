@@ -118,9 +118,6 @@ daylystat  <- paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "", basena
 # datafile    = paste0(DATOUT, "/P02_allcm21data" )
 # daylystat   = paste0(DATOUT, "/P02_allcm21stat" )
 
-## create a new temp dir
-unlink(tmpfolder, recursive = TRUE)
-dir.create(tmpfolder)#, showWarnings = FALSE)
 
 
 
@@ -179,10 +176,13 @@ pbcount = 0
 #+ include=TRUE, echo=F, results="asis"
 for (afile in input_files) {
 
+    ## create a new temp dir
+    unlink(tmpfolder, recursive = TRUE)
+    dir.create(tmpfolder)
+
+
     #### Get raw data ####
     rawdata        <- readRDS(afile)
-    rawdata$Global <- NA
-    rawdata$GLstd  <- NA
     rawdata$day    <- as.Date(rawdata$Date)
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
 
@@ -269,8 +269,11 @@ for (afile in input_files) {
                                        nightlimit = DARK_ELEV,
                                        dstretch   = DSTRETCH)
 
-
-        daydata
+        if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+            # cat("Can not apply dark\n")
+            todays_dark_correction <- NA
+            dark_day <- NA
+        } else {
 
         ####    Dark Correction function   #####################################
         dark_generator <- dark_function(dark_day    = dark_day,
@@ -280,6 +283,7 @@ for (afile in input_files) {
                                         test        = test,
                                         missfiles   = missfiles,
                                         missingdark = NA )
+
 
         ####    Create dark signal for correction    ###########################
         todays_dark_correction <- dark_generator(daydata$Date)
@@ -305,70 +309,46 @@ for (afile in input_files) {
 # # # #        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
 # # # #        ########################################################################
 
-        stopifnot(NR_min_global == 0)
 
 
 
+        ## plot to external pdf
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+            if (any(grepl( "CM21valueWdark", names(daydata)))) {
+                somedata <- daydata[ Elevat < 1 ]
+                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                       xlab = "CHP1 Signal V", ylab = "", ylim = ylim)
+                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+                abline(h=0,col="orange")
+                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            }
+        dev.off()
 
+}
 
-
-        # ## plot to external pdf
-        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-        #     plot_norm2(daydata, test, tag)
-        #
-        #     ## add plot for night time signalo only
-        #
-        #     ## Dark signal plot
-        #     if (all(is.na(todays_dark_correction))) {
-        #         ## empty plot when no data
-        #         plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
-        #     } else {
-        #         plot(daydata$Date, todays_dark_correction, "l",xlab = "UTC", ylab = "Dark W/m^2")
-        #         title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-        #     }
-        # dev.off()
-
-
-
-        ## keep some statistics
-        day    = data.frame(Date    = theday,
-                            CMCF    = dayCMCF,
-                            NAs     = sum(is.na(daydata$CM21value)),
-                            SunUP   = sum(  daydata$Eleva >= 0 ),
-                            Dmean   = mean( todays_dark_correction,        na.rm = T),
-                            sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$CM21value)),
-                            Mavg    = dark_day$Mavg,
-                            Mmed    = dark_day$Mmed,
-                            Msta    = dark_day$Msta,
-                            Mend    = dark_day$Mend,
-                            Mcnt    = dark_day$Mcnt,
-                            Eavg    = dark_day$Eavg,
-                            Emed    = dark_day$Emed,
-                            Esta    = dark_day$Esta,
-                            Eend    = dark_day$Eend,
-                            Ecnt    = dark_day$Ecnt
-        )
-
-
+        #### Day stats #######################3
         day = data.frame(Date    = theday,
                          CMCF    = dayCMCF,
                          NAs     = sum(is.na(daydata$CM21value)),
-                         SunUP   = sum(  daydata$Eleva >= 0 ),
-                         Dmean   = mean( todays_dark_correction,        na.rm = T),
-                         sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$CM21value)),
+                         SunUP   = sum(      daydata$Eleva >= 0 ),
+                         Dmean   = mean(     todays_dark_correction,na.rm = T),
+                         sunMeas = sum(      daydata$Eleva >= 0 &
+                                             !is.na(daydata$CM21value)),
                          CalcDate = Sys.time()
         )
+        darkDT <- rbind( darkDT, cbind(day, dark_day), fill=T)
 
-        darkDT <- rbind( darkDT, cbind(day,dark_day), fill=T)
 
+        daydata <- merge( daydata, wholeday, by = intersect(names(daydata),names(wholeday)), all = T)
 
         ## gather data
-        globaldata <- rbind( globaldata, daydata )
+        globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
         ## gather day statistics
-        statist    <- rbind(statist, day )
+        statist    <- rbind(statist, cbind(day,dark_day), fill = TRUE)
 
-        rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
+        # rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
 
     } #END loop of days
 
@@ -411,12 +391,19 @@ if(FALSE){
 
     cat('\n')
     cat('\n')
+}
+
 
     ## write this years data
     # capture.output(
     #     myRtools::write_RDS(globaldata, paste0(GLOBAL_DIR ,sub("SIG", "GHI", basename(afile)))),
     #     file = "/dev/null" )
-}
+
+    ## create pdf with all daily plots
+    system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", paste0(DAILYgrDIR,"Daily_Dark_",yyyy,".pdf")) )
+
+
+
 }
 #'
 
@@ -427,8 +414,6 @@ stop()
 #     myRtools::write_RDS(statist, daylystat),
 #     file = "/dev/null" )
 
-## create pdf with all daily plots
-system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
 
 
 
