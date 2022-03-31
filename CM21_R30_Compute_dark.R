@@ -208,7 +208,7 @@ for (afile in input_files) {
 
     for (ddd in daystodo) {
 
-        theday      <- as.POSIXct( as.Date(ddd), origin = "1970-01-01")
+        theday      <- as.POSIXct( as.Date(ddd, origin = "1970-01-01"))
         test        <- format( theday, format = "%d%m%y06" )
         dayCMCF     <- cm21factor(theday)
 
@@ -216,8 +216,8 @@ for (afile in input_files) {
         day         <- data.frame()
 
         daymimutes  <- data.frame(
-            Date = seq( as.POSIXct(paste(as.Date(ddd), "00:00:30")),
-                        as.POSIXct(paste(as.Date(ddd), "23:59:30")), by = "min"  )
+            Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
+                        as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
         )
 
         ## choose GLB_LOW_LIM by date
@@ -269,69 +269,51 @@ for (afile in input_files) {
                                        nightlimit = DARK_ELEV,
                                        dstretch   = DSTRETCH)
 
+        dark_day$Mmed <- 0.001
+        dark_day$Emed <- 0.001
+        dark_day$Mavg <- 0.001
+        dark_day$Eavg <- 0.001
+        dark_day$Msta <- 100
+
+        daydata
+
         ####    Dark Correction function   #####################################
-        dark_function <- dark_function(dark_day    = dark_day,
-                                       DCOUNTLIM   = DCOUNTLIM,
-                                       type        = "median",
-                                       dd          = theday ,
-                                       test        = test,
-                                       missfiles   = missfiles,
-                                       missingdark = 0 )
+        dark_generator <- dark_function(dark_day    = dark_day,
+                                        DCOUNTLIM   = DCOUNTLIM,
+                                        type        = "median",
+                                        adate       = theday ,
+                                        test        = test,
+                                        missfiles   = missfiles,
+                                        missingdark = NA )
 
-        ####    Create dark signal for correction    ###############################
-        todays_dark_correction <- dark_function(daydata$Date)
-
-        plot(daydata$CM21value,type = "l")
-        lines(daydata$CM21value + todays_dark_signal,type = "l",col=2)
-
-        plot(daydata$CM21value[daydata$Elevat < 5],type = "l")
-        lines(daydata$CM21value[daydata$Elevat < 5] - todays_dark_signal[daydata$Elevat < 5],type = "l",col=2)
+        ####    Create dark signal for correction    ###########################
+        todays_dark_correction <- dark_generator(daydata$Date)
 
 
-        ####    Apply dark correction    ###########################################
-        daydata$Global  <-  daydata$Global  -  todaysdark
+        ####    Apply dark correction    #######################################
+        daydata[, CM21valueWdark := CM21value  -  todays_dark_correction ]
 
 
 
-
-
-        ####  Convert to irradiance  ###########################################
-        daydata$Global <- daydata$CM21value * dayCMCF
-        daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-        ########################################################################
-
-
-
-        #### Filter too low Global values  #####################################
-        pre_count     <- daydata[ !is.na(CM21value), .N ]
-        daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-        ########################################################################
+# # # #        ##TODO move that ####
+# # # #
+# # # #        ####  Convert to irradiance  ###########################################
+# # # #        daydata$Global <- daydata$CM21value * dayCMCF
+# # # #        daydata$GLstd  <- daydata$CM21sd    * dayCMCF
+# # # #        ########################################################################
+# # # #
+# # # #
+# # # #
+# # # #        #### Filter too low Global values  #####################################
+# # # #        pre_count     <- daydata[ !is.na(CM21value), .N ]
+# # # #        daydata       <- daydata[ Global >= GLB_LOW_LIM ]
+# # # #        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
+# # # #        ########################################################################
 
         stopifnot(NR_min_global == 0)
 
 
-        ####    Calculate Dark    ##################################################
-        dark_day <- dark_calculations( dates    = daydata$Date,
-                                       values   = daydata$Global,
-                                       elevatio = daydata$Eleva,
-                                       darklim  = DARK_ELEV,
-                                       dstretch = DSTRETCH)
 
-        ####    Dark Correction    #################################################
-        dark_line <-  dark_correction(dark_day    = dark_day,
-                                      DCOUNTLIM   = DCOUNTLIM,
-                                      type        = "median",
-                                      dd          = theday ,
-                                      test        = test,
-                                      missfiles   = missfiles,
-                                      missingdark = 0 )
-
-        ####    Create dark signal for correction    ###############################
-        todaysdark <- dark_line(daydata$Date)
-
-        ####    Apply dark correction    ###########################################
-        daydata$Global  <-  daydata$Global  -  todaysdark
 
 
 
@@ -339,12 +321,14 @@ for (afile in input_files) {
         # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
         #     plot_norm2(daydata, test, tag)
         #
+        #     ## add plot for night time signalo only
+        #
         #     ## Dark signal plot
-        #     if (all(is.na(todaysdark))) {
+        #     if (all(is.na(todays_dark_correction))) {
         #         ## empty plot when no data
         #         plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10))
         #     } else {
-        #         plot(daydata$Date, todaysdark, "l",xlab = "UTC", ylab = "Dark W/m^2")
+        #         plot(daydata$Date, todays_dark_correction, "l",xlab = "UTC", ylab = "Dark W/m^2")
         #         title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
         #     }
         # dev.off()
@@ -354,16 +338,10 @@ for (afile in input_files) {
         ## keep some statistics
         day    = data.frame(Date    = theday,
                             CMCF    = dayCMCF,
-                            NAs     = sum(is.na(daydata$Global)),
+                            NAs     = sum(is.na(daydata$CM21value)),
                             SunUP   = sum(  daydata$Eleva >= 0 ),
-                            MinVa   = min(  daydata$CM21value, na.rm = T),
-                            MaxVa   = max(  daydata$CM21value, na.rm = T),
-                            AvgVa   = mean( daydata$CM21value, na.rm = T),
-                            MinGL   = min(  daydata$Global,    na.rm = T),
-                            MaxGL   = max(  daydata$Global,    na.rm = T),
-                            AvgGL   = mean( daydata$Global,    na.rm = T),
-                            Dmean   = mean( todaysdark,        na.rm = T),
-                            sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$Global)),
+                            Dmean   = mean( todays_dark_correction,        na.rm = T),
+                            sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$CM21value)),
                             Mavg    = dark_day$Mavg,
                             Mmed    = dark_day$Mmed,
                             Msta    = dark_day$Msta,
@@ -375,6 +353,19 @@ for (afile in input_files) {
                             Eend    = dark_day$Eend,
                             Ecnt    = dark_day$Ecnt
         )
+
+
+        day = data.frame(Date    = theday,
+                         CMCF    = dayCMCF,
+                         NAs     = sum(is.na(daydata$CM21value)),
+                         SunUP   = sum(  daydata$Eleva >= 0 ),
+                         Dmean   = mean( todays_dark_correction,        na.rm = T),
+                         sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$CM21value)),
+                         CalcDate = Sys.time()
+        )
+
+        darkDT <- rbind( darkDT, cbind(day,dark_day), fill=T)
+
 
         ## gather data
         globaldata <- rbind( globaldata, daydata )
