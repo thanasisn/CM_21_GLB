@@ -39,15 +39,13 @@
 #'
 #' Read text files with CM_21 signal data to rds
 #'
-#'   - list Sirena files
-#'   - list Radmon files
-#'   - add sun position
-#'   - all minutes of year
+#'   - Lists Sirena files
+#'   - Lists Radmon files
+#'   - Reads data from Sirena only
+#'   - Adds sun position
 #'   - NO FILTERING
 #'   - Store as .Rds binaries files for further use
 #'   - Works for a set date range
-#'   - based on level_0_CM21_x8
-#'   - Reads data from Sirena only
 #'
 #+ echo=F, include=T
 
@@ -62,8 +60,8 @@ knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
-#+ include=TRUE, echo=FALSE, results = 'asis'
 
+#+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -94,7 +92,7 @@ if (!exists("params")){
 }
 
 
-
+#+ include=TRUE, echo=FALSE, results = 'asis'
 
 ####  Files for import  ####
 
