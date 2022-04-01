@@ -1,12 +1,12 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "CM21 signal filtering."
+#' title:         "CM21 signal process."
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Read signal data and write level 0 data.
-#'                 Marks or remove problematic data."
+#' abstract:      "Read signal data and write level 1 data.
+#'                 Computes dark."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -35,38 +35,26 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
+
+#'
+#' Read signal and compute dark level correction
+#'
+#' - Compute dark when it is fisable
+#' - Apply dark correction
+#' - Plot daily signal and dark correction on external pdf
+#' - Keep dark statistics for use next
+#'
 #+ echo=F, include=T
 
 
 ####_  Document options _####
 
 knitr::opts_chunk$set(comment    = ""      )
-
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
-
-
-####_ Notes _####
-
-#
-#
-# Read all yearly data and create
-# database of all data
-# pdf of all days
-# pdf of suspects
-# statistic on days
-#
-#
-# -  FILTERING   std > value
-# -  CONVERTING  total irradiance
-# -  FILTERING   too low global value
-#
-
-
-
 
 
 
@@ -85,16 +73,15 @@ if(!interactive()) {
 
 
 
-## FIXME this is for pdf output
-options(warn=-1)
+# ## FIXME this is for pdf output
+# options(warn=-1)
 
-#+ echo=F, include=F
 library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/CM21_functions.R")
-#'
+
 
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
@@ -117,20 +104,6 @@ missfiles  <- paste0(BASED, "LOGS/", basename(Script.Name),"_missingfilelist.dat
 tmpfolder  <- paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
 dailyplots <- paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
 daylystat  <- paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "", basename(Script.Name)), "_stats")
-
-
-
-# datafile    = paste0(DATOUT, "/P02_allcm21data" )
-# daylystat   = paste0(DATOUT, "/P02_allcm21stat" )
-
-
-
-
-TEST      = TRUE
-TEST      = FALSE
-
-
-
 
 
 ## . Get data input files ####
@@ -174,7 +147,7 @@ if (length(years_to_do) == 0 ) {
 }
 
 
-
+years_to_do <- 2008
 
 ## Keep record of dark signal
 if (file.exists(DARKSTORE)) {
@@ -184,38 +157,24 @@ if (file.exists(DARKSTORE)) {
 }
 
 
-#test
-# input_files <- grep("2015",input_files, value = T)
 
 
 #'
-#' ## Info
+#' Calculate dark signal.
 #'
-#' Apply more filtering on the data and do a first dark calculation.
-#' Daily plot with GHI and dark signal are in the file: "`r basename(dailyplots)`" .
+#' Excludes calculation from daily data values where
+#' signal standard deviation > `r STD_relMAX` * max(daily signal).
 #'
-#' ### Apply variation filtering.
+#' Excludes calculation when there are less than `r STD_ret_ap_for`
+#' valid data points for a day
 #'
-#' Exclude from daily data values where signals standard deviation > `r STD_relMAX` * max(daily signal).
-#'
-#' ### Covert signal to global irradiance.
-#'
-#' The conversion is done with a factor which is interpolated between CM-21 calibrations.
-#'
-#' ### Filter minimum Global irradiance.
-#'
-#' Reject data when GHI is below an acceptable limit.
-#' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
-#' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
-#' This is due to changes in instrumentation.
-#'
+#+ echo=F, include=T
 
 
 
-## loop all input files
 
 statist <- data.table()
-pbcount = 0
+
 
 
 #+ include=TRUE, echo=F, results="asis"
@@ -226,9 +185,10 @@ for ( yyyy in years_to_do) {
     #### Get raw data ####
     afile <- grep(yyyy, input_files,  value = T)
 
-    ## create a new temp dir
+    ## create a new temp dir for plots
     unlink(tmpfolder, recursive = TRUE)
     dir.create(tmpfolder)
+    pbcount <- 0
 
 
     #### Get raw data ####
@@ -239,14 +199,12 @@ for ( yyyy in years_to_do) {
     ## drop NA signal
     rawdata        <- rawdata[ !is.na(CM21value) ]
 
-    daystodo <- unique( rawdata$day )
+    daystodo       <- unique( rawdata$day )
 
-    if (TEST) { daystodo <- sort(sample(daystodo,20)) }
 
     ## init yearly calculations
     globaldata    <- data.table()
-    NR_extreme_SD = 0
-    NR_min_global = 0
+    NR_extreme_SD <- 0
 
 
     cat(paste("\\newpage\n\n"))
@@ -266,20 +224,11 @@ for ( yyyy in years_to_do) {
                         as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
         )
 
-        ## choose GLB_LOW_LIM by date
-        if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
-        if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
 
-
-        ## get valid day data
-
-        ## all vars
+        ## get all day
         wholeday    <- rawdata[ day == as.Date(theday) ]
-        ## only valid data
+        ## only valid data for dark
         daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
-
-
-        # stopifnot(wholeday[! is.na(QFlag_1), .N ]==0)
 
 
         ## fill all minutes for nicer graphs
@@ -315,7 +264,7 @@ for ( yyyy in years_to_do) {
         if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
-            dark_day <- NA
+            dark_day               <- NA
         } else {
 
             ####    Dark Correction function   #####################################
@@ -337,37 +286,53 @@ for ( yyyy in years_to_do) {
 
 
 
-            # # # #        ##TODO move that ####
+            # # # #    #' ### Covert signal to global irradiance.
+            # # # #    #'
+            # # # #    #' The conversion is done with a factor which is interpolated between CM-21 calibrations.
+            # # # #    #'
+            # # # #    #' ### Filter minimum Global irradiance.
+            # # # #    #'
+            # # # #    #' Reject data when GHI is below an acceptable limit.
+            # # # #    #' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
+            # # # #    #' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
+            # # # #    #' This is due to changes in instrumentation.
+
+            # # # #    ##TODO move that ####
             # # # #
-            # # # #        ####  Convert to irradiance  ###########################################
-            # # # #        daydata$Global <- daydata$CM21value * dayCMCF
-            # # # #        daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-            # # # #        ########################################################################
+            # # # #     ## choose GLB_LOW_LIM by date
+            # # # #     if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
+            # # # #     if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
+            # # # #
+            # # # #
+            # # # #    ####  Convert to irradiance  ###########################################
+            # # # #    daydata$Global <- daydata$CM21value * dayCMCF
+            # # # #    daydata$GLstd  <- daydata$CM21sd    * dayCMCF
+            # # # #    ########################################################################
             # # # #
             # # # #
             # # # #
-            # # # #        #### Filter too low Global values  #####################################
-            # # # #        pre_count     <- daydata[ !is.na(CM21value), .N ]
-            # # # #        daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-            # # # #        NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-            # # # #        ########################################################################
+            # # # #    #### Filter too low Global values  #####################################
+            # # # #    pre_count     <- daydata[ !is.na(CM21value), .N ]
+            # # # #    daydata       <- daydata[ Global >= GLB_LOW_LIM ]
+            # # # #    NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
+            # # # #    ########################################################################
 
 
 
 
-            ## plot to external pdf
-            pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-            if (any(grepl( "CM21valueWdark", names(daydata)))) {
-                somedata <- daydata[ Elevat < 1 ]
-                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
-                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
-                abline(h=0,col="orange")
-                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-                text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
-            }
-            dev.off()
+            # ## plot to external pdf
+            # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+            # if (any(grepl( "CM21valueWdark", names(daydata)))) {
+            #     somedata <- daydata[ Elevat < 1 ]
+            #     ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+            #     plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+            #            ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+            #     points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+            #     abline(h=0,col="orange")
+            #     title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            #     text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
+            # }
+            # dev.off()
 
         }
 
@@ -392,7 +357,7 @@ for ( yyyy in years_to_do) {
         globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
 
-        rm( theday, dayCMCF, todays_dark_correction, dark_line, day, daydata )
+        rm( theday, dayCMCF, todays_dark_correction, dark_generator, day, daydata )
 
     } #END loop of days
 
@@ -407,162 +372,89 @@ for ( yyyy in years_to_do) {
 
     ## create pdf with all daily plots
     system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
-                  paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")) )
+                  paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")),
+           ignore.stderr = T )
 
 
 
-if(FALSE){
-    tempout <- data.frame()
-
-    tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
-    tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
-    tempout <- rbind( tempout, data.frame(Name = "Minimum GHI limit", Data_points = NR_min_global) )
-    tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
+    cat(paste0( "**",
+                NR_loaded, "** non NA data points loaded\n\n" ))
+    cat(paste0( "**",
+                NR_extreme_SD, "** excluded from dark calculation due to extreme SD\n\n" ))
 
 
-
-    cat('\\scriptsize\n')
-
+    cat('\\scriptsize\n\n')
     # cat('\\footnotesize\n')
+    cat(pander( summary(globaldata[,!c("Date","Azimuth","QFlag_1")]) ))
+    cat('\\normalsize\n\n')
 
-    cat(pander( tempout ))
-
-    cat(pander( summary(globaldata[,!c("Date","Azimuth")]) ))
-
-    cat('\\normalsize\n')
-
-    cat('\n')
 
     hist(globaldata$CM21value, breaks = 50, main = paste("CM21 GHI ", yyyy ) )
+    cat('\n\n')
 
-    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 GHI SD", yyyy ) )
+    hist(globaldata$CM21valueWdark, breaks = 50, main = paste("CM21 SIG w Dark ", yyyy ) )
+    cat('\n\n')
 
-    plot(globaldata$Elevat, globaldata$Global, pch = 19, cex = .8,
-         main = paste("CM21 GHI ", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 GHI" )
+    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 SIG SD", yyyy ) )
+    cat('\n\n')
 
-    plot(globaldata$Elevat, globaldata$GLstd,    pch = 19, cex = .8,
-         main = paste("CM21 GHI SD", yyyy ),
-         xlab = "Elevation",
-         ylab = "CM21 GHI Standard Deviations")
+    # plot(globaldata$Elevat, globaldata$CM21valueWdark, pch = 19, cex = .8,
+    #      main = paste("CM21 SIG w Dark ", yyyy ),
+    #      xlab = "Elevation",
+    #      ylab = "CM21 GHI" )
+    # cat('\n\n')
 
-    cat('\n')
-    cat('\n')
+    # plot(globaldata$Elevat, globaldata$GLstd,    pch = 19, cex = .8,
+    #      main = paste("CM21 GHI SD", yyyy ),
+    #      xlab = "Elevation",
+    #      ylab = "CM21 GHI Standard Deviations")
+    # cat('\n\n')
+
+
+    cat('\n\n')
+
+    statist <- darkDT[ year(Date) == yyyy ]
+
+    cat(paste("#### Summary of daily Dark\n\n"))
+
+    hist(statist$sunMeas, main = paste("Sun measurements"    , yyyy), breaks = 50)
+    hist(statist$Mavg,    main = paste("Morning Average Dark", yyyy), breaks = 50)
+    hist(statist$Mmed,    main = paste("Morning Median Dark" , yyyy), breaks = 50)
+    hist(statist$Mcnt,    main = paste("Morning count Dark"  , yyyy), breaks = 50)
+    hist(statist$Eavg,    main = paste("Evening Average Dark", yyyy), breaks = 50)
+    hist(statist$Emed,    main = paste("Evening Median Dark" , yyyy), breaks = 50)
+    hist(statist$Ecnt,    main = paste("Evening count Dark"  , yyyy), breaks = 50)
+
+    plot(statist$Date, statist$CMCF,    "p", pch = 16, cex = .5, main = paste("Conversion factor"   , yyyy) , xlab = "" )
+    plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = paste("Sun measurements"    , yyyy) , xlab = "" )
+    plot(statist$Date, statist$SunUP,   "p", pch = 16, cex = .5, main = paste("Sun up measurements" , yyyy) , xlab = "" )
+    plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = paste("Morning Average Dark", yyyy) , xlab = "" )
+    plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = paste("Morning Median Dark" , yyyy) , xlab = "" )
+    plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = paste("Morning count Dark"  , yyyy) , xlab = "" )
+    plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = paste("Evening Average Dark", yyyy) , xlab = "" )
+    plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = paste("Evening Median Dark" , yyyy) , xlab = "" )
+    plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = paste("Evening count Dark"  , yyyy) , xlab = "" )
+
+    cat(paste("#### Days with Evening dark data points count < 100\n\n"))
+
+    unique( as.Date( statist$Date[ which(statist$Ecnt < 100 ) ] ) )
+
+
+    cat(paste("#### Days with Morning dark data points count < 50\n\n"))
+
+    unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )
+
+    cat(paste("#### Days with ( sun  measurements / sun up ) < 0.2\n\n"))
+
+    unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
+
+
+    cat(paste("#### Day with the minimum morning median dark\n\n"))
+
+    statist$Date[ which.min( statist$Mmed ) ]
 
 }
 
-
-stop()
-
-
-}
-#'
-
-
-stop()
-
-
-#'
-#' ## Summary of daily statistics.
-#'
-
-
-hist(statist$NAs,     main = "NAs",                  breaks = 50, xlab = "NA count" )
-hist(statist$MinVa,   main = "Minimum Value",        breaks = 50, xlab = "Min daily signal"  )
-hist(statist$MaxVa,   main = "Maximum Value",        breaks = 50, xlab = "Max daily signal"  )
-hist(statist$AvgVa,   main = "Average Value",        breaks = 50, xlab = "Mean daily signal"  )
-hist(statist$MinGL,   main = "Minimum Global",       breaks = 50, xlab = "Min daily global" )
-hist(statist$MaxGL,   main = "Maximum Global",       breaks = 50, xlab = "Max daily global" )
-hist(statist$AvgGL,   main = "Average Global",       breaks = 50, xlab = "Mean daily global" )
-hist(statist$sunMeas, main = "Sun measurements",     breaks = 50, xlab = "Data count with sun up"  )
-hist(statist$Mavg,    main = "Morning Average Dark", breaks = 50, xlab = "Morning mean dark"           )
-hist(statist$Mmed,    main = "Morning Median Dark",  breaks = 50, xlab = "Morning median dark"         )
-hist(statist$Mcnt,    main = "Morning count Dark",   breaks = 50, xlab = "Morning data count for dark" )
-hist(statist$Eavg,    main = "Evening Average Dark", breaks = 50, xlab = "Evening mean dark"           )
-hist(statist$Emed,    main = "Evening Median Dark",  breaks = 50, xlab = "Evening median dark"         )
-hist(statist$Ecnt,    main = "Evening count Dark",   breaks = 50, xlab = "Evening data count for dark" )
-
-
-plot(statist$Date, statist$CMCF,    "p", pch = 16, cex = .5, main = "Conversion factor"    , xlab = "" )
-plot(statist$Date, statist$NAs,     "p", pch = 16, cex = .5, main = "NA count"             , xlab = "" )
-plot(statist$Date, statist$MinVa,   "p", pch = 16, cex = .5, main = "Minimum Value"        , xlab = "" )
-plot(statist$Date, statist$MaxVa,   "p", pch = 16, cex = .5, main = "Maximum Value"        , xlab = "" )
-plot(statist$Date, statist$AvgVa,   "p", pch = 16, cex = .5, main = "Average Value"        , xlab = "" )
-plot(statist$Date, statist$MinGL,   "p", pch = 16, cex = .5, main = "Minimum Global"       , xlab = "" )
-plot(statist$Date, statist$MaxGL,   "p", pch = 16, cex = .5, main = "Maximum Global"       , xlab = "" )
-plot(statist$Date, statist$AvgGL,   "p", pch = 16, cex = .5, main = "Average Global"       , xlab = "" )
-plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = "Sun measurements"     , xlab = "" )
-plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = "Morning Average Dark" , xlab = "" )
-plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = "Morning Median Dark"  , xlab = "" )
-plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = "Morning count Dark"   , xlab = "" )
-plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = "Evening Average Dark" , xlab = "" )
-plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = "Evening Median Dark"  , xlab = "" )
-plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = "Evening count Dark"   , xlab = "" )
-plot(statist$Date, statist$sunMeas/statist$SunUP , "p", pch=16,cex=.5, main = "Sun up measurements / Sun up count" , xlab = "" )
-
-
-#'
-#' ### Days with average global < -50 .
-#'
-unique( as.Date( statist$Date[ which(statist$AvgGL < -50 ) ] ) )
-
-#'
-#' ### Days with average global > 390 .
-#'
-unique( as.Date( statist$Date[ which(statist$AvgGL > 390 ) ] ) )
-
-# plot(statist$Date[statist$MaxGL<2000], statist$MaxGL[statist$MaxGL<2000], "p", pch=16,cex=.5 )
-
-#'
-#' ### Days with max global > 1500 .
-#'
-unique( as.Date( statist$Date[ which(statist$MaxGL > 1500 ) ] ) )
-
-
-# plot(statist$Date[statist$MinGL>-200], statist$MinGL[statist$MinGL>-200], "p", pch=16,cex=.5 )
-# plot(statist$Date[statist$MinGL<200], statist$MinGL[statist$MinGL<200], "p", pch=16,cex=.5 )
-
-
-#'
-#' ### Days with min global < -200 .
-#'
-unique( as.Date( statist$Date[ which(statist$MinGL < -200 ) ] ) )
-
-#'
-#' ### Days with min global > 200 .
-#'
-unique( as.Date( statist$Date[ which(statist$MinGL > 200 ) ] ) )
-
-
-# plot(statist$Date[statist$Ecnt>100], statist$Ecnt[statist$Ecnt>100] , "p", pch=16,cex=.5 )
-
-
-#'
-#' ### Days with Evening dark data points count < 100 .
-#'
-unique( as.Date( statist$Date[ which(statist$Ecnt < 100 ) ] ) )
-
-#'
-#' ### Days with Morning dark data points count < 50 .
-#'
-unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )
-
-
-# plot(statist$Date[statist$sunMeas<100], statist$sunMeas[statist$sunMeas<100]  , "p", pch=16,cex=.5 )
-
-
-#'
-#' ### Days with ( sun  measurements / sun up ) < 0.2 .
-#'
-unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
-
-
-#'
-#' ### Day with the minimum morning median dark .
-#'
-
-statist$Date[ which.min( statist$Mmed ) ]
 
 
 
