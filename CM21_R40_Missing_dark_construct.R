@@ -82,7 +82,10 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 ## get first pass statistics
-statist <- readRDS(DARKSTORE)
+darkDT  <- readRDS(DARKSTORE)
+darkDT[ dark_day == "MISSING" | is.na(Emed) | is.na(Mmed),]
+darkDT[ is.na(dark_day) ]
+
 
 
 #'
@@ -277,9 +280,9 @@ lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 #
 
 
-## keep dark constructed signal for reference when missing
-save( darkmean, darkmedian, runningDark,
-      file = DARKFILE, compress = TRUE)
+# ## keep dark constructed signal for reference when missing
+# save( darkmean, darkmedian, runningDark,
+#       file = DARKFILE, compress = TRUE)
 
 
 
