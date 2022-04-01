@@ -24,8 +24,8 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     fig_width:  8
-#'     fig_height: 5
+#'     fig_width:        6
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -49,13 +49,14 @@
 
 ####_  Document options _####
 
+#+ echo=F, include=F
+
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
-
 
 
 ####  Set environment  ####
@@ -71,10 +72,8 @@ if(!interactive()) {
 }
 
 
-
-
-# ## FIXME this is for pdf output
-# options(warn=-1)
+## FIXME this is for pdf output
+if (!interactive()) { options(warn=-1) }
 
 library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
@@ -147,7 +146,6 @@ if (length(years_to_do) == 0 ) {
 }
 
 
-years_to_do <- 2008
 
 ## Keep record of dark signal
 if (file.exists(DARKSTORE)) {
@@ -169,11 +167,6 @@ if (file.exists(DARKSTORE)) {
 #' valid data points for a day
 #'
 #+ echo=F, include=T
-
-
-
-
-statist <- data.table()
 
 
 
@@ -320,19 +313,19 @@ for ( yyyy in years_to_do) {
 
 
 
-            # ## plot to external pdf
-            # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-            # if (any(grepl( "CM21valueWdark", names(daydata)))) {
-            #     somedata <- daydata[ Elevat < 1 ]
-            #     ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-            #     plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
-            #            ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-            #     points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
-            #     abline(h=0,col="orange")
-            #     title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-            #     text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
-            # }
-            # dev.off()
+            ## plot to external pdf
+            pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+            if (any(grepl( "CM21valueWdark", names(daydata)))) {
+                somedata <- daydata[ Elevat < 1 ]
+                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+                abline(h=0,col="orange")
+                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+                text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
+            }
+            dev.off()
 
         }
 
@@ -362,8 +355,9 @@ for ( yyyy in years_to_do) {
     } #END loop of days
 
     ## write this years data
-    # write_RDS(object = globaldata,
-    #           file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
+    globaldata$day <- NULL
+    write_RDS(object = globaldata,
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
 
 
     ## partial write most recent stats
@@ -389,14 +383,14 @@ for ( yyyy in years_to_do) {
     cat('\\normalsize\n\n')
 
 
-    hist(globaldata$CM21value, breaks = 50, main = paste("CM21 GHI ", yyyy ) )
-    cat('\n\n')
+    # hist(globaldata$CM21value, breaks = 50, main = paste("CM21 GHI ", yyyy ) )
+    # cat('\n\n')
 
-    hist(globaldata$CM21valueWdark, breaks = 50, main = paste("CM21 SIG w Dark ", yyyy ) )
-    cat('\n\n')
+    # hist(globaldata$CM21valueWdark, breaks = 50, main = paste("CM21 SIG w Dark ", yyyy ) )
+    # cat('\n\n')
 
-    hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 SIG SD", yyyy ) )
-    cat('\n\n')
+    # hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 SIG SD", yyyy ) )
+    # cat('\n\n')
 
     # plot(globaldata$Elevat, globaldata$CM21valueWdark, pch = 19, cex = .8,
     #      main = paste("CM21 SIG w Dark ", yyyy ),
@@ -435,27 +429,27 @@ for ( yyyy in years_to_do) {
     plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = paste("Evening Median Dark" , yyyy) , xlab = "" )
     plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = paste("Evening count Dark"  , yyyy) , xlab = "" )
 
-    cat(paste("#### Days with Evening dark data points count < 100\n\n"))
+    cat(paste("#### Days with Evening dark data points count < 100\n\n\n"))
+    cat(paste(unique(as.Date( statist$Date[ which(statist$Ecnt < 100 )]))),"\n\n")
 
-    unique( as.Date( statist$Date[ which(statist$Ecnt < 100 ) ] ) )
 
+    cat(paste("#### Days with Morning dark data points count < 50\n\n\n"))
 
-    cat(paste("#### Days with Morning dark data points count < 50\n\n"))
+    cat(paste(unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )),"\n\n")
 
-    unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )
+    cat(paste("#### Days with ( sun  measurements / sun up ) < 0.2\n\n\n"))
 
-    cat(paste("#### Days with ( sun  measurements / sun up ) < 0.2\n\n"))
-
-    unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
+    cat(paste(unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )),"\n\n")
 
 
     cat(paste("#### Day with the minimum morning median dark\n\n"))
 
-    statist$Date[ which.min( statist$Mmed ) ]
+    cat(paste(statist$Date[ which.min( statist$Mmed ) ]),"\n\n")
+
+    cat('\n\n')
 
 }
-
-
+#'
 
 
 #' **END**

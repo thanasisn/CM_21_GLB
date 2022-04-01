@@ -21,26 +21,32 @@ dark_calculations <- function(elevatio,
                               dates,
                               dstretch,
                               values) {
-    ## find local noun
-    nounindex    <- match( max(elevatio), elevatio )
-    ## split day in half
-    selectmorn   <- elevatio < nightlimit & zoo::index(elevatio) < nounindex
-    selecteven   <- elevatio < nightlimit & zoo::index(elevatio) > nounindex
-    ## all morning and evening dates
-    morning      <- dates[selectmorn]
-    evening      <- dates[selecteven]
 
-    ## morning selection with time limit
-    mornigend    <- morning[max(zoo::index(morning))]
-    mornigstart  <- mornigend - dstretch
-    ## selection for morning dark
-    morningdark  <- selectmorn & dates <= mornigend & mornigstart < dates
+    require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
 
-    ## evening selection with time limit
-    eveningstart <- evening[min(zoo::index(evening))]
-    eveningend   <- eveningstart + dstretch
-    ## selection for evening dark
-    eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
+    ### suppress warnings zoo::index
+    suppressWarnings({
+        ## find local noun
+        nounindex    <- match( max(elevatio), elevatio )
+        ## split day in half
+        selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
+        selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
+        ## all morning and evening dates
+        morning      <- dates[selectmorn]
+        evening      <- dates[selecteven]
+
+        ## morning selection with time limit
+        mornigend    <- morning[max(index(morning))]
+        mornigstart  <- mornigend - dstretch
+        ## selection for morning dark
+        morningdark  <- selectmorn & dates <= mornigend & mornigstart < dates
+
+        ## evening selection with time limit
+        eveningstart <- evening[min(index(evening))]
+        eveningend   <- eveningstart + dstretch
+        ## selection for evening dark
+        eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
+    })
 
     return(
         data.frame(
