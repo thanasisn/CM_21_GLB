@@ -83,8 +83,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 ## get first pass statistics
 darkDT  <- readRDS(DARKSTORE)
-darkDT[ dark_day == "MISSING" | is.na(Emed) | is.na(Mmed),]
-darkDT[ is.na(dark_day) ]
+statist <- darkDT[ dark_flag == "COMPUTED"]
 
 
 
@@ -245,7 +244,7 @@ rmn  = 15
 #' ## Construct missing Dark
 #'
 #' **We will use running mean with a window of `r rmn` days,**
-#' **and interpolate to get a daily value to fill the gaps**
+#' **and interpolate to get a daily mean value to fill the gaps**
 #'
 #+ echo=F, include=T
 
@@ -267,29 +266,26 @@ plot(statist$Date, statist$Dmean, pch = 19, cex = 0.2, main = paste("Running mea
 lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 
 
+darkfill <- darkDT[ dark_flag == "MISSING"]
+
 #'
-#' ## There are `r sum(is.na(runningDark$DARK))` missing dark cases to fill.
+#' ## There are `r nrow(darkfill)` days with un-computable dark to fill.
 #'
+#+ echo=F, include=T
 
-# statist[  ]
+darkfill$Date
 
+#+ echo=F, include=F
 
-#
-# ## use function to fill gaps
-# runningDark$DARK[is.na(runningDark$DARK)]  <- runningDark_valid_func(runningDark$Date[is.na(runningDark$DARK)])
-#
+darkfill[, DARK := runningDark_valid_func(darkfill$Date)]
 
+#+ echo=F, include=T
 
-# ## keep dark constructed signal for reference when missing
-# save( darkmean, darkmedian, runningDark,
-#       file = DARKFILE, compress = TRUE)
-
-
-
-
+write_RDS( darkfill, DARKCONST )
 
 
 
 ## END ##
 tac = Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+if (interactive()) beepr::beep(7)
