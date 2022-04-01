@@ -259,7 +259,8 @@ for ( yyyy in years_to_do) {
         if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
-            dark_day               <- "MISSING"
+            dark_day               <- NA
+            dark_flag              <- "MISSING"
         } else {
 
             ####    Dark Correction function   #####################################
@@ -274,10 +275,10 @@ for ( yyyy in years_to_do) {
 
             ####    Create dark signal for correction    ###########################
             todays_dark_correction <- dark_generator(daydata$Date)
-
+            dark_flag              <- "COMPUTED"
 
             ####    Apply dark correction    #######################################
-            daydata[, CM21valueWdark := CM21value  -  todays_dark_correction ]
+            daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
 
 
 
@@ -332,14 +333,15 @@ for ( yyyy in years_to_do) {
         }
 
         ####    Day stats    ###################################################
-        day = data.frame(Date    = theday,
-                         CMCF    = dayCMCF,
-                         NAs     = sum(is.na(daydata$CM21value)),
-                         SunUP   = sum(      daydata$Eleva >= 0 ),
-                         Dmean   = mean(     todays_dark_correction,na.rm = T),
-                         sunMeas = sum(      daydata$Eleva >= 0 &
-                                                 !is.na(daydata$CM21value)),
-                         CalcDate = Sys.time()
+        day = data.frame(Date      = theday,
+                         CMCF      = dayCMCF,
+                         NAs       = sum(is.na(daydata$CM21value)),
+                         SunUP     = sum(      daydata$Eleva >= 0 ),
+                         Dmean     = mean(     todays_dark_correction,na.rm = T),
+                         sunMeas   = sum(      daydata$Eleva >= 0 &
+                                              !is.na(daydata$CM21value)),
+                         dark_flag = dark_flag,
+                         CalcDate  = Sys.time()
         )
         darkDT <- rbind( darkDT, cbind(day, dark_day), fill=T)
 
@@ -352,7 +354,7 @@ for ( yyyy in years_to_do) {
         globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
 
-        rm( theday, dayCMCF, todays_dark_correction, dark_generator, day, daydata )
+        rm( theday, dayCMCF, todays_dark_correction, dark_generator, day, daydata, dark_flag )
 
     } #END loop of days
 
