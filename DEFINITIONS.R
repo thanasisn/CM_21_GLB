@@ -28,6 +28,8 @@ BAD_RANGES = "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
 DARKFILE  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
 
 DARKSTORE <- paste0(SIGNAL_DIR, "/Dark_data_S0.Rds")
+DARKCONST <- paste0(SIGNAL_DIR, "/Dark_constr_S0.Rds")
+
 
 ####  Log files  ####
 MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")
@@ -39,8 +41,8 @@ BREAKDATE  = as.POSIXct("2014-02-05 00:00:00")
 
 
 ## Lower global limit any Global value below this should be erroneous data
-GLB_LOW_LIM_01   = -15      ## before breakdate
-GLB_LOW_LIM_02   = -7       ## after breakdata
+GLB_LOW_LIM_01   = -15      ## before break-date
+GLB_LOW_LIM_02   = -7       ## after break-data
 
 
 ## Dark Calculations

@@ -261,6 +261,10 @@ for ( yyyy in years_to_do) {
             todays_dark_correction <- NA
             dark_day               <- NA
             dark_flag              <- "MISSING"
+
+            ## get dark from precompute file
+
+
         } else {
 
             ####    Dark Correction function   #####################################
@@ -460,3 +464,5 @@ for ( yyyy in years_to_do) {
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+#if (!interactive())
+beepr::beep(7)
