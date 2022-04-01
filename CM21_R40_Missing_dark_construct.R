@@ -81,17 +81,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 
-## PATHS
-# daylystat = paste0(dirname(GLOBAL_DIR), "/CM21_P30_GHI_daily_filtered_stats.Rds")
-
-
-
-
-
-
-
-## get first approximation statistics
-# statist <- readRDS(daylystat)
+## get first pass statistics
 statist <- readRDS(DARKSTORE)
 
 
@@ -102,9 +92,10 @@ statist <- readRDS(DARKSTORE)
 #' signal when it can not be computed for a day.
 #' This is a result of missing data before sunrise on/and after sunset.
 #'
+#' \newpage
+#' \FloatBarrier
 #'
-#'
-#' ## Dark calculated with `median` value.
+#' ## Dark calculated with the `median` value.
 #'
 #' The median dark of a period before morning and after night is used as the
 #' base of the dark signal correction.
@@ -119,9 +110,9 @@ darkmedian <- approxfun( statist$Date, Dmed )
 
 par(mar = c(2,4,2,1))
 
-plot(statist$Date, Dmed, pch = 19, cex = 0.2,
-     main = "Median", xlab = "", ylab = "Daily dark values")
-
+# plot(statist$Date, Dmed, pch = 19, cex = 0.2,
+#      main = "Median", xlab = "", ylab = "Daily dark values")
+#
 
 plot(statist$Date, darkmedian(statist$Date), pch = 19, cex = 0.2 ,col="red",
      main="Median reconstruction fill missing")
@@ -138,24 +129,23 @@ legend("topleft",
 
 
 #'
-#' ## Dark calculated as `mean` value.
+#'
+#' ## Dark calculated with the `mean` value.
 #'
 #' The mean dark of a period before morning and after night is used as the
 #' base of the dark signal correction.
 #'
+#+ echo=F, include=T
 
 temp <- data.frame(statist$Mavg, statist$Eavg)
 Dmen <- rowMeans(temp, na.rm = TRUE)
 
-darkmean <- approxfun( statist$Date, Dmed )
-
+## approximate function for dark
+darkmean <- approxfun( statist$Date, Dmed,
+                       method = "linear")
 
 
 par(mar = c(2,4,2,1))
-
-plot(statist$Date, Dmen, pch = 19, cex = 0.2,
-     main = "Mean", xlab = "", ylab = "Daily dark values")
-
 
 plot(statist$Date, darkmean(statist$Date), pch = 19, cex = 0.2 ,col="red",
      main = "Mean reconstruction fill missing")
@@ -169,14 +159,11 @@ legend("topleft",
        bty = "n")
 
 
-
-
-
-
-
 #'
 #' ## Mean Dark from first pass
 #'
+#+ echo=F, include=T
+
 plot(statist$Date, statist$Dmean, pch = 19, cex = 0.2,
      main = "Average Dark Correction on first pass" )
 
@@ -204,11 +191,13 @@ scatter.smooth( x = statist$Date[sel_2],
                 main = "Mean Daily dark after break")
 axis.POSIXct(1, statist$Date[sel_1])
 
-
+#'
+#' \newpage
+#' \FloatBarrier
 #'
 #' ## Dark calculated as `running mean` value.
 #'
-
+#+ echo=F, include=T
 
 
 # show runmean for different window sizes
@@ -224,7 +213,7 @@ if ( length(y) > 0 ) {
     lines(x, runmean(y,24), col = col[4], lwd = 2)
     lines(x, runmean(y,50), col = col[5], lwd = 2)
     lab = c("data",  "k=8", "k=15", "k=24", "k=50")
-    legend("topright", lab, col = col, lty = 1 )
+    legend("topright", lab, col = col, lty = 1, cex = 0.8, ncol =3, bty = "n" )
 }
 
 x <- statist$Date[  sel_2 ]
@@ -239,48 +228,53 @@ if ( length(y) > 0 ) {
     lines(x, runmean(y,24), col = col[4], lwd = 2)
     lines(x, runmean(y,50), col = col[5], lwd = 2)
     lab = c("data",  "k=8", "k=15", "k=24", "k=50")
-    legend("bottomleft", lab, col = col, lty = 1 )
+    legend("bottomleft", lab, col = col, lty = 1, cex = 0.8, ncol =3, bty = "n"  )
 }
 
 
 ## select running mean window to use
 rmn  = 15
 
-
 #'
-#' **We will use running mean with a window of `r rmn` days**.
+#' \newpage
+#' \FloatBarrier
 #'
+#' ## Construct missing Dark
+#'
+#' **We will use running mean with a window of `r rmn` days,**
 #' **and interpolate to get a daily value to fill the gaps**
 #'
+#+ echo=F, include=T
 
-
-## do running mean for two periods
+## Running mean for two periods
 rnmD        <- c(runmean( statist$Dmean[sel_1], rmn ), runmean( statist$Dmean[sel_2], rmn ) )
 runningDark <- data.frame(Date = statist$Date, DARK = rnmD)
-
-
-## create interpolated data to fill any gap in the running mean
-runningDark_valid <- runningDark[!is.nan(runningDark$DARK),]
-
-
-## use this function to fill the gaps
-runningDark_valid_func <- approxfun(runningDark_valid$Date,runningDark_valid$DARK)
-
-## gaps are NA
 runningDark$DARK[is.nan(runningDark$DARK)] <- NA
 
-#'
-#' There are `r sum(is.na(runningDark$DARK))` missing dark cases to fill.
-#'
 
-## use function to fill gaps
-runningDark$DARK[is.na(runningDark$DARK)]  <- runningDark_valid_func(runningDark$Date[is.na(runningDark$DARK)])
+## Use valid data to interpolate
+runningDark_valid <- runningDark[ !is.nan(runningDark$DARK), ]
 
-# rnmD = c(runmean( statist$Dmean[sel_1], rmn, endrule = "NA" ),
-#          runmean( statist$Dmean[sel_2], rmn, endrule = "NA" ) )
+
+## Create interpolate function
+runningDark_valid_func <- approxfun( runningDark_valid$Date, runningDark_valid$DARK)
+
+
 plot(statist$Date, statist$Dmean, pch = 19, cex = 0.2, main = paste("Running mean of ", rmn, " days") )
 lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 
+
+#'
+#' ## There are `r sum(is.na(runningDark$DARK))` missing dark cases to fill.
+#'
+
+# statist[  ]
+
+
+#
+# ## use function to fill gaps
+# runningDark$DARK[is.na(runningDark$DARK)]  <- runningDark_valid_func(runningDark$Date[is.na(runningDark$DARK)])
+#
 
 
 ## keep dark constructed signal for reference when missing

@@ -37,20 +37,20 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 #        output_dir           = "~/CM_21_GLB/REPORTS")
 #
 #
-# render("./CM21_R30_Compute_dark.R",
-#        params = list(  ALL_YEARS = TRUE ),
-#        clean                = T  ,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
+render("./CM21_R30_Compute_dark.R",
+       params = list(  ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
 
-
+render("./CM21_R40_Missing_dark_construct.R",
+       params = list(  ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS")
 
 
 stop()
 
-render("./CM21_P40_missing_dark_reconstruction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+
 
 render("./CM21_P50_GHI_dark_correction.R",
        params = list( CACHE = F ),
