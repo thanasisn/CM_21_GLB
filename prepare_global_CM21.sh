@@ -21,8 +21,11 @@ info "Try to get new files"
 info "Read raw files to SIG"
 Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
 
-info "Filter raw data to L0"
+info "Filter raw data to S0"
 Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R"
+
+info "Compute dark to S1"
+Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
 
 
 

@@ -35,12 +35,15 @@ system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
 #        params = list( ALL_YEARS = TRUE ),
 #        clean                = T  ,
 #        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+#
+# render("./CM21_R30_Compute_dark.R",
+#        params = list(  ALL_YEARS = TRUE ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
 
 
-render("./CM21_R30_Compute_dark.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
+
 
 stop()
 
