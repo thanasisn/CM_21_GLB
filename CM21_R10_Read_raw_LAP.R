@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "Read raw CM21 data."
+#' title:         "Read raw CM21 data. **LAP -> SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -34,6 +34,8 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
+#'
+#'  **LAP -> SIG**
 #'
 #' Read text files with CM_21 signal data to rds
 #'

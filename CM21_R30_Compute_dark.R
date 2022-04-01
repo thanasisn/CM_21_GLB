@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "CM21 signal process."
+#' title:         "CM21 signal process. **S0 -> S1**"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -37,9 +37,11 @@
 
 
 #'
+#' **S0 -> S1**
+#'
 #' Read signal and compute dark level correction
 #'
-#' - Compute dark when it is fisable
+#' - Compute dark when it is feasible
 #' - Apply dark correction
 #' - Plot daily signal and dark correction on external pdf
 #' - Keep dark statistics for use next
@@ -199,9 +201,9 @@ for ( yyyy in years_to_do) {
     globaldata    <- data.table()
     NR_extreme_SD <- 0
 
-
-    cat(paste("\\newpage\n\n"))
-    cat(paste("## ",yyyy,"\n\n"))
+    cat("\\FloatBarrier\n\n")
+    cat("\\newpage\n\n")
+    cat("\n## Year:", yyyy, "\n\n" )
 
     for (ddd in daystodo) {
 
