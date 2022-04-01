@@ -259,7 +259,7 @@ for ( yyyy in years_to_do) {
         if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
-            dark_day               <- NA
+            dark_day               <- "MISSING"
         } else {
 
             ####    Dark Correction function   #####################################
