@@ -1,11 +1,11 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
-#'
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title: "CM21 daily GHI complete dark correction."
-#' author: "Natsis Athanasios"
-#' date: "`r format(Sys.time(), '%B %d, %Y')`"
-#' keywords: "CM21, CM21 data validation, global irradiance"
+#' title:         "CM21 signal to radiation. **S1 -> L0**"
+#' author:        "Natsis Athanasios"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
+#' abstract:      "Read signal and dark correction and convert to global radiation."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
@@ -23,72 +23,72 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:        6
+#'     fig_height:       4
 #'   html_document:
-#'     keep_md:          yes
-#'   odt_document:  default
-#'   word_document: default
-#'
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#' date: "`r format(Sys.time(), '%F')`"
 #' params:
-#'   CACHE: true
+#'    ALL_YEARS: TRUE
 #' ---
 
+#'
+#' **S1 -> L0**
+#'
+#'
 #+ echo=F, include=T
 
-if (!exists("params")) {
-    params <- list()
-    params$CACHE <- TRUE }
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE     )
-knitr::opts_chunk$set(cache      = params$CACHE    )
-# knitr::opts_chunk$set(include    = FALSE   )
-knitr::opts_chunk$set(include    = TRUE    )
-knitr::opts_chunk$set(comment    = ""      )
-
-# pdf output is huge too many point to plot
+#+ echo=F, include=F
+knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"   )
-
-knitr::opts_chunk$set(fig.width  = 8       )
-knitr::opts_chunk$set(fig.height = 6       )
-
-knitr::opts_chunk$set(out.width  = "70%"    )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'     )
+# knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
-####_ Notes _####
 
 
 
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
+                            return("CM21_R20_") })
+if(!interactive()) {
+    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+}
 
 
 ## FIXME this is for pdf output
 # options(warn=-1) ## hide warnigs
 # options(warn=2)  ## stop on warnigs
 
-#+ echo=F, include=F
-library(data.table, quietly = T)
-library(pander,     quietly = T)
-# library(RAerosols,  quietly = T)
-source("~/CM_21_GLB/CM21_functions.R")
-#'
+library(data.table, quietly = T, warn.conflicts = F)
+library(pander,     quietly = T, warn.conflicts = F)
+library(myRtools,   quietly = T, warn.conflicts = F)
+library(RAerosols,  quietly = T, warn.conflicts = F)
 
-####  . Variables  ####
+source("~/CM_21_GLB/CM21_functions.R")
+
+
+####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
-tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+ALL_YEARS = FALSE
+if (!exists("params")){
+    params <- list( ALL_YEARS = ALL_YEARS)
+}
 
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
 ## PATHS
@@ -116,9 +116,6 @@ input_files <- list.files( path       = GLOBAL_DIR,
                            full.names = T )
 input_files <- sort(input_files)
 
-## . get functions for missing dark resolution
-## were precomputed at the previous step
-load(DARKFILE)
 
 
 
@@ -137,7 +134,8 @@ statist <- data.table()
 pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files) {
+if (FALSE) {
+# for (afile in input_files) {
 
 
     #### Get raw data ####

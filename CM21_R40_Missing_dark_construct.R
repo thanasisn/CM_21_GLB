@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "CM21 dark trend reconstruction.**"
+#' title:         "CM21 dark trend reconstruction."
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -64,7 +64,7 @@ if(!interactive()) {
 
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(caTools,     quietly = T, warn.conflicts = F)
+library(caTools,    quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 
 
