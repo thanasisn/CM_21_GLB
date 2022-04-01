@@ -142,6 +142,9 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+
+years_to_do <- 2007:2022
+
 ## decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
@@ -154,6 +157,11 @@ if (file.exists(DARKSTORE)) {
     darkDT <- readRDS(DARKSTORE)
 } else {
     darkDT <- data.table()
+}
+## Read pre prepared dark
+if (file.exists(DARKCONST)) {
+    construct <- readRDS(DARKCONST)
+    construct <- construct[!is.na(DARK)]
 }
 
 
@@ -169,6 +177,7 @@ if (file.exists(DARKSTORE)) {
 #' valid data points for a day
 #'
 #+ echo=F, include=T
+
 
 
 
@@ -259,82 +268,96 @@ for ( yyyy in years_to_do) {
         if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
-            dark_day               <- NA
             dark_flag              <- "MISSING"
+            missingdark            <- NA
 
-            ## get dark from precompute file
-
-
+            ## get dark from pre-computed file
+            if (exists("construct")) {
+                todays_dark_correction <- construct[ Date == theday, DARK]
+                dark_flag              <- "CONSTRUCTED"
+            }
         } else {
 
-            ####    Dark Correction function   #####################################
-            dark_generator <- dark_function(dark_day    = dark_day,
-                                            DCOUNTLIM   = DCOUNTLIM,
-                                            type        = "median",
-                                            adate       = theday ,
-                                            test        = test,
-                                            missfiles   = missfiles,
-                                            missingdark = NA )
+        ####    Dark Correction function   #####################################
+        dark_generator <- dark_function(dark_day    = dark_day,
+                                        DCOUNTLIM   = DCOUNTLIM,
+                                        type        = "median",
+                                        adate       = theday ,
+                                        test        = test,
+                                        missfiles   = missfiles,
+                                        missingdark = missingdark )
 
 
-            ####    Create dark signal for correction    ###########################
-            todays_dark_correction <- dark_generator(daydata$Date)
-            dark_flag              <- "COMPUTED"
+        ####    Create dark signal for correction    ###########################
+        todays_dark_correction <- dark_generator(daydata$Date)
+        dark_flag              <- "COMPUTED"
+}
 
-            ####    Apply dark correction    #######################################
-            daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
-
-
-
-            # # # #    #' ### Covert signal to global irradiance.
-            # # # #    #'
-            # # # #    #' The conversion is done with a factor which is interpolated between CM-21 calibrations.
-            # # # #    #'
-            # # # #    #' ### Filter minimum Global irradiance.
-            # # # #    #'
-            # # # #    #' Reject data when GHI is below an acceptable limit.
-            # # # #    #' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
-            # # # #    #' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
-            # # # #    #' This is due to changes in instrumentation.
-
-            # # # #    ##TODO move that ####
-            # # # #
-            # # # #     ## choose GLB_LOW_LIM by date
-            # # # #     if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
-            # # # #     if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
-            # # # #
-            # # # #
-            # # # #    ####  Convert to irradiance  ###########################################
-            # # # #    daydata$Global <- daydata$CM21value * dayCMCF
-            # # # #    daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-            # # # #    ########################################################################
-            # # # #
-            # # # #
-            # # # #
-            # # # #    #### Filter too low Global values  #####################################
-            # # # #    pre_count     <- daydata[ !is.na(CM21value), .N ]
-            # # # #    daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-            # # # #    NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-            # # # #    ########################################################################
+        ####    Apply dark correction    #######################################
+        daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
 
 
 
+        # # # #    #' ### Covert signal to global irradiance.
+        # # # #    #'
+        # # # #    #' The conversion is done with a factor which is interpolated between CM-21 calibrations.
+        # # # #    #'
+        # # # #    #' ### Filter minimum Global irradiance.
+        # # # #    #'
+        # # # #    #' Reject data when GHI is below an acceptable limit.
+        # # # #    #' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
+        # # # #    #' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
+        # # # #    #' This is due to changes in instrumentation.
 
-            ## plot to external pdf
-            pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-            if (any(grepl( "CM21valueWdark", names(daydata)))) {
-                somedata <- daydata[ Elevat < 1 ]
+        # # # #    ##TODO move that ####
+        # # # #
+        # # # #     ## choose GLB_LOW_LIM by date
+        # # # #     if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
+        # # # #     if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
+        # # # #
+        # # # #
+        # # # #    ####  Convert to irradiance  ###########################################
+        # # # #    daydata$Global <- daydata$CM21value * dayCMCF
+        # # # #    daydata$GLstd  <- daydata$CM21sd    * dayCMCF
+        # # # #    ########################################################################
+        # # # #
+        # # # #
+        # # # #
+        # # # #    #### Filter too low Global values  #####################################
+        # # # #    pre_count     <- daydata[ !is.na(CM21value), .N ]
+        # # # #    daydata       <- daydata[ Global >= GLB_LOW_LIM ]
+        # # # #    NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
+        # # # #    ########################################################################
+
+
+
+        ## plot to external pdf
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        if (any(grepl( "CM21valueWdark", names(daydata)))) {
+            ## plot night
+            somedata <- daydata[ Elevat < 1 ]
+            if (nrow(somedata)>0) {
                 ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
                 plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
                        ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
                 points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
                 abline(h=0,col="orange")
-                title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
-                text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
+                title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
+                text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+            ## or plot day
+            } else {
+                somedata <- daydata[ Elevat >=1 ]
+                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+                abline(h=0,col="orange")
+                title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
+                text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
             }
-            dev.off()
-
         }
+        dev.off()
+
 
         ####    Day stats    ###################################################
         day = data.frame(Date      = theday,
