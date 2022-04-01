@@ -11,6 +11,9 @@
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -25,6 +28,7 @@
 #'     toc:              yes
 #'     fig_width:        6
 #'     fig_height:       4
+#'     urlcolor:         blue
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -33,6 +37,13 @@
 #' params:
 #'    ALL_YEARS: TRUE
 #' ---
+
+
+#'
+#' Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)
+#'
+#' Data display:
+#'
 
 
 #+ echo=F, include=T
