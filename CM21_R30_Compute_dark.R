@@ -99,6 +99,11 @@ source("~/CM_21_GLB/CM21_functions.R")
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
+ALL_YEARS = FALSE
+if (!exists("params")){
+    params <- list( ALL_YEARS = ALL_YEARS)
+}
+
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -126,11 +131,50 @@ TEST      = FALSE
 
 
 
-## . get data input files ####
+
+
+## . Get data input files ####
 input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                            full.names = T )
-input_files <- sort(input_files)
+
+input_years <- as.numeric(
+    sub(".rds", "",
+        sub(".*_S0_","",
+            basename(input_files),),ignore.case = T))
+
+
+## . Get storage files ####
+output_files <- list.files( path    = SIGNAL_DIR,
+                            pattern = "LAP_CM21_H_S1_[0-9]{4}.Rds",
+                            full.names = T )
+
+if (!params$ALL_YEARS) {
+    years_to_do <- c()
+    for (ay in input_years) {
+        inp <- grep(ay, input_files,  value = T)
+        out <- grep(ay, output_files, value = T)
+        if ( length(out) == 0 ) {
+            ## do if not there
+            years_to_do <- c(years_to_do,ay)
+        } else {
+            ## do if newer data
+            if (file.mtime(inp) > file.mtime(out))
+                years_to_do <- c(years_to_do,ay)
+        }
+        years_to_do <- sort(unique(years_to_do))
+    }
+} else {
+    years_to_do <- sort(unique(input_years))
+}
+
+## decide what to do
+if (length(years_to_do) == 0 ) {
+    stop("NO new data! NO need to parse!")
+}
+
+
+
 
 ## Keep record of dark signal
 if (file.exists(DARKSTORE)) {
@@ -173,8 +217,14 @@ if (file.exists(DARKSTORE)) {
 statist <- data.table()
 pbcount = 0
 
+
 #+ include=TRUE, echo=F, results="asis"
-for (afile in input_files) {
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
+for ( yyyy in years_to_do) {
+
+    #### Get raw data ####
+    afile <- grep(yyyy, input_files,  value = T)
 
     ## create a new temp dir
     unlink(tmpfolder, recursive = TRUE)
@@ -199,12 +249,8 @@ for (afile in input_files) {
     NR_min_global = 0
 
 
-    yyyy    <- year(rawdata$day[1])
     cat(paste("\\newpage\n\n"))
     cat(paste("## ",yyyy,"\n\n"))
-
-
-
 
     for (ddd in daystodo) {
 
@@ -319,6 +365,7 @@ for (afile in input_files) {
                 points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
                 abline(h=0,col="orange")
                 title(main = paste(test, format(daydata$Date[1] , format = "  %F")))
+                text(somedata$Date[1], ylim[2], , labels = tag, pos = 4, cex =.9)
             }
             dev.off()
 
@@ -350,14 +397,18 @@ for (afile in input_files) {
     } #END loop of days
 
     ## write this years data
-    write_RDS(object = globaldata,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
+    # write_RDS(object = globaldata,
+    #           file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
 
 
-
+    ## partial write most recent stats
+    darkDT <- darkDT[ , .SD[which.max(CalcDate)], by = Date ]
+    write_RDS(object = darkDT, file = DARKSTORE)
 
     ## create pdf with all daily plots
-    system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")) )
+    system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
+                  paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")) )
+
 
 
 if(FALSE){
@@ -368,8 +419,7 @@ if(FALSE){
     tempout <- rbind( tempout, data.frame(Name = "Minimum GHI limit", Data_points = NR_min_global) )
     tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
 
-    panderOptions('table.alignment.default', 'right')
-    panderOptions('table.split.table',        120   )
+
 
     cat('\\scriptsize\n')
 
@@ -399,10 +449,11 @@ if(FALSE){
 
     cat('\n')
     cat('\n')
+
 }
 
 
-
+stop()
 
 
 }
@@ -410,12 +461,6 @@ if(FALSE){
 
 
 stop()
-## write statistics on data
-# capture.output(
-#     myRtools::write_RDS(statist, daylystat),
-#     file = "/dev/null" )
-
-
 
 
 #'
