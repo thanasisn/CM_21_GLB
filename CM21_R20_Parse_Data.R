@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "CM21 signal filtering."
+#' title:         "CM21 signal filtering. **SIG -> S0** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -35,6 +35,8 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
+#'
+#' **SIG -> S0**
 #'
 #' Read all yearly **signal** data and create **Level 0** data
 #'
@@ -146,7 +148,7 @@ input_years <- as.numeric(
 
 ## . Get storage files ####
 output_files <- list.files( path    = SIGNAL_DIR,
-                            pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
+                            pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                             full.names = T )
 
 
@@ -228,7 +230,7 @@ for ( yyyy in years_to_do) {
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
-    cat("\n## Year:", yyyy, "\n" )
+    cat("\n## Year:", yyyy, "\n\n" )
 
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
 
