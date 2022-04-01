@@ -40,9 +40,9 @@
 
 
 #'
-#' Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' Data display:
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
 #'
 
 

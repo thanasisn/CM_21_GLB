@@ -2,7 +2,7 @@
 Data processing of CM-21 data to produce Total Irradiance data.
 ================================================================
 
-## Developed for in Laboratory of Atmosperic Pysics, for use in Thessaloniki, Greece.
+## Developed in Laboratory of Atmospheric Physics, for use in Thessaloniki, Greece.
 
 
 - Convert CM-21 instrument signal data to Global Irradiance.
