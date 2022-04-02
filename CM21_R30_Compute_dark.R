@@ -97,7 +97,6 @@ source("~/CM_21_GLB/CM21_functions.R")
 source("~/CM_21_GLB/DEFINITIONS.R")
 
 ALL_YEARS = FALSE
-ALL_YEARS = T
 
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
@@ -373,6 +372,10 @@ for ( yyyy in years_to_do) {
                     abline(h=0,col="orange")
                     title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
                     text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+                } else {
+                    ## or plot empty for consistency
+                    plot.new()
+                    title(main = paste(test, format(daydata$Date[1], format = "%F"), "NOT PLOTABLE"))
                 }
             }
         }
