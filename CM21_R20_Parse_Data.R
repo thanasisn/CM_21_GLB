@@ -85,7 +85,6 @@ if(!interactive()) {
 
 #+ echo=F, include=F
 ####  External code  ####
-# library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_write_data.R")
@@ -103,9 +102,6 @@ ALL_YEARS = FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
-
-
-
 
 
 

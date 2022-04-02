@@ -16,7 +16,7 @@ info "START :: $0 :: $* ::"
 
 
 info "Try to get new files"
-"$HOME/Aerosols/BASH_help/update_data_from_sirena.sh"
+"$(dirname "$0")/get_data_from_sirena.sh"
 
 info "Read raw files to SIG"
 Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
