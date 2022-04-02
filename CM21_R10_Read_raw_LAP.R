@@ -11,6 +11,9 @@
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -23,8 +26,9 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     fig_width:  8
-#'     fig_height: 5
+#'     fig_width:        8
+#'     fig_height:       5
+#'     urlcolor:         blue
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -34,8 +38,13 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
+
 #'
 #'  **LAP -> SIG**
+#'
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#'
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
 #'
 #' Read text files with CM_21 signal data to rds
 #'
@@ -51,7 +60,7 @@
 
 ####_  Document options _####
 
-
+#+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
@@ -73,6 +82,7 @@ if(!interactive()) {
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
     filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
 }
+
 
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)

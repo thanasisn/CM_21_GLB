@@ -44,8 +44,6 @@
 #'
 #' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
 #'
-
-
 #+ echo=F, include=T
 
 ####_  Document options _####
@@ -60,6 +58,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 
+#+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
