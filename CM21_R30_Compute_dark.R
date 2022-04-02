@@ -88,6 +88,8 @@ source("~/CM_21_GLB/CM21_functions.R")
 source("~/CM_21_GLB/DEFINITIONS.R")
 
 ALL_YEARS = FALSE
+ALL_YEARS = T
+
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
@@ -143,7 +145,6 @@ if (!params$ALL_YEARS) {
 }
 
 
-years_to_do <- 2007:2022
 
 ## decide what to do
 if (length(years_to_do) == 0 ) {
@@ -273,8 +274,16 @@ for ( yyyy in years_to_do) {
 
             ## get dark from pre-computed file
             if (exists("construct")) {
-                todays_dark_correction <- construct[ Date == theday, DARK]
-                dark_flag              <- "CONSTRUCTED"
+                ## can not find date
+                if (! theday %in% construct$Date) {
+                    todays_dark_correction <- NA
+                    dark_flag              <- "MISSING"
+                    missingdark            <- NA
+                } else {
+                    ## got data from database
+                    todays_dark_correction <- construct[ Date == theday, DARK]
+                    dark_flag              <- "CONSTRUCTED"
+                }
             }
         } else {
 
@@ -336,7 +345,7 @@ for ( yyyy in years_to_do) {
         if (any(grepl( "CM21valueWdark", names(daydata)))) {
             ## plot night
             somedata <- daydata[ Elevat < 1 ]
-            if (nrow(somedata)>0) {
+            if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
                 ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
                 plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
                        ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
@@ -344,16 +353,18 @@ for ( yyyy in years_to_do) {
                 abline(h=0,col="orange")
                 title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
                 text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
-            ## or plot day
+                ## or plot day
             } else {
                 somedata <- daydata[ Elevat >=1 ]
-                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
-                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
-                abline(h=0,col="orange")
-                title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
-                text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+                if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
+                    ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+                    plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                           ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+                    points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+                    abline(h=0,col="orange")
+                    title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
+                    text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+                }
             }
         }
         dev.off()
