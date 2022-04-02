@@ -467,7 +467,6 @@ for ( yyyy in years_to_do) {
     hist(statist$Emed,    main = paste("Evening Median Dark" , yyyy), breaks = 50)
     hist(statist$Ecnt,    main = paste("Evening count Dark"  , yyyy), breaks = 50)
 
-    plot(statist$Date, statist$CMCF,    "p", pch = 16, cex = .5, main = paste("Conversion factor"   , yyyy) , xlab = "" )
     plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = paste("Sun measurements"    , yyyy) , xlab = "" )
     plot(statist$Date, statist$SunUP,   "p", pch = 16, cex = .5, main = paste("Sun up measurements" , yyyy) , xlab = "" )
     plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = paste("Morning Average Dark", yyyy) , xlab = "" )
