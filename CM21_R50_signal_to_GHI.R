@@ -85,7 +85,7 @@ library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 library(RAerosols,  quietly = T, warn.conflicts = F)
 
-source("~/CM_21_GLB/CM21_functions.R")
+source("~/CM_21_GLB/Functions_CM21.R")
 
 
 ####  . . Variables  ####
