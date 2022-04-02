@@ -38,7 +38,6 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
-
 #'
 #'  **LAP -> SIG**
 #'
@@ -84,6 +83,8 @@ if(!interactive()) {
 }
 
 
+#+ echo=F, include=F
+library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)

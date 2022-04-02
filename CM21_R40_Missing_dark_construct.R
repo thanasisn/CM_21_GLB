@@ -72,6 +72,7 @@ if(!interactive()) {
 }
 
 
+#+ echo=F, include=F
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(caTools,    quietly = T, warn.conflicts = F)
