@@ -42,7 +42,7 @@
 #'
 #' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #+ echo=F, include=T
 
@@ -73,15 +73,18 @@ if(!interactive()) {
 
 
 #+ echo=F, include=F
+####  External code  ####
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 library(caTools,    quietly = T, warn.conflicts = F)
-library(myRtools,   quietly = T, warn.conflicts = F)
+source("~/CM_21_GLB/Functions_write_data.R")
 
-
-####  . . Variables  ####
+####  Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 
+####  Execution control  ####
 ALL_YEARS = FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)

@@ -43,10 +43,9 @@
 #'
 #' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
-#'
-#' Read signal and compute dark level correction
+#' Read **Signal 0** and compute dark level correction **Signal 1** data
 #'
 #' - Compute dark when it is feasible
 #' - Apply dark correction
@@ -59,12 +58,12 @@
 ####_  Document options _####
 
 #+ echo=F, include=F
-knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"    )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'     )
+# knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 
@@ -86,24 +85,25 @@ if(!interactive()) {
 if (!interactive()) { options(warn=-1) }
 
 #+ echo=F, include=F
+####  External code  ####
 library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(myRtools,   quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_CM21.R")
+source("~/CM_21_GLB/Functions_write_data.R")
 
-
-####  . . Variables  ####
+####  Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 
+####  Execution control  ####
 ALL_YEARS = FALSE
-
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
 
-
-tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 ## Standard deviation filter (apply after other filters)
 STD_ret_ap_for = 10   ## apply rule when there are enough data points
