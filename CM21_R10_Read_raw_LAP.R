@@ -43,9 +43,9 @@
 #'
 #' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
-#' Read text files with CM_21 signal data to rds
+#' Read **LAP files** with CM_21 signal data to **Signal** rds files
 #'
 #'   - Lists Sirena files
 #'   - Lists Radmon files

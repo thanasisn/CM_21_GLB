@@ -44,10 +44,9 @@
 #'
 #' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
-#'
-#' Read all yearly **signal** data and create **Level 0** data
+#' Read **raw signal** data and create **Signal 0** data
 #'
 #'  - REMOVE data for bad time ranges
 #'  - MARK   positive signal limits
@@ -85,19 +84,21 @@ if(!interactive()) {
 
 
 #+ echo=F, include=F
-library(RAerosols,  quietly = T, warn.conflicts = F)
+####  External code  ####
+# library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(myRtools,   quietly = T, warn.conflicts = F)
+source("~/CM_21_GLB/Functions_write_data.R")
+
+
+####  Variables  ####
+source("~/CM_21_GLB/DEFINITIONS.R")
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
-
-####  . . Variables  ####
-source("~/CM_21_GLB/DEFINITIONS.R")
-
 OutliersPlot <- 5
 
+####  Execution control  ####
 ALL_YEARS = FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
@@ -113,7 +114,7 @@ if (!exists("params")){
 #'
 #+ include=T, echo=F
 
-## . Load exclusion list ####
+####  Load exclusion list  ####
 
 ranges       <- read.table( BAD_RANGES,
                             sep         = ";",
@@ -149,7 +150,7 @@ cat('\n\n')
 
 
 
-## . Get data input files ####
+####  Get data input files  ####
 input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
                            full.names = T )
@@ -159,7 +160,7 @@ input_years <- as.numeric(
             basename(input_files),),ignore.case = T))
 
 
-## . Get storage files ####
+## Get storage files
 output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                             full.names = T )
@@ -185,7 +186,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-## decide what to do
+## Decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
 }
@@ -230,11 +231,9 @@ if (length(years_to_do) == 0 ) {
 
 
 
-## loop all input files
+####  Loop all years  ####
 
 #+ include=TRUE, echo=F, results="asis"
-panderOptions('table.alignment.default', 'right')
-panderOptions('table.split.table',        120   )
 for ( yyyy in years_to_do) {
 
     #### Get raw data ####
@@ -322,9 +321,9 @@ for ( yyyy in years_to_do) {
 
 
     par(mar = c(2,4,2,1))
-    month_vec <- strftime(  rawdata$Date, format = "%m")
-    dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
-                            list(month_vec), FUN = summary, digits = 6 )
+    month_vec <- strftime( rawdata$Date, format = "%m")
+    dd        <- aggregate(rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
+                           list(month_vec), FUN = summary, digits = 6 )
 
     boxplot(rawdata$CM21value ~ month_vec )
     title(main = paste("CM21value by month", yyyy) )
