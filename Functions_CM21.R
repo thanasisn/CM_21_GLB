@@ -1,7 +1,5 @@
 
 Sys.setenv(TZ = "UTC")
-# require(xts)  ## index command
-
 
 
 

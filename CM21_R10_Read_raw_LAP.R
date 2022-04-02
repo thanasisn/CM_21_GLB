@@ -84,19 +84,21 @@ if(!interactive()) {
 
 
 #+ echo=F, include=F
-library(RAerosols,  quietly = T, warn.conflicts = F)
+####  External code  ####
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-library(myRtools,   quietly = T, warn.conflicts = F)
+source("~/CM_21_GLB/Functions_write_data.R")
+
+
+####  Variables  ####
+source("~/CM_21_GLB/DEFINITIONS.R")
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
-
-####  . . Variables  ####
-source("~/CM_21_GLB/DEFINITIONS.R")
-
 OutliersPlot <- 4
 
+
+####  Execution control  ####
 ALL_YEARS = FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
@@ -105,7 +107,7 @@ if (!exists("params")){
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
-####  Files for import  ####
+## Files for import
 
 sirena_files <- list.files( path        = SIRENA_DIR,
                             recursive   = TRUE,
@@ -151,12 +153,12 @@ years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
 #'
 #+ include=TRUE, echo=FALSE
 
+####  Check for new data to parse  ####
 if (!params$ALL_YEARS) {
-    NEWDATA <- FALSE
-
+    NEWDATA            <- FALSE
     sirena_files_dates <- file.mtime(sirena_files)
-
-    storagefiles       <- list.files(SIGNAL_DIR, "LAP_CM21_H_SIG.*.rds", full.names = T, ignore.case = T)
+    storagefiles       <- list.files(SIGNAL_DIR, "LAP_CM21_H_SIG.*.rds",
+                                     full.names = T, ignore.case = T)
     last_storage_date  <- max(file.mtime(storagefiles))
     newfiles           <- sirena_files[sirena_files_dates > last_storage_date]
 
@@ -192,8 +194,7 @@ if (!params$ALL_YEARS) {
 #'
 #+ include=TRUE, echo=FALSE, results="asis"
 
-## one output file per year
-## we assume the files are in the correct folder
+## loop all years
 for ( YYYY in years_to_do ) {
     yy           <- substr(YYYY, 3,4)
     year_data    <- data.table()
