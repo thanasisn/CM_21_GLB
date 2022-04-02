@@ -11,6 +11,9 @@
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -38,6 +41,10 @@
 #' **S1 -> L0**
 #'
 #'
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#'
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#'
 #+ echo=F, include=T
 
 
@@ -55,6 +62,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 
+#+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()

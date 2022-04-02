@@ -12,6 +12,9 @@
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -35,9 +38,13 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
-
 #'
 #' **S0 -> S1**
+#'
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#'
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#'
 #'
 #' Read signal and compute dark level correction
 #'
@@ -52,7 +59,6 @@
 ####_  Document options _####
 
 #+ echo=F, include=F
-
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
@@ -61,6 +67,8 @@ knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
+
+#+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -77,6 +85,7 @@ if(!interactive()) {
 ## FIXME this is for pdf output
 if (!interactive()) { options(warn=-1) }
 
+#+ echo=F, include=F
 library(RAerosols,  quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
@@ -125,6 +134,8 @@ output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_S1_[0-9]{4}.Rds",
                             full.names = T )
 
+
+
 if (!params$ALL_YEARS) {
     years_to_do <- c()
     for (ay in input_years) {
@@ -143,8 +154,6 @@ if (!params$ALL_YEARS) {
 } else {
     years_to_do <- sort(unique(input_years))
 }
-
-
 
 ## decide what to do
 if (length(years_to_do) == 0 ) {

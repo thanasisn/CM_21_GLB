@@ -12,6 +12,9 @@
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -24,8 +27,9 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     fig_width:  8
-#'     fig_height: 5
+#'     fig_width:        8
+#'     fig_height:       5
+#'     urlcolor:         blue
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -38,6 +42,11 @@
 #'
 #' **SIG -> S0**
 #'
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#'
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-chp1_global/](https://thanasisn.netlify.app/3-data_display/2-chp1_global/)**
+#'
+#'
 #' Read all yearly **signal** data and create **Level 0** data
 #'
 #'  - REMOVE data for bad time ranges
@@ -48,8 +57,10 @@
 #'
 #+ echo=F, include=T
 
+
 ####_  Document options _####
 
+#+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
@@ -59,6 +70,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 
+#+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -79,6 +91,7 @@ library(pander,     quietly = T, warn.conflicts = F)
 library(myRtools,   quietly = T, warn.conflicts = F)
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
+
 
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
@@ -465,12 +478,8 @@ for ( yyyy in years_to_do) {
     title(main = paste("CM21sd by month", yyyy) )
     cat('\n\n')
 
-
-
-
 }
 #'
-
 
 
 #' **END**
