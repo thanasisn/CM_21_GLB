@@ -45,6 +45,11 @@
 #'
 #' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
+#' Convert CM21 signal $[V]$ to radiation $[W/m^2]$.
+#'
+#' - Apply proper gain by the acquisition system
+#' - Use an interpolated sensitivity between calibrations.
+#'
 #+ echo=F, include=T
 
 
@@ -80,11 +85,11 @@ if(!interactive()) {
 # options(warn=-1) ## hide warnigs
 # options(warn=2)  ## stop on warnigs
 
-#+ echo=F, include=F
+#+ echo=F, include=T
 ####  External code  ####
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
-# source("~/CM_21_GLB/Functions_CM21.R")
+source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_write_data.R")
 
 
@@ -163,6 +168,63 @@ if (length(years_to_do) == 0 ) {
 years_to_do <- 2007
 
 
+#'
+#' ## CM21 conversion factor calculation
+#'
+#+ include=T, echo=F
+
+pander(calibration_data, caption = "CM21 calibrations")
+
+
+## create some plot data
+dates <- seq(calibration_data$Date[1],Sys.time(),by="day")
+
+
+
+plot(dates, sensitivity(dates),
+     pch = 19, main = "CM21 Sensitivity",
+     xlab = "", ylab = "", cex = .3)
+points(calibration_data$Date, calibration_data$Sens, col = "green")
+legend("bottomleft",
+       legend = c("Sensitivity Interpolation", "Sensitivity calibration"),
+       pch    = c( 19, 1 ),
+       col    = c(  1, "green"),
+       bty    = "n", cex = 0.8)
+cat("\n\n")
+
+
+plot(dates, gain(dates),
+     pch = 19, main = "CM21 Acquisition gain",
+     xlab = "", ylab = "", cex = .3)
+points(calibration_data$Date, calibration_data$Gain,  col = "cyan")
+legend("right",
+       legend = c("Acquisition gain Constant", "Acquisition gain data"),
+       pch    = c( 19, 1 ),
+       col    = c(  1, "cyan"),
+       bty    = "n", cex = 0.8)
+cat("\n\n")
+
+
+
+plot(dates, cm21factor(dates),
+     pch = 19, main = "CM21 convertion factor",
+     xlab = "", ylab = "", cex = .3)
+points(calibration_data$Date, calibration_data$Gain / calibration_data$Sensitivity,
+       col = "orange" )
+legend("right",
+       legend = c("Convertion factor interpolated", "Convertion factor calibrated"),
+       pch    = c( 19, 1 ),
+       col    = c(  1, "orange"),
+       bty    = "n", cex = 0.8)
+cat("\n\n")
+
+
+plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sens))/calibration_data$Sens ,
+     main = "CM21 calibration factor change %",
+     xlab = "", ylab = "%", col = "blue")
+cat("\n\n")
+
+
 
 
 
@@ -173,11 +235,31 @@ pbcount = 0
 
 #+ include=TRUE, echo=F, results="asis"
 for ( yyyy in years_to_do) {
+    cat("\n\\FloatBarrier\n\n")
+    cat("\\newpage\n\n")
+    cat("\n## Year:", yyyy, "\n\n" )
 
-
-    #### Get raw data ####
+    ####  Get raw data
     afile    <- grep(yyyy, input_files,  value = T)
     rawdata  <- readRDS(afile)
+
+    ####  Generate conversion factor
+    rawdata[ , CM21CF := cm21factor(Date) ]
+
+
+
+    ##TODO convert to watt
+    ## same names as before
+    ## dark and no dark
+    ## drop data at next level
+    ## see old files
+    ## copy filters from here and Aerosols for level 1
+
+
+
+    plot(rawdata$Date, rawdata$CM21CF,"l",
+         xlab = "", ylab = "", main = paste("Converion factor", yyyy))
+
 
 #     daystodo    <- unique( rawdata$day )
 #
@@ -191,9 +273,7 @@ for ( yyyy in years_to_do) {
 #
 #
 
-    cat("\\FloatBarrier\n\n")
-    cat("\\newpage\n\n")
-    cat("\n## Year:", yyyy, "\n\n" )
+
 
 #
 #     for (ddd in daystodo) {
