@@ -219,8 +219,8 @@ legend("right",
 cat("\n\n")
 
 
-plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sens))/calibration_data$Sens ,
-     main = "CM21 calibration factor change %",
+plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sensitivity))/calibration_data$Sensitivity ,
+     main = "CM21 Sensitivity change %",
      xlab = "", ylab = "%", col = "blue")
 cat("\n\n")
 
