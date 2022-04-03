@@ -100,6 +100,8 @@ panderOptions('table.split.table',        120   )
 
 ####  Execution control  ####
 ALL_YEARS = FALSE
+ALL_YEARS = TRUE
+
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
@@ -112,11 +114,6 @@ tmpfolder  = paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Nam
 dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
 daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , basename(Script.Name)),"_stats")
 
-
-
-## create a new temp dir
-unlink(tmpfolder, recursive = TRUE)
-dir.create(tmpfolder, showWarnings = FALSE)
 
 
 
@@ -165,7 +162,6 @@ if (length(years_to_do) == 0 ) {
 }
 
 
-years_to_do <- 2007
 
 
 #'
@@ -251,8 +247,9 @@ for ( yyyy in years_to_do) {
         cat("\n**There are missing dark correction values!!!!**\n\n")
     }
 
-
-
+    ####  Convert to physical values  ####
+    rawdata[ , wattGLB    := CM21CF * CM21valueWdark ]
+    rawdata[ , wattGLB_SD := CM21CF * CM21sd         ]
 
 
 
@@ -267,7 +264,12 @@ for ( yyyy in years_to_do) {
 
 
     plot(rawdata$Date, rawdata$CM21CF,"l",
-         xlab = "", ylab = "", main = paste("Converion factor", yyyy))
+         xlab = "", ylab = "", main = paste("Conversion factor", yyyy))
+
+    plot(rawdata$Date, rawdata$wattGLB, pch = 19, cex = 0.5,
+         xlab = "", ylab = "", main = paste("Global radiation", yyyy))
+
+
 
 
 #     daystodo    <- unique( rawdata$day )
