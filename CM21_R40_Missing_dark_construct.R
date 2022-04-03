@@ -295,7 +295,8 @@ darkfill[, DARK := runningDark_valid_func(darkfill$Date)]
 
 #+ echo=F, include=T
 
-write_RDS( darkfill, DARKCONST )
+write_RDS(object = darkfill,
+          file   = DARKCONST )
 
 
 
