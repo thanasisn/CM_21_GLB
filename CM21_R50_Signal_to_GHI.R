@@ -246,6 +246,15 @@ for ( yyyy in years_to_do) {
     ####  Generate conversion factor
     rawdata[ , CM21CF := cm21factor(Date) ]
 
+    ####  Check dark conditions
+    if (rawdata[ is.na(CM21valueWdark), .N ] != 0) {
+        cat("\n**There are missing dark correction values!!!!**\n\n")
+    }
+
+
+
+
+
 
 
     ##TODO convert to watt
@@ -272,6 +281,38 @@ for ( yyyy in years_to_do) {
 #     NR_min_global = 0
 #
 #
+
+
+    # # # #    #' ### Covert signal to global irradiance.
+    # # # #    #'
+    # # # #    #' The conversion is done with a factor which is interpolated between CM-21 calibrations.
+    # # # #    #'
+    # # # #    #' ### Filter minimum Global irradiance.
+    # # # #    #'
+    # # # #    #' Reject data when GHI is below an acceptable limit.
+    # # # #    #' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
+    # # # #    #' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
+    # # # #    #' This is due to changes in instrumentation.
+
+    # # # #    ##TODO move that ####
+    # # # #
+    # # # #     ## choose GLB_LOW_LIM by date
+    # # # #     if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
+    # # # #     if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
+    # # # #
+    # # # #
+    # # # #    ####  Convert to irradiance  ###########################################
+    # # # #    daydata$Global <- daydata$CM21value * dayCMCF
+    # # # #    daydata$GLstd  <- daydata$CM21sd    * dayCMCF
+    # # # #    ########################################################################
+    # # # #
+    # # # #
+    # # # #
+    # # # #    #### Filter too low Global values  #####################################
+    # # # #    pre_count     <- daydata[ !is.na(CM21value), .N ]
+    # # # #    daydata       <- daydata[ Global >= GLB_LOW_LIM ]
+    # # # #    NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
+    # # # #    ########################################################################
 
 
 

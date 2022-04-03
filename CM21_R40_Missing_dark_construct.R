@@ -97,14 +97,15 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 ## get first pass statistics
 darkDT  <- readRDS(DARKSTORE)
+statist <- darkDT[ dark_flag == "COMPUTED"]
 
+#'
+#' List of dark resolution scheme
+#'
+#+ echo=F, include=T
 
 table(darkDT$dark_flag)
 
-statist <- darkDT[ dark_flag == "COMPUTED"]
-
-
-darkDT[ dark_flag == "CONSTRUCTED"]
 
 
 #'
@@ -286,7 +287,7 @@ plot(statist$Date, statist$Dmean, pch = 19, cex = 0.2, main = paste("Running mea
 lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 
 
-darkfill <- darkDT[ dark_flag == "MISSING"]
+darkfill <- darkDT[ dark_flag != "COMPUTED"]
 
 #'
 #' ## There are `r nrow(darkfill)` days with un-computable dark to fill.
