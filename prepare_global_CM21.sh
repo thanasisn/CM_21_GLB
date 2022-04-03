@@ -35,6 +35,32 @@ Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
 
 
 
+
+
+
+
+
+
+
+
+## rclone options
+bwlim=${1:-110}  # if not set to 110
+rclone="$HOME/PROGRAMS/rclone"
+config="$HOME/Documents/rclone.conf"
+otheropt=" --checkers=20 --delete-before --stats=300s"
+bwlimit="--bwlimit=${bwlim}k"
+
+
+
+info "Upload  CM21_Reports"
+"${rclone}" ${otheropt} "${bwlimit}" --config "$config" copy "$HOME/CM_21_GLB/REPORTS/REPORTS" lapauththanasis:/Aerosols/CM21_Reports
+
+info "Upload  CM21_Daily"
+"${rclone}" ${otheropt} "${bwlimit}" --config "$config" copy "$HOME/CM_21_GLB/REPORTS/DAILY"   lapauththanasis:/Aerosols/CM21_Daily
+
+
+
+
 ## end coding
 printf "%s %-10s %-10s %-50s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$SECONDS"
 exit 0
