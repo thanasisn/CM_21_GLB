@@ -16,7 +16,7 @@ info "START :: $0 :: $* ::"
 
 
 info "Try to get new files"
-"$(dirname "$0")/get_data_from_sirena.sh"
+"$HOME/Aerosols/BASH_help/update_data_from_sirena.sh"
 
 info "Read raw files to SIG"
 Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
@@ -30,6 +30,8 @@ Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
 info "Construct missing dark for S1"
 Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R"
 
+info "Convert S1 to L1 GHI"
+Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
 
 
 

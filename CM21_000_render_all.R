@@ -49,6 +49,11 @@ render("./CM21_R40_Missing_dark_construct.R",
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
+render("./CM21_R50_Signal_to_GHI.R",
+       params = list(  ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+
 stop()
 
 
