@@ -97,8 +97,14 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 ## get first pass statistics
 darkDT  <- readRDS(DARKSTORE)
+
+
+table(darkDT$dark_flag)
+
 statist <- darkDT[ dark_flag == "COMPUTED"]
 
+
+darkDT[ dark_flag == "CONSTRUCTED"]
 
 
 #'
