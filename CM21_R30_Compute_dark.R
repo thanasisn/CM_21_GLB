@@ -73,7 +73,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_R20_") })
+                            return("CM21_R30_") })
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
@@ -404,9 +404,9 @@ for ( yyyy in years_to_do) {
 
     ## write this years data
     globaldata$day <- NULL
+    globaldata     <- globaldata[ !is.na(CM21value) ]
     write_RDS(object = globaldata,
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
-
 
     ## partial write most recent stats
     darkDT <- darkDT[ , .SD[which.max(CalcDate)], by = Date ]
