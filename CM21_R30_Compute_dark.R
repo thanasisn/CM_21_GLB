@@ -207,10 +207,6 @@ for ( yyyy in years_to_do) {
     rawdata        <- readRDS(afile)
     rawdata$day    <- as.Date(rawdata$Date)
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
-
-    ## drop NA signal
-    rawdata        <- rawdata[ !is.na(CM21value) ]
-
     daystodo       <- unique( rawdata$day )
 
 
@@ -290,7 +286,7 @@ for ( yyyy in years_to_do) {
             }
         } else {
 
-            ####    Dark Correction function   #####################################
+            ####    Dark Correction function   #################################
             dark_generator <- dark_function(dark_day    = dark_day,
                                             DCOUNTLIM   = DCOUNTLIM,
                                             type        = "median",
@@ -300,7 +296,7 @@ for ( yyyy in years_to_do) {
                                             missingdark = missingdark )
 
 
-            ####    Create dark signal for correction    ###########################
+            ####    Create dark signal for correction    #######################
             todays_dark_correction <- dark_generator(daydata$Date)
             dark_flag              <- "COMPUTED"
         }

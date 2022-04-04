@@ -82,8 +82,8 @@ if(!interactive()) {
 
 
 ## FIXME this is for pdf output
-# options(warn=-1) ## hide warnigs
-# options(warn=2)  ## stop on warnigs
+# options(warn=-1) ## hide warnings
+# options(warn=2)  ## stop on warnings
 
 #+ echo=F, include=T
 ####  External code  ####
@@ -100,8 +100,6 @@ panderOptions('table.split.table',        120   )
 
 ####  Execution control  ####
 ALL_YEARS = FALSE
-ALL_YEARS = TRUE
-
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
@@ -224,10 +222,27 @@ cat("\n\n")
 
 
 
+#'
+#' ### Check for minimum Global irradiance.
+#'
+#' Reject data when GHI is below an acceptable limit.
+#'
+#' **Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,**
+#'
+#' **after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.**
+#'
+#' This is due to changes in instrumentation.
+#'
+#+ include=T, echo=F
+
+
+
+years_to_do <- 2007
+
 ## loop all input files
 
 statist <- data.table()
-pbcount = 0
+
 
 #+ include=TRUE, echo=F, results="asis"
 for ( yyyy in years_to_do) {
@@ -238,6 +253,8 @@ for ( yyyy in years_to_do) {
     ####  Get raw data
     afile    <- grep(yyyy, input_files,  value = T)
     rawdata  <- readRDS(afile)
+    gather   <- data.table()
+    pbcount  <- 0
 
     ####  Generate conversion factor
     rawdata[ , CM21CF := cm21factor(Date) ]
@@ -250,16 +267,122 @@ for ( yyyy in years_to_do) {
     ####  Convert to physical values  ####
     rawdata[ , wattGLB    := CM21CF * CM21valueWdark ]
     rawdata[ , wattGLB_SD := CM21CF * CM21sd         ]
+    rawdata[ , SZA        := 90     - Elevat         ]
+
+
+
+    # ##TODO move
+    # ## Init another flag
+    # rawdata[, QFlag_2 := as.factor(NA)]
+    #
+    # ####   Mark too low Global values    #######################################
+    # rawdata[ Date  < BREAKDATE & wattGLB < GLB_LOW_LIM_01, QFlag_2 := "TooLowGlobal"  ]
+    # rawdata[ Date >= BREAKDATE & wattGLB < GLB_LOW_LIM_02, QFlag_2 := "TooLowGlobal"  ]
+    #
+    # testlow <- rawdata[ QFlag_2 == "TooLowGlobal"]
+    # if ( nrow(testlow)>0 ) {
+    #     cat("\n**Marked too low Global records on:**\n\n")
+    #     cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
+    #     cat("\n\n")
+    # }
+    # ############################################################################
 
 
 
 
-    ##TODO convert to watt
-    ## same names as before
-    ## dark and no dark
-    ## drop data at next level
-    ## see old files
-    ## copy filters from here and Aerosols for level 1
+
+
+    for (aday in sort(unique(rawdata$Date))) {
+
+        theday      <- as.Date(as.POSIXct( aday, origin = "1970-01-01"))
+        test        <- format( theday, format = "%d%m%y06" )
+        daymimutes  <- data.frame(
+            Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
+                        as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
+        )
+        daydata     <- rawdata[ as.Date(Date) == as.Date(theday) ]
+        daydata     <- merge(daydata, daymimutes, all = T)
+        pbcount     <- pbcount + 1
+
+
+        ## break morning-evening (common columns)
+        maxElev       <-  max( daydata$Elevat, na.rm = T)
+
+        day_noon      <-  DAY_$Date30[ DAY_$Elevat == maxElev ]
+        DAY_$preNoon  <-  DAY_$Date30 <= day_noon
+
+
+
+    }
+
+
+
+
+    #     for (ddd in daystodo) {
+    #
+    #
+    #         day         <- data.frame()
+    #
+    #         daymimutes  <- data.frame(
+    #             Date = seq( as.POSIXct(paste(as.Date(ddd), "00:00:30")),
+    #                         as.POSIXct(paste(as.Date(ddd), "23:59:30")), by = "min"  )
+    #         )
+    #
+    #
+    #
+    #         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+    #             plot_norm2(daydata, test, tag)
+    #
+    #
+    #         dev.off()
+    #
+    #
+    #
+    #         ## keep some statistics
+    #         day   <- data.frame(Date    = theday,
+    #                             CMCF    = dayCMCF,
+    #                             NAs     = sum(is.na(daydata$Global)),
+    #                             SunUP   = sum(  daydata$Eleva >= 0 ),
+    #                             MinVa   = min(  daydata$CM21value, na.rm = T),
+    #                             MaxVa   = max(  daydata$CM21value, na.rm = T),
+    #                             AvgVa   = mean( daydata$CM21value, na.rm = T),
+    #                             MinGL   = min(  daydata$Global,    na.rm = T),
+    #                             MaxGL   = max(  daydata$Global,    na.rm = T),
+    #                             AvgGL   = mean( daydata$Global,    na.rm = T),
+    #                             Dmean   = mean( todaysdark,        na.rm = T),
+    #                             sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$Global)),
+    #                             Mavg    = dark_day$Mavg,
+    #                             Mmed    = dark_day$Mmed,
+    #                             Msta    = dark_day$Msta,
+    #                             Mend    = dark_day$Mend,
+    #                             Mcnt    = dark_day$Mcnt,
+    #                             Eavg    = dark_day$Eavg,
+    #                             Emed    = dark_day$Emed,
+    #                             Esta    = dark_day$Esta,
+    #                             Eend    = dark_day$Eend,
+    #                             Ecnt    = dark_day$Ecnt
+    #         )
+    #
+    #         ## gather data
+    #         globaldata <- rbind( globaldata, daydata )
+    #
+    #         ## gather day statistics
+    #         statist    <- rbind(statist, day )
+    #
+    #         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
+    #
+    #     } #END loop of days
+
+
+
+
+
+
+
+
+
+
+    rawdata[ Elevat == max(Elevat), .N , by = as.Date(Date)]
 
 
 
@@ -271,145 +394,25 @@ for ( yyyy in years_to_do) {
 
 
 
+    ##TODO
+    ## drop data at next level
+    ## see old files
+    ## copy filters from here and Aerosols for level 1
+
+
 
 #     daystodo    <- unique( rawdata$day )
-#
-#     ##TODO continue from here
 #
 #
 #     ## init yearly calculations
 #     globaldata    <- data.table()
 #     NR_extreme_SD = 0
 #     NR_min_global = 0
-#
-#
-
-
-    # # # #    #' ### Covert signal to global irradiance.
-    # # # #    #'
-    # # # #    #' The conversion is done with a factor which is interpolated between CM-21 calibrations.
-    # # # #    #'
-    # # # #    #' ### Filter minimum Global irradiance.
-    # # # #    #'
-    # # # #    #' Reject data when GHI is below an acceptable limit.
-    # # # #    #' Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,
-    # # # #    #' after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.
-    # # # #    #' This is due to changes in instrumentation.
-
-    # # # #    ##TODO move that ####
-    # # # #
-    # # # #     ## choose GLB_LOW_LIM by date
-    # # # #     if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
-    # # # #     if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
-    # # # #
-    # # # #
-    # # # #    ####  Convert to irradiance  ###########################################
-    # # # #    daydata$Global <- daydata$CM21value * dayCMCF
-    # # # #    daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-    # # # #    ########################################################################
-    # # # #
-    # # # #
-    # # # #
-    # # # #    #### Filter too low Global values  #####################################
-    # # # #    pre_count     <- daydata[ !is.na(CM21value), .N ]
-    # # # #    daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-    # # # #    NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-    # # # #    ########################################################################
 
 
 
-#
-#     for (ddd in daystodo) {
-#
-#         theday      <- as.POSIXct( as.Date(ddd), origin = "1970-01-01")
-#         test        <- format( theday, format = "%d%m%y06" )
-#         dayCMCF     <- cm21factor(theday)
-#
-#         pbcount     <- pbcount + 1
-#         day         <- data.frame()
-#
-#         daymimutes  <- data.frame(
-#             Date = seq( as.POSIXct(paste(as.Date(ddd), "00:00:30")),
-#                         as.POSIXct(paste(as.Date(ddd), "23:59:30")), by = "min"  )
-#         )
-#
-#         ## choose GLB_LOW_LIM by date
-#         if ( theday  < BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_01 }
-#         if ( theday >= BREAKDATE ) { GLB_LOW_LIM <- GLB_LOW_LIM_02 }
-#
-#
-#         ## get daily data
-#         daydata     <- rawdata[ day == as.Date(theday) ]
-#         ## add all minutes for nicer graphs
-#         daydata     <- merge(daydata, daymimutes, all = T)
-#         daydata$day <- as.Date(daydata$Date)
-#
-#
-#
-#         ####  Re-Convert to irradiance  ########################################
-#         ## This will reset the previus dark correction
-#         daydata$Global <- daydata$CM21value * dayCMCF
-#         daydata$GLstd  <- daydata$CM21sd    * dayCMCF
-#         ########################################################################
-#
-#
-#
-#         ####  Filter too low Global values  ####################################
-#         pre_count     <- daydata[ !is.na(CM21value), .N ]
-#         daydata       <- daydata[ Global >= GLB_LOW_LIM ]
-#         NR_min_global <- NR_min_global + pre_count - daydata[ !is.na(CM21value), .N ]
-#         ########################################################################
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
-#             plot_norm2(daydata, test, tag)
-#
-#
-#         dev.off()
-#
-#
-#
-#         ## keep some statistics
-#         day   <- data.frame(Date    = theday,
-#                             CMCF    = dayCMCF,
-#                             NAs     = sum(is.na(daydata$Global)),
-#                             SunUP   = sum(  daydata$Eleva >= 0 ),
-#                             MinVa   = min(  daydata$CM21value, na.rm = T),
-#                             MaxVa   = max(  daydata$CM21value, na.rm = T),
-#                             AvgVa   = mean( daydata$CM21value, na.rm = T),
-#                             MinGL   = min(  daydata$Global,    na.rm = T),
-#                             MaxGL   = max(  daydata$Global,    na.rm = T),
-#                             AvgGL   = mean( daydata$Global,    na.rm = T),
-#                             Dmean   = mean( todaysdark,        na.rm = T),
-#                             sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$Global)),
-#                             Mavg    = dark_day$Mavg,
-#                             Mmed    = dark_day$Mmed,
-#                             Msta    = dark_day$Msta,
-#                             Mend    = dark_day$Mend,
-#                             Mcnt    = dark_day$Mcnt,
-#                             Eavg    = dark_day$Eavg,
-#                             Emed    = dark_day$Emed,
-#                             Esta    = dark_day$Esta,
-#                             Eend    = dark_day$Eend,
-#                             Ecnt    = dark_day$Ecnt
-#         )
-#
-#         ## gather data
-#         globaldata <- rbind( globaldata, daydata )
-#
-#         ## gather day statistics
-#         statist    <- rbind(statist, day )
-#
-#         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
-#
-#     } #END loop of days
+
+
 #
 #
 #     tempout <- data.frame()
