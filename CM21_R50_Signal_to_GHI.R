@@ -308,10 +308,14 @@ for ( yyyy in years_to_do) {
         ## break morning-evening (common columns)
         maxElev       <-  max( daydata$Elevat, na.rm = T)
 
+
+
         day_noon      <-  DAY_$Date30[ DAY_$Elevat == maxElev ]
         DAY_$preNoon  <-  DAY_$Date30 <= day_noon
 
 
+
+        stop()
 
     }
 
