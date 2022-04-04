@@ -232,17 +232,15 @@ if (length(years_to_do) == 0 ) {
 for ( yyyy in years_to_do) {
 
     #### Get raw data ####
-    afile <- grep(yyyy, input_files,  value = T)
-    rawdata        <- readRDS(afile)
+    afile    <- grep(yyyy, input_files,  value = T)
+    rawdata  <- readRDS(afile)
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
 
-    NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
+    NR_loaded  <- rawdata[ !is.na(CM21value), .N ]
 
-    ## drop NA signal
-    rawdata <- rawdata[ !is.na(CM21value) ]
 
     ####    Mark bad date ranges    ############################################
     rawdata[ , Bad_ranges := "" ]
@@ -264,8 +262,9 @@ for ( yyyy in years_to_do) {
                          file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",yyyy,"_bad_ranges"),
                          clean  = TRUE)
 
-    rawdata <- rawdata[ Bad_ranges == "",  ]
-    rawdata[, Bad_ranges := NULL ]
+    rawdata[ Bad_ranges == "", CM21value := NA ]
+    rawdata[ Bad_ranges == "", CM21sd    := NA ]
+    rawdata[ , Bad_ranges := NULL ]
     ############################################################################
 
 
