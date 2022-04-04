@@ -260,9 +260,12 @@ for ( yyyy in years_to_do) {
     rawdata[ , CM21CF := cm21factor(Date) ]
 
     ####  Check dark conditions
-    if (rawdata[ is.na(CM21valueWdark), .N ] != 0) {
+    if (rawdata[!is.na(CM21valueWdark) & is.na(CM21valueWdark), .N ] != 0) {
         cat("\n**There are missing dark correction values!!!!**\n\n")
     }
+
+
+
 
     ####  Convert to physical values  ####
     rawdata[ , wattGLB    := CM21CF * CM21valueWdark ]
@@ -289,12 +292,14 @@ for ( yyyy in years_to_do) {
 
 
 
+    ##  Get only days with valid data
+    daystodo <- rawdata[ , .(N = sum(!is.na(CM21value))), by = .(Days <- as.Date(Date)) ]
+    daystodo <- daystodo[ N > 0, Days ]
 
 
+    for (aday in sort(daystodo)) {
 
-    for (aday in sort(unique(rawdata$Date))) {
-
-        theday      <- as.Date(as.POSIXct( aday, origin = "1970-01-01"))
+        theday      <- as.Date( aday, origin = "1970-01-01")
         test        <- format( theday, format = "%d%m%y06" )
         daymimutes  <- data.frame(
             Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
@@ -306,66 +311,32 @@ for ( yyyy in years_to_do) {
 
 
         ## break morning-evening (common columns)
-        maxElev       <-  max( daydata$Elevat, na.rm = T)
+        maxElev         <- max( daydata$Elevat, na.rm = T)
+        day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
+        daydata$preNoon <- daydata$Date <= day_noon
 
 
-
-        day_noon      <-  DAY_$Date30[ DAY_$Elevat == maxElev ]
-        DAY_$preNoon  <-  DAY_$Date30 <= day_noon
-
-
-
-        stop()
 
     }
 
 
 
 
+    stop()
+
+
     #     for (ddd in daystodo) {
-    #
-    #
-    #         day         <- data.frame()
-    #
-    #         daymimutes  <- data.frame(
-    #             Date = seq( as.POSIXct(paste(as.Date(ddd), "00:00:30")),
-    #                         as.POSIXct(paste(as.Date(ddd), "23:59:30")), by = "min"  )
-    #         )
     #
     #
     #
     #         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
+    #
     #             plot_norm2(daydata, test, tag)
     #
     #
     #         dev.off()
     #
     #
-    #
-    #         ## keep some statistics
-    #         day   <- data.frame(Date    = theday,
-    #                             CMCF    = dayCMCF,
-    #                             NAs     = sum(is.na(daydata$Global)),
-    #                             SunUP   = sum(  daydata$Eleva >= 0 ),
-    #                             MinVa   = min(  daydata$CM21value, na.rm = T),
-    #                             MaxVa   = max(  daydata$CM21value, na.rm = T),
-    #                             AvgVa   = mean( daydata$CM21value, na.rm = T),
-    #                             MinGL   = min(  daydata$Global,    na.rm = T),
-    #                             MaxGL   = max(  daydata$Global,    na.rm = T),
-    #                             AvgGL   = mean( daydata$Global,    na.rm = T),
-    #                             Dmean   = mean( todaysdark,        na.rm = T),
-    #                             sunMeas = sum(daydata$Eleva >= 0 & !is.na(daydata$Global)),
-    #                             Mavg    = dark_day$Mavg,
-    #                             Mmed    = dark_day$Mmed,
-    #                             Msta    = dark_day$Msta,
-    #                             Mend    = dark_day$Mend,
-    #                             Mcnt    = dark_day$Mcnt,
-    #                             Eavg    = dark_day$Eavg,
-    #                             Emed    = dark_day$Emed,
-    #                             Esta    = dark_day$Esta,
-    #                             Eend    = dark_day$Eend,
-    #                             Ecnt    = dark_day$Ecnt
-    #         )
     #
     #         ## gather data
     #         globaldata <- rbind( globaldata, daydata )
@@ -386,8 +357,6 @@ for ( yyyy in years_to_do) {
 
 
 
-    rawdata[ Elevat == max(Elevat), .N , by = as.Date(Date)]
-
 
 
     plot(rawdata$Date, rawdata$CM21CF,"l",
@@ -400,18 +369,7 @@ for ( yyyy in years_to_do) {
 
     ##TODO
     ## drop data at next level
-    ## see old files
     ## copy filters from here and Aerosols for level 1
-
-
-
-#     daystodo    <- unique( rawdata$day )
-#
-#
-#     ## init yearly calculations
-#     globaldata    <- data.table()
-#     NR_extreme_SD = 0
-#     NR_min_global = 0
 
 
 

@@ -106,7 +106,6 @@ statist <- darkDT[ dark_flag == "COMPUTED"]
 
 table(darkDT$dark_flag)
 
-darkDT[ dark_flag == "MISSING"]
 
 
 #'
