@@ -377,7 +377,6 @@ for ( yyyy in years_to_do) {
 
     ## write this years data
     globaldata$day <- NULL
-    globaldata     <- globaldata[ !is.na(CM21value) ]
     write_RDS(object = globaldata,
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
 
