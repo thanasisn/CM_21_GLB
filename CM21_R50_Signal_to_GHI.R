@@ -315,14 +315,21 @@ for ( yyyy in years_to_do) {
         day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
         daydata$preNoon <- daydata$Date <= day_noon
 
+        ## gather all data
+        gather          <- rbind(gather, daydata)
+
+
 
 
     }
 
 
+    write_RDS(object = gather,
+              file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L0_", yyyy, ".Rds"))
 
 
-    stop()
+
+
 
 
     #     for (ddd in daystodo) {
@@ -359,10 +366,10 @@ for ( yyyy in years_to_do) {
 
 
 
-    plot(rawdata$Date, rawdata$CM21CF,"l",
+    plot(gather$Date, gather$CM21CF,"l",
          xlab = "", ylab = "", main = paste("Conversion factor", yyyy))
 
-    plot(rawdata$Date, rawdata$wattGLB, pch = 19, cex = 0.5,
+    plot(gather$Date, gather$wattGLB, pch = 19, cex = 0.5,
          xlab = "", ylab = "", main = paste("Global radiation", yyyy))
 
 
