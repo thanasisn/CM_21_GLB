@@ -106,6 +106,7 @@ statist <- darkDT[ dark_flag == "COMPUTED"]
 
 table(darkDT$dark_flag)
 
+darkDT[ dark_flag == "MISSING"]
 
 
 #'
@@ -288,6 +289,7 @@ lines(statist$Date, rnmD, "l", col = "red", lwd = 2 )
 
 
 darkfill <- darkDT[ dark_flag != "COMPUTED"]
+
 
 #'
 #' ## There are `r nrow(darkfill)` days with un-computable dark to fill.
