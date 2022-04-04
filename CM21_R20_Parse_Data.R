@@ -97,7 +97,7 @@ panderOptions('table.split.table',        120   )
 OutliersPlot <- 5
 
 ####  Execution control  ####
-ALL_YEARS = FALSE
+ALL_YEARS <- FALSE
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
@@ -181,6 +181,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
@@ -262,8 +263,11 @@ for ( yyyy in years_to_do) {
                          file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",yyyy,"_bad_ranges"),
                          clean  = TRUE)
 
-    rawdata[ Bad_ranges == "", CM21value := NA ]
-    rawdata[ Bad_ranges == "", CM21sd    := NA ]
+    rawdata$Bad_ranges
+
+
+    rawdata[ Bad_ranges != "", CM21value := NA ]
+    rawdata[ Bad_ranges != "", CM21sd    := NA ]
     rawdata[ , Bad_ranges := NULL ]
     ############################################################################
 
@@ -273,12 +277,16 @@ for ( yyyy in years_to_do) {
 
     ## Plot with some checks after bad regions
     yearlims <- data.table()
-    for (an in grep("CM21",names(rawdata),value = T)){
-        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-        low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
-        upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
+    for (an in grep("CM21", names(rawdata), value = T)){
+        suppressWarnings({
+            daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+                                   dmax =  max(get(an),na.rm = T))  , by = as.Date(Date) ]
+            low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
+            upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
+        })
 
+        ## check if we can decide
+        if (is.na(low) | is.na(upe)) next()
         yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
@@ -291,6 +299,7 @@ for ( yyyy in years_to_do) {
 
     cat('\n\n')
 
+    rawdata[!is.na(CM21value)]
     hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
     cat('\n\n')
 
@@ -416,21 +425,15 @@ for ( yyyy in years_to_do) {
     ## Plot with some checks after bad regions
     yearlims <- data.table()
     for (an in grep("CM21",names(rawdata),value = T)){
-        daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-                               dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
-        low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
-        upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
-
+        suppressWarnings({
+            daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
+                                   dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+            low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
+            upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
+        })
         yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
-        # if ( nrow(test) > 0 ) {
-        #     cat('\n\n')
-        #     cat(paste("#### Remaining Suspects after removing bad data from log.\n\n"))
-        #     cat('\n\n')
-        #     cat(pander(test))
-        #     cat('\n\n')
-        # }
     }
 
     cat('\n\n')

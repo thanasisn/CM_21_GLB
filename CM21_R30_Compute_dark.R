@@ -153,6 +153,8 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+years_to_do <- 2006:2022
+
 ## decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
@@ -265,7 +267,11 @@ for ( yyyy in years_to_do) {
                                        nightlimit = DARK_ELEV,
                                        dstretch   = DSTRETCH)
 
-        if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+
+
+        # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+        if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+                (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
             dark_flag              <- "MISSING"
@@ -311,10 +317,11 @@ for ( yyyy in years_to_do) {
         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
         if (any(grepl( "CM21valueWdark", names(daydata)))) {
             ## plot night
-            somedata <- daydata[ Elevat < 1 ]
+            somedata <- daydata[ Elevat < 1 & !is.na(CM21value) ]
             if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
                 ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                plot(  somedata$Date, somedata$CM21value,
+                       pch  = 19, cex = 0.5,
                        ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
                 points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
                 abline(h=0,col="orange")
@@ -322,12 +329,14 @@ for ( yyyy in years_to_do) {
                 text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
                 ## or plot day
             } else {
-                somedata <- daydata[ Elevat >=1 ]
+                somedata <- daydata[ Elevat >=1 & !is.na(CM21value) ]
                 if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
                     ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                    plot(  somedata$Date, somedata$CM21value,     pch=19,cex=0.5,
+                    plot(  somedata$Date, somedata$CM21value,
+                           pch = 19, cex = 0.5,
                            ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-                    points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+                    points(somedata$Date, somedata$CM21valueWdark,
+                           pch = 19, cex = 0.5, col = "blue")
                     abline(h=0,col="orange")
                     title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
                     text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
@@ -356,8 +365,8 @@ for ( yyyy in years_to_do) {
 
 
         ####    Get processed and unprocessed data    ##########################
-        daydata   <- merge( daydata, wholeday,
-                            by = intersect(names(daydata),names(wholeday)), all = T)
+        daydata    <- merge( daydata, wholeday,
+                             by = intersect(names(daydata),names(wholeday)), all = T)
 
         globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
