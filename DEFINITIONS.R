@@ -55,7 +55,8 @@ DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than 
 ####  Process Control  ####
 
 ## date range to process
-START_DAY   <- as.POSIXct("2006-01-01 00:00:00 UTC")
+START_DAY   <- as.POSIXct("1993-01-01 00:00:00 UTC")
+# START_DAY   <- as.POSIXct("2006-01-01 00:00:00 UTC")
 END_DAY     <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
