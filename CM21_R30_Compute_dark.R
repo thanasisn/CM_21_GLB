@@ -209,10 +209,12 @@ for ( yyyy in years_to_do) {
     rawdata        <- readRDS(afile)
     rawdata$day    <- as.Date(rawdata$Date)
     NR_loaded      <- rawdata[ !is.na(CM21value), .N ]
-    daystodo       <- unique( rawdata$day )
 
+    ##  Get only days with valid data
+    daystodo <- rawdata[ , .(N = sum(!is.na(CM21value))), by = .(Days <- as.Date(Date)) ]
+    daystodo <- daystodo[ N > 0, Days ]
 
-    ## init yearly calculations
+    ##  Init yearly calculations
     globaldata    <- data.table()
     NR_extreme_SD <- 0
 
@@ -475,5 +477,4 @@ for ( yyyy in years_to_do) {
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-#if (!interactive())
-beepr::beep(7)
+if (interactive()) beepr::beep(7)
