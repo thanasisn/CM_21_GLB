@@ -26,8 +26,8 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     fig_width:        6
-#'     fig_height:       4
+#'     fig_width:        7
+#'     fig_height:       4.5
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -99,7 +99,8 @@ panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
 
-elevlim <- -5  ## elevation limit for scatter plots
+elevlim   <- -5  ## elevation limit for scatter plots
+wattlimit <- 50  ## radiation limit for histograms
 
 
 ####  Execution control  ####
@@ -157,6 +158,8 @@ if (!params$ALL_YEARS) {
 } else {
     years_to_do <- sort(unique(input_years))
 }
+
+years_to_do <- 2008
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -241,7 +244,7 @@ cat("\n\n")
 
 
 
-# years_to_do <- 2007
+
 
 ## loop all input files
 
@@ -334,27 +337,34 @@ for ( yyyy in years_to_do) {
 
         ## Normal plots
 
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             ## fix plot range
-            dddd = min(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
-            uuuu = max(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
+            withdark <- daydata$CM21value * daydata$CM21CF
+            dddd = min(daydata$wattGLB, daydata$wattGLB_SD, withdark , na.rm = TRUE)
+            uuuu = max(daydata$wattGLB, daydata$wattGLB_SD, withdark , na.rm = TRUE)
             if (dddd > -5  ) { dddd = 0  }
             if (uuuu < 190 ) { uuuu = 200}
             ylim = c(dddd , uuuu)
 
+
+
+
             plot(daydata$Date, daydata$wattGLB,
                  "l", xlab = "UTC", ylab = expression(W / m^2),
                  col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
+
+            lines(daydata$Date, daydata$CM21value * daydata$CM21CF)
+
             abline(h = 0, col = "gray60")
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
                    col = "lightgray", lty = "dotted", lwd = par("lwd"))
             points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
             title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
             text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.7 )
-        dev.off()
+        # dev.off()
 
 
-
+stop()
 
 
     }
@@ -385,10 +395,10 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
-    plot(gather$Date, gather$CM21CF,"l",
-         xlab = "", ylab = "",
-         main = paste("Conversion factor", yyyy))
-    cat("\n\n")
+    # plot(gather$Date, gather$CM21CF,"l",
+    #      xlab = "", ylab = "",
+    #      main = paste("Conversion factor", yyyy))
+    # cat("\n\n")
 
 
     plot(gather$Date, gather$wattGLB, pch = 19, cex = 0.5,
@@ -409,6 +419,57 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
+    par(mar = c(4,4,2,1))
+    morning  <-   gather$preNoon & gather$Elevat > elevlim
+    evening  <- ! gather$preNoon & gather$Elevat > elevlim
+
+    plot(  gather$Elevat[morning], gather$wattGLB[morning], pch = ".", cex = 1.5, col = "blue",
+           main = paste(yyyy, "Global " ), ylab = expression(W / m^2), xlab = expression("Elevation [°]"))
+    points(gather$Elevat[evening], gather$wattGLB[evening], pch = ".", cex = 1.5,  col = "green")
+    legend("topleft", legend = c("Before noon", "After noon"),
+           bty="n" ,text.col = c("blue", "green"), cex = 1)
+    cat("\n\n")
+
+
+
+    hist(gather$wattGLB[ gather$wattGLB > wattlimit],
+         main = paste(yyyy, "Global ", "radiation > ",wattlimit),
+         breaks = 40 , las=1, probability =  T, xlab = expression(W / m^2))
+    lines(density(gather$wattGLB, na.rm = T) , col ="green" , lwd = 2)
+    cat("\n\n")
+
+
+    hist(gather$wattGLB_SD,
+         main = paste(yyyy, "Global standard deviation "),
+         breaks = 40 , las=1, probability =  T, xlab = expression(W / m^2))
+    # lines(density(gather$wattGLB_SD, na.rm = T) , col ="green" , lwd = 2)
+    cat("\n\n")
+
+
+
+    par(mar = c(2,4,2,1))
+    week_vec = strftime(  gather$Date , format = "%W")
+    sunnupp = gather$Elevat >= 0
+
+
+    boxplot(gather$wattGLB[sunnupp] ~ week_vec[sunnupp] )
+    title(main = paste(yyyy, "Global irradiance (Elevation > 0)"))
+    cat("\n\n")
+
+
+    boxplot(gather$wattGLB_SD[sunnupp] ~ week_vec[sunnupp] )
+    title(main = paste(yyyy, "Global standard deviation (Elevation > 0)"))
+    cat("\n\n")
+
+
+    boxplot(gather[sunnupp, CM21value - CM21valueWdark  ] ~ week_vec[sunnupp],
+            ylab = "")
+    title(main = paste(yyyy, "CM21 dark offset (Elevation > 0)"))
+    cat("\n\n")
+
+
+
+
     ##TODO
     ## drop data at next level
     ## copy filters from here and Aerosols for level 1
@@ -416,7 +477,6 @@ for ( yyyy in years_to_do) {
 
 
 
-    #+ include=T, echo=F
 
 
 #     tempout <- data.frame()
@@ -469,6 +529,9 @@ for ( yyyy in years_to_do) {
 
 }
 #'
+#+ include=T, echo=F
+
+
 
 # ## write statistics on data
 # capture.output(
