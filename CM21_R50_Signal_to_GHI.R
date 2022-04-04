@@ -98,6 +98,10 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
+
+elevlim <- -5  ## elevation limit for scatter plots
+
+
 ####  Execution control  ####
 ALL_YEARS = FALSE
 if (!exists("params")){
@@ -108,7 +112,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 ## PATHS
-tmpfolder  = paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
+tmpfolder  <- paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
 dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
 daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , basename(Script.Name)),"_stats")
 
@@ -237,7 +241,7 @@ cat("\n\n")
 
 
 
-years_to_do <- 2007
+# years_to_do <- 2007
 
 ## loop all input files
 
@@ -254,6 +258,11 @@ for ( yyyy in years_to_do) {
     afile    <- grep(yyyy, input_files,  value = T)
     rawdata  <- readRDS(afile)
     gather   <- data.table()
+
+
+    ## create a new temp dir for plots
+    unlink(tmpfolder, recursive = TRUE)
+    dir.create(tmpfolder)
     pbcount  <- 0
 
     ####  Generate conversion factor
@@ -321,57 +330,83 @@ for ( yyyy in years_to_do) {
 
 
 
+        ####    Daily plots    #################################################
+
+        ## Normal plots
+
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+            ## fix plot range
+            dddd = min(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
+            uuuu = max(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
+            if (dddd > -5  ) { dddd = 0  }
+            if (uuuu < 190 ) { uuuu = 200}
+            ylim = c(dddd , uuuu)
+
+            plot(daydata$Date, daydata$wattGLB,
+                 "l", xlab = "UTC", ylab = expression(W / m^2),
+                 col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
+            abline(h = 0, col = "gray60")
+            abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
+                   col = "lightgray", lty = "dotted", lwd = par("lwd"))
+            points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
+            title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.7 )
+        dev.off()
+
+
+
+
+
     }
 
 
+    ## save data for this year
     write_RDS(object = gather,
               file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L0_", yyyy, ".Rds"))
 
 
+    ## create pdf with all daily plots
+    system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
+                  paste0(DAILYgrDIR,"Daily_GHI_",yyyy,".pdf")),
+           ignore.stderr = T )
 
 
 
-
-    #     for (ddd in daystodo) {
-    #
-    #
-    #
-    #         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)))
-    #
-    #             plot_norm2(daydata, test, tag)
-    #
-    #
-    #         dev.off()
-    #
-    #
-    #
-    #         ## gather data
-    #         globaldata <- rbind( globaldata, daydata )
-    #
-    #         ## gather day statistics
-    #         statist    <- rbind(statist, day )
-    #
-    #         rm( theday, dayCMCF, todaysdark, dark_line, day, daydata )
-    #
-    #     } #END loop of days
+    ##  Add time column (same date with original times)
+    dummytimes     <-  strftime(   gather$Date, format = "%H:%M:%S")
+    gather$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
 
 
 
-
-
-
-
-
-
-
+    par(mar = c(2,4,2,1))
+    plot(gather$Times, gather$wattGLB,
+         pch = ".", cex = 1.5, ylab = expression(W / m^2) , xlab = "",
+         main = paste(yyyy, "Global" ))
+    cat("\n\n")
 
 
     plot(gather$Date, gather$CM21CF,"l",
-         xlab = "", ylab = "", main = paste("Conversion factor", yyyy))
+         xlab = "", ylab = "",
+         main = paste("Conversion factor", yyyy))
+    cat("\n\n")
+
 
     plot(gather$Date, gather$wattGLB, pch = 19, cex = 0.5,
-         xlab = "", ylab = "", main = paste("Global radiation", yyyy))
+         xlab = "", ylab = expression(W / m^2),
+         main = paste("Global radiation", yyyy))
+    cat("\n\n")
 
+
+    plot(gather$Elevat, gather$wattGLB, pch = 19, cex = 0.5,
+         xlab = "", ylab = expression(W / m^2),
+         main = paste("Global radiation", yyyy))
+    cat("\n\n")
+
+
+    plot(gather$Azimuth, gather$wattGLB, pch = 19, cex = 0.5,
+         xlab = "", ylab = expression(W / m^2),
+         main = paste("Global radiation", yyyy))
+    cat("\n\n")
 
 
     ##TODO
@@ -381,9 +416,9 @@ for ( yyyy in years_to_do) {
 
 
 
+    #+ include=T, echo=F
 
-#
-#
+
 #     tempout <- data.frame()
 #     yyyy    <- year(globaldata$day[1])
 #
