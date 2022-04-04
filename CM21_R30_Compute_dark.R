@@ -377,7 +377,7 @@ for ( yyyy in years_to_do) {
 
     } #END loop of days
 
-    ## write this years data
+    ## write all days with data
     globaldata$day <- NULL
     write_RDS(object = globaldata,
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
