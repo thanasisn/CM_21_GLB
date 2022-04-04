@@ -1,0 +1,689 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+%
+\documentclass[
+  11pt,
+  a4paper,oneside]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={CM21 signal to radiation. S1 -\textgreater{} L0},
+  pdfauthor={Natsis Athanasios},
+  colorlinks=true,
+  linkcolor=Maroon,
+  filecolor=Maroon,
+  citecolor=Blue,
+  urlcolor=Blue,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[left=0.5in,right=0.5in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{caption}
+\usepackage{placeins}
+\captionsetup{font=small}
+
+\title{CM21 signal to radiation. \textbf{S1 -\textgreater{} L0}}
+\author{Natsis Athanasios}
+\date{2022-04-04}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Read signal and dark correction and convert to global radiation.
+\end{abstract}
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\textbf{S1 -\textgreater{} L0}
+
+\textbf{Source code: \href{https://github.com/thanasisn/CM_21_GLB}{github.com/thanasisn/CM\_21\_GLB}}
+
+\textbf{Data display: \href{https://thanasisn.netlify.app/3-data_display/2-cm21_global/}{thanasisn.netlify.app/3-data\_display/2-cm21\_global/}}
+
+Convert CM21 signal \([V]\) to radiation \([W/m^2]\).
+
+\begin{itemize}
+\tightlist
+\item
+  Apply proper gain by the acquisition system
+\item
+  Use an interpolated sensitivity between calibrations.
+\item
+  No filtering of data at this point.
+\end{itemize}
+
+\hypertarget{cm21-conversion-factor-calculation}{%
+\subsection{CM21 conversion factor calculation}\label{cm21-conversion-factor-calculation}}
+
+\begin{longtable}[]{@{}rrr@{}}
+\caption{CM21 calibrations}\tabularnewline
+\toprule
+Date & Sensitivity & Gain\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+Date & Sensitivity & Gain\tabularnewline
+\midrule
+\endhead
+1991-01-01 & 1.198e-05 & 0.005\tabularnewline
+1995-10-21 & 1.198e-05 & 0.02\tabularnewline
+1995-11-01 & 1.198e-05 & 0.01\tabularnewline
+2004-07-01 & 1.198e-05 & 0.04\tabularnewline
+2005-12-05 & 1.199e-05 & 0.04\tabularnewline
+2011-12-30 & 1.196e-05 & 0.04\tabularnewline
+2012-01-31 & 1.196e-05 & 0.04\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-5-1} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-5-2} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-5-3} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-5-4} \end{center}
+
+\hypertarget{check-for-minimum-global-irradiance.}{%
+\subsubsection{Check for minimum Global irradiance.}\label{check-for-minimum-global-irradiance.}}
+
+Reject data when GHI is below an acceptable limit.
+
+\textbf{Before 2014-02-05 we use -15,}
+
+\textbf{after 2014-02-05 we use -7.}
+
+This is due to changes in instrumentation.
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2006}{%
+\subsection{Year: 2006}\label{year-2006}}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2006.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2006.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-1} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-2} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-3} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-4} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-5} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-6} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-7} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-8} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-9} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2007}{%
+\subsection{Year: 2007}\label{year-2007}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-10} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2007.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2007.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-11} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-12} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-13} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-14} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-15} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-16} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-17} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-18} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-19} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2008}{%
+\subsection{Year: 2008}\label{year-2008}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-20} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2008.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2008.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-21} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-22} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-23} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-24} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-25} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-26} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-27} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-28} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-29} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2009}{%
+\subsection{Year: 2009}\label{year-2009}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-30} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2009.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2009.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-31} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-32} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-33} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-34} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-35} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-36} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-37} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-38} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-39} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2010}{%
+\subsection{Year: 2010}\label{year-2010}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-40} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2010.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2010.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-41} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-42} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-43} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-44} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-45} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-46} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-47} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-48} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-49} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2011}{%
+\subsection{Year: 2011}\label{year-2011}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-50} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2011.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2011.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-51} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-52} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-53} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-54} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-55} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-56} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-57} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-58} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-59} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2012}{%
+\subsection{Year: 2012}\label{year-2012}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-60} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2012.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2012.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-61} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-62} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-63} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-64} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-65} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-66} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-67} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-68} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-69} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2013}{%
+\subsection{Year: 2013}\label{year-2013}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-70} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2013.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2013.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-71} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-72} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-73} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-74} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-75} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-76} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-77} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-78} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-79} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2014}{%
+\subsection{Year: 2014}\label{year-2014}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-80} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2014.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2014.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-81} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-82} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-83} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-84} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-85} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-86} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-87} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-88} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-89} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2015}{%
+\subsection{Year: 2015}\label{year-2015}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-90} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2015.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2015.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-91} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-92} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-93} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-94} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-95} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-96} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-97} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-98} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-99} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2016}{%
+\subsection{Year: 2016}\label{year-2016}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-100} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2016.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2016.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-101} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-102} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-103} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-104} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-105} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-106} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-107} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-108} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-109} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2017}{%
+\subsection{Year: 2017}\label{year-2017}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-110} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2017.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2017.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-111} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-112} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-113} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-114} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-115} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-116} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-117} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-118} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-119} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2018}{%
+\subsection{Year: 2018}\label{year-2018}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-120} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2018.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2018.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-121} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-122} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-123} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-124} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-125} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-126} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-127} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-128} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-129} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2019}{%
+\subsection{Year: 2019}\label{year-2019}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-130} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2019.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2019.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-131} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-132} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-133} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-134} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-135} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-136} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-137} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-138} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-139} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2020}{%
+\subsection{Year: 2020}\label{year-2020}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-140} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2020.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2020.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-141} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-142} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-143} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-144} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-145} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-146} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-147} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-148} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-149} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2021}{%
+\subsection{Year: 2021}\label{year-2021}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-150} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2021.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2021.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-151} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-152} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-153} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-154} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-155} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-156} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-157} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-158} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-159} \end{center}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{year-2022}{%
+\subsection{Year: 2022}\label{year-2022}}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-160} \end{center}
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2022.Rds
+
+Written: /home/athan/DATA/Broad\_Band/CM21\_H\_global/LAP\_CM21\_H\_L0\_2022.inf.md
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-161} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-162} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-163} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-164} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-165} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-166} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-167} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-168} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-169} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{/home/athan/CM_21_GLB/REPORTS/REPORTS/CM21_R50_Signal_to_GHI_files/figure-latex/unnamed-chunk-7-170} \end{center}
+
+\textbf{END}
+
+\begin{verbatim}
+2022-04-04 18:38:37.8 athan@sagan /home/athan/CM_21_GLB/CM21_000_render_all.R 10.580018 mins
+\end{verbatim}
+
+\end{document}
