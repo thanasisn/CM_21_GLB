@@ -340,6 +340,7 @@ for ( yyyy in years_to_do) {
     ## start flags columns
     rawdata[, QFlag_1 := as.factor(NA)]
 
+    stop()
 
     ####    Mark signal physical limits    #####################################
     rawdata[ CM21value <  MINsgLIM, QFlag_1 := "sgLIM_hit" ]
