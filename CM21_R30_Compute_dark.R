@@ -153,8 +153,6 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 2006:2022
-
 ## decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
