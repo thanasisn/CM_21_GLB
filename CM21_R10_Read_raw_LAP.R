@@ -348,6 +348,18 @@ for ( YYYY in years_to_do ) {
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
         abline(v=signal_physical_limits$Date)
+
+
+
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-2,3))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+        abline(v=signal_physical_limits$Date)
+
+        testdata <- extra[ Date > as.POSIXct("1995-10-8") &
+                           Date < as.POSIXct("1995-11-15") ]
+        plot(testdata$Date, testdata$WATTTOT , pch = ".", col = "cyan")
+
         cat('\n\n')
 
         part <- year_data[ Date > as.POSIXct("1995-11-15") &
