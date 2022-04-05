@@ -99,6 +99,10 @@ panderOptions('table.split.table',        120   )
 OutliersPlot <- 4
 
 
+## read magic data
+extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
+
+
 ####  Execution control  ####
 ALL_YEARS = FALSE
 if (!exists("params")){
@@ -147,7 +151,7 @@ rm(rad_names, radmon_files)
 
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
-years_to_do <- 2004:2010
+
 
 #'
 #' Allowed years to do: `r years_to_do`
@@ -182,6 +186,8 @@ if (!params$ALL_YEARS) {
         new_to_do <- years_to_do[years_to_do %in% newyears]
         NEWDATA   <- TRUE
     }
+
+    missing_years <- 1995
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
@@ -352,6 +358,7 @@ for ( YYYY in years_to_do ) {
         abline(v=signal_physical_limits$Date)
         cat('\n\n')
 
+        stop()
     }
 
 

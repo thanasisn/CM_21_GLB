@@ -104,7 +104,14 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
 DT[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
 DT[  st.dev   < -8,  st.dev   := NA ]
 
-stop()
+
+## export for validation my process
+temp <- copy(DT)
+temp[, file    := NULL]
+temp[, TIME_UT := NULL]
+names(temp)[names(temp) == "[W.m-2]"] <- "WATTTOT"
+myRtools::write_RDS(temp, "~/DATA/Broad_Band/CM21_TOT")
+
 
 
 #'
