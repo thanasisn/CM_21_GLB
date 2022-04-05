@@ -92,7 +92,7 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
         date      <- as.POSIXct(strptime(partdate, "%j%y" ))
         temp$Date <- date
         temp$file <- af
-        DT    <- rbind(DT, temp)
+        DT        <- rbind(DT, temp)
         print(date)
     }
     myRtools::writeDATA(DT, rdsfile)
@@ -104,7 +104,7 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
 DT[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
 DT[  st.dev   < -8,  st.dev   := NA ]
 
-
+stop()
 
 
 #'

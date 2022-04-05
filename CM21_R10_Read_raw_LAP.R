@@ -147,7 +147,7 @@ rm(rad_names, radmon_files)
 
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
-
+years_to_do <- 2004:2010
 
 #'
 #' Allowed years to do: `r years_to_do`
@@ -182,8 +182,6 @@ if (!params$ALL_YEARS) {
         new_to_do <- years_to_do[years_to_do %in% newyears]
         NEWDATA   <- TRUE
     }
-
-missing_years <- 1995:2004
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
@@ -325,6 +323,18 @@ for ( YYYY in years_to_do ) {
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
 
+
+    plot(year_data$Date, year_data$CM21value, pch = 19, cex = .5,
+         main = paste("CM21 signal ", YYYY ),
+         xlab = "Elevation",
+         ylab = "CM21 signal" )
+    points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
+    points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
+    abline(v=signal_physical_limits$Date)
+    cat('\n\n')
+
+
+
     if (YYYY == 1995) {
         part <- year_data[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
@@ -346,18 +356,31 @@ for ( YYYY in years_to_do ) {
 
 
     if (YYYY == 1996) {
-        part <- year_data[ Date > as.POSIXct("1996-01-01") &
-                           Date < as.POSIXct("1996-3-15") ]
+        part <- year_data[ Date > as.POSIXct("1996-02-01") &
+                           Date < as.POSIXct("1996-03-7") ]
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
-
-
-        stop()
+        abline(v=as.POSIXct("1996-2-08"))
+        abline(v=as.POSIXct("1996-2-29 12:00"))
+        ## TODO check with total
     }
 
-    if (YYYY == 2004) {}
+    if (YYYY == 2004) {
+        part <- year_data[ Date > as.POSIXct("2004-06-01") &
+                           Date < as.POSIXct("2004-08-01") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+
+        abline(v=signal_physical_limits$Date)
+    }
+
+
+
+
+
 
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
