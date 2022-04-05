@@ -187,7 +187,7 @@ if (!params$ALL_YEARS) {
         NEWDATA   <- TRUE
     }
 
-    missing_years <- 1996
+    missing_years <- 2005:2010
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
@@ -351,7 +351,7 @@ for ( YYYY in years_to_do ) {
 
         testdata <- extra[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
-        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
         cat('\n\n')
 
 
@@ -364,7 +364,7 @@ for ( YYYY in years_to_do ) {
 
         testdata <- extra[ Date > as.POSIXct("1995-11-15") &
                            Date < as.POSIXct("1995-12-31") ]
-        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
         cat('\n\n')
 
     }
@@ -381,9 +381,7 @@ for ( YYYY in years_to_do ) {
 
         testdata <- extra[ Date > as.POSIXct("1996-02-01") &
                            Date < as.POSIXct("1996-03-7") ]
-        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
-
-        stop()
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
     }
 
@@ -395,7 +393,33 @@ for ( YYYY in years_to_do ) {
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
         abline(v=signal_physical_limits$Date)
+
+        testdata <- extra[ Date > as.POSIXct("2004-06-01") &
+                           Date < as.POSIXct("2004-08-01") ]
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
+
     }
+
+
+    if (YYYY == 2005) {
+        part <- year_data[ Date > as.POSIXct("2005-11-15") &
+                           Date < as.POSIXct("2005-12-31") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+
+        abline(v=signal_physical_limits$Date)
+
+        testdata <- extra[ Date > as.POSIXct("2005-11-15") &
+                           Date < as.POSIXct("2005-12-31") ]
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
+
+    }
+
+
+
+
+
 
 
 
