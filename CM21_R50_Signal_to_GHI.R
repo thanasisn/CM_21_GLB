@@ -159,6 +159,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+years_to_do <- 1993
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -315,25 +316,31 @@ for ( yyyy in years_to_do) {
         day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
         daydata$preNoon <- daydata$Date <= day_noon
 
-        ## gather all data!!
+        ## gather all data for storage!!
         gather          <- rbind(gather, daydata)
 
 
         ####    Normal plots    ################################################
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             ## fix plot range
-            withdark <- daydata$CM21value * daydata$CM21CF
-            dddd = min(daydata$wattGLB, daydata$wattGLB_SD, withdark , na.rm = TRUE)
-            uuuu = max(daydata$wattGLB, daydata$wattGLB_SD, withdark , na.rm = TRUE)
+            daydata$withdark <- daydata$CM21value * daydata$CM21CF
+            dddd <- min(daydata$wattGLB,
+                        daydata$wattGLB_SD,
+                        daydata$withdark , na.rm = TRUE)
+            uuuu <- max(daydata$wattGLB,
+                        daydata$wattGLB_SD,
+                        daydata$withdark , na.rm = TRUE)
             if (dddd > -5  ) { dddd = 0  }
             if (uuuu < 190 ) { uuuu = 200}
             ylim = c(dddd , uuuu)
 
-            plot(daydata$Date, withdark,
+            plot(daydata$Date, daydata$withdark,
                  "l", xlab = "UTC", ylab = expression(W / m^2),
                  col  = "darkgreen", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
 
             lines(daydata$Date, daydata$wattGLB, col = "green", lwd = 2)
+
+            plot(daydata$Date, daydata$wattGLB)
 
             abline(h = 0, col = "gray60")
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
@@ -349,7 +356,8 @@ for ( yyyy in years_to_do) {
                    lty = c(1,1,NA), pch = c(NA,NA,"."),
                    col = c("darkgreen", "green", "red"), cex = 0.8,)
 
-        dev.off()
+        # dev.off()
+stop()
 
     }##END loop of days
 
