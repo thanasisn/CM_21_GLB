@@ -88,6 +88,7 @@ if(!interactive()) {
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_write_data.R")
+source("~/CM_21_GLB/Functions_CM21_factor.R")
 
 
 ####  Variables  ####
@@ -182,6 +183,8 @@ if (!params$ALL_YEARS) {
         NEWDATA   <- TRUE
     }
 
+missing_years <- 1995:2004
+
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
         years_to_do <- sort(unique(c(missing_years,new_to_do)))
@@ -268,11 +271,23 @@ for ( YYYY in years_to_do ) {
     cat(missing_files,sep = "\n\n")
 
 
-    #### . . Add all the minutes of the year ####
-    all_min   <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
-                     as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
-    all_min   <- data.frame(Date = all_min)
-    year_data <- merge(year_data, all_min, all = T)
+    # #### . . Add all the minutes of the year ####
+    # all_min   <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
+    #                  as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
+    # all_min   <- data.frame(Date = all_min)
+    # year_data <- merge(year_data, all_min, all = T)
+
+
+    ## add signal limits on plots
+    year_data[ , sig_lowlim := signal_lower_limit(Date) ]
+    year_data[ , sig_upplim := signal_upper_limit(Date) ]
+
+    ####  Save signal data to file  ####
+    write_RDS(object = year_data,
+              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+
+
+    ####    Yearly Plots    ####################################################
 
 
     ####  Do some plots for this year before filtering  ####
@@ -287,6 +302,8 @@ for ( YYYY in years_to_do ) {
             yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
         }
     })
+
+
 
     # cat('\\scriptsize\n')
     # cat(pander( summary(year_data[,-c('Date','Azimuth')]) ))
@@ -304,9 +321,44 @@ for ( YYYY in years_to_do ) {
          main = paste("CM21 signal ", YYYY ),
          xlab = "Elevation",
          ylab = "CM21 signal" )
-    abline( h = yearlims[ an == "CM21value", low], col = "red")
-    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+    points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
+    points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
+
+    if (YYYY == 1995) {
+        part <- year_data[ Date > as.POSIXct("1995-10-8") &
+                           Date < as.POSIXct("1995-11-15") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-2,3))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+        abline(v=signal_physical_limits$Date)
+        cat('\n\n')
+
+        part <- year_data[ Date > as.POSIXct("1995-11-15") &
+                           Date < as.POSIXct("1995-12-31") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+        abline(v=signal_physical_limits$Date)
+        cat('\n\n')
+
+    }
+
+
+    if (YYYY == 1996) {
+        part <- year_data[ Date > as.POSIXct("1996-01-01") &
+                           Date < as.POSIXct("1996-3-15") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+
+
+
+        stop()
+    }
+
+    if (YYYY == 2004) {}
+
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
          main = paste("CM21 signal SD", YYYY ),

@@ -8,7 +8,7 @@ is.POSIXct <- function(x) inherits(x, "POSIXct")
 calibration_data <- matrix(
        c( "1991-01-01", 11.98E-6, 0.5E-2,
           "1995-10-21", 11.98E-6,   2E-2,
-          "1995-11-01", 11.98E-6,   1E-2,
+          "1995-11-02", 11.98E-6,   1E-2,  ## <- this is correct!!!
           "2004-07-01", 11.98E-6,   4E-2,
           "2005-12-05", 11.99E-6,   4E-2,
           "2011-12-30", 11.96E-6,   4E-2,
@@ -48,4 +48,36 @@ cm21factor <- function(date) {
         stop("input must be POSIXct.\n you gave : ",date)
     }
 }
+
+
+
+## Possible signal range on acquisition
+signal_physical_limits <- matrix(
+    c( "1991-01-01", -0.5, 3.5,
+       "1995-10-21",   -1,   1,
+       "1995-11-02", -0.5,   2,
+       "2004-07-01", -99,   99,
+       "2005-12-05", -99,   99,
+       "2011-12-30", -99,   99,
+       "2012-01-31", -99,   99  ),
+    byrow = TRUE,
+    ncol = 3)
+
+## Format to data frame
+signal_physical_limits <- data.frame(Date      = as.POSIXct(signal_physical_limits[,1]),
+                                     Lower_lim = as.numeric(signal_physical_limits[,2]),
+                                     Upper_lim = as.numeric(signal_physical_limits[,3]))
+signal_lower_limit <- approxfun( x      = signal_physical_limits$Date,
+                                 y      = signal_physical_limits$Lower_lim,
+                                 method = "constant",
+                                 rule   = 1:2  )
+signal_upper_limit <- approxfun( x      = signal_physical_limits$Date,
+                                 y      = signal_physical_limits$Upper_lim,
+                                 method = "constant",
+                                 rule   = 1:2  )
+
+
+
+
+
 
