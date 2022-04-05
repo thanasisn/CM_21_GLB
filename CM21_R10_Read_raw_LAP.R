@@ -187,7 +187,7 @@ if (!params$ALL_YEARS) {
         NEWDATA   <- TRUE
     }
 
-    missing_years <- 2015:2022
+    # missing_years <- 2015:2022
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
