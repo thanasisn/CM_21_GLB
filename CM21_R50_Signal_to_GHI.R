@@ -100,6 +100,9 @@ panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
 
+## temp folder for daily plots
+tmpfolder <- paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
+
 elevlim   <- -5  ## elevation limit for scatter plots
 wattlimit <- 50  ## radiation limit for histograms
 
@@ -114,10 +117,6 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 ## PATHS
-tmpfolder  <- paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
-dailyplots = paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
-daylystat  = paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "" , basename(Script.Name)),"_stats")
-
 
 
 
@@ -244,13 +243,6 @@ cat("\n\n")
 
 
 
-
-
-## loop all input files
-
-statist <- data.table()
-
-
 #+ include=TRUE, echo=F, results="asis"
 for ( yyyy in years_to_do) {
     cat("\n\\FloatBarrier\n\n")
@@ -263,7 +255,7 @@ for ( yyyy in years_to_do) {
     gather   <- data.table()
 
 
-    ## create a new temp dir for plots
+    ## create a new temp dir for each years plots
     unlink(tmpfolder, recursive = TRUE)
     dir.create(tmpfolder)
     pbcount  <- 0
@@ -275,8 +267,6 @@ for ( yyyy in years_to_do) {
     if (rawdata[!is.na(CM21valueWdark) & is.na(CM21valueWdark), .N ] != 0) {
         cat("\n**There are missing dark correction values!!!!**\n\n")
     }
-
-
 
 
     ####  Convert to physical values  ####
@@ -304,10 +294,9 @@ for ( yyyy in years_to_do) {
 
 
 
-    ##  Get only days with valid data
+    ##  Get only days with valid data to loop
     daystodo <- rawdata[ , .(N = sum(!is.na(CM21value))), by = .(Days <- as.Date(Date)) ]
     daystodo <- daystodo[ N > 0, Days ]
-
 
     for (aday in sort(daystodo)) {
 
@@ -321,16 +310,13 @@ for ( yyyy in years_to_do) {
         daydata     <- merge(daydata, daymimutes, all = T)
         pbcount     <- pbcount + 1
 
-
-        ## break morning-evening (common columns)
+        ## break morning-evening
         maxElev         <- max( daydata$Elevat, na.rm = T)
         day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
         daydata$preNoon <- daydata$Date <= day_noon
 
-        ## gather all data
+        ## gather all data!!
         gather          <- rbind(gather, daydata)
-
-
 
 
         ####    Normal plots    ################################################
@@ -365,11 +351,10 @@ for ( yyyy in years_to_do) {
 
         dev.off()
 
+    }##END loop of days
 
-    }
 
-
-    ## save data for this year
+    ####    Save data for this year    #########################################
     write_RDS(object = gather,
               file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L0_", yyyy, ".Rds"))
 
@@ -380,24 +365,17 @@ for ( yyyy in years_to_do) {
            ignore.stderr = T )
 
 
+    ####    Yearly plots    ####################################################
 
     ##  Add time column (same date with original times)
     dummytimes     <-  strftime(   gather$Date, format = "%H:%M:%S")
     gather$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
-
-
 
     par(mar = c(2,4,2,1))
     plot(gather$Times, gather$wattGLB,
          pch = ".", cex = 1.5, ylab = expression(W / m^2) , xlab = "",
          main = paste(yyyy, "Global" ))
     cat("\n\n")
-
-
-    # plot(gather$Date, gather$CM21CF,"l",
-    #      xlab = "", ylab = "",
-    #      main = paste("Conversion factor", yyyy))
-    # cat("\n\n")
 
 
     plot(gather$Date, gather$wattGLB, pch = 19, cex = 0.5,
@@ -428,7 +406,6 @@ for ( yyyy in years_to_do) {
     legend("topleft", legend = c("Before noon", "After noon"),
            bty="n" ,text.col = c("blue", "green"), cex = 1)
     cat("\n\n")
-
 
 
     hist(gather$wattGLB[ gather$wattGLB > wattlimit],
@@ -468,201 +445,15 @@ for ( yyyy in years_to_do) {
 
 
 
-
-    ##TODO
-    ## drop data at next level
-    ## copy filters from here and Aerosols for level 1
-
-
-
-
-
-
-#     tempout <- data.frame()
-#     yyyy    <- year(globaldata$day[1])
-#
-#     cat(paste("\\newpage\n\n"))
-#     cat(paste("## ",yyyy,"\n\n"))
-#
-#     tempout <- rbind( tempout, data.frame(Name = "Initial data",      Data_points = NR_loaded) )
-#     tempout <- rbind( tempout, data.frame(Name = "SD limit",          Data_points = NR_extreme_SD) )
-#     tempout <- rbind( tempout, data.frame(Name = "Minimum GHI limit", Data_points = NR_min_global) )
-#     tempout <- rbind( tempout, data.frame(Name = "Remaining data",    Data_points = globaldata[ !is.na(CM21value), .N ]) )
-#
-#     panderOptions('table.alignment.default', 'right')
-#     panderOptions('table.split.table',        120   )
-#
-#     cat('\\scriptsize\n')
-#
-#     # cat('\\footnotesize\n')
-#
-#     cat(pander( tempout ))
-#
-#     cat(pander( summary(globaldata[,!c("Date","Azimuth")]) ))
-#
-#     cat('\\normalsize\n')
-#
-#     cat('\n')
-#
-#     hist(globaldata$CM21value, breaks = 50, main = paste("CM21 GHI ", yyyy ) )
-#
-#     hist(globaldata$CM21sd,    breaks = 50, main = paste("CM21 GHI SD", yyyy ) )
-#
-#     plot(globaldata$Elevat, globaldata$Global, pch = 19, cex = .8,
-#          main = paste("CM21 GHI ", yyyy ),
-#          xlab = "Elevation",
-#          ylab = "CM21 GHI" )
-#
-#     plot(globaldata$Elevat, globaldata$GLstd,    pch = 19, cex = .8,
-#          main = paste("CM21 GHI SD", yyyy ),
-#          xlab = "Elevation",
-#          ylab = "CM21 GHI Standard Deviations")
-#
-#     cat('\n')
-#     cat('\n')
-#
-#     # write this years data
-#     capture.output(
-#         RAerosols::write_RDS(globaldata, paste0( GLOBAL_DIR , sub("_L1", "_L2", basename(afile)))),
-#         file = "/dev/null" )
-
 }
-#'
 #+ include=T, echo=F
 
 
+##TODO
+## drop data at next level
+## copy filters from here and Aerosols for level 1
 
-# ## write statistics on data
-# capture.output(
-#     RAerosols::write_RDS(statist, daylystat),
-#     file = "/dev/null" )
-#
-# ## create pdf with all daily plots
-# # system( paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ", dailyplots) )
-#
-#
-#
-# #'
-# #' ## Summary of daily statistics.
-# #'
-#
-#
-# hist(statist$NAs,     main = "NAs",                  breaks = 50, xlab = "NA count"            )
-# hist(statist$MinVa,   main = "Minimum Value",        breaks = 50, xlab = "Min daily signal"    )
-# hist(statist$MaxVa,   main = "Maximum Value",        breaks = 50, xlab = "Max daily signal"    )
-# hist(statist$AvgVa,   main = "Average Value",        breaks = 50, xlab = "Mean daily signal"   )
-# hist(statist$MinGL,   main = "Minimum Global",       breaks = 50, xlab = "Min daily global"    )
-# hist(statist$MaxGL,   main = "Maximum Global",       breaks = 50, xlab = "Max daily global"    )
-# hist(statist$AvgGL,   main = "Average Global",       breaks = 50, xlab = "Mean daily global"     )
-# hist(statist$sunMeas, main = "Sun measurements",     breaks = 50, xlab = "Data count with sun up"     )
-# hist(statist$Mavg,    main = "Morning Average Dark", breaks = 50, xlab = "Morning mean dark"           )
-# hist(statist$Mmed,    main = "Morning Median Dark",  breaks = 50, xlab = "Morning median dark"         )
-# hist(statist$Mcnt,    main = "Morning count Dark",   breaks = 50, xlab = "Morning data count for dark" )
-# hist(statist$Eavg,    main = "Evening Average Dark", breaks = 50, xlab = "Evening mean dark"           )
-# hist(statist$Emed,    main = "Evening Median Dark",  breaks = 50, xlab = "Evening median dark"         )
-# hist(statist$Ecnt,    main = "Evening count Dark",   breaks = 50, xlab = "Evening data count for dark" )
-#
-#
-# plot(statist$Date, statist$CMCF,    "p", pch = 16, cex = .5, main = "Conversion factor"    , xlab = "" )
-# plot(statist$Date, statist$NAs,     "p", pch = 16, cex = .5, main = "NA count"             , xlab = "" )
-# plot(statist$Date, statist$MinVa,   "p", pch = 16, cex = .5, main = "Minimum Value"        , xlab = "" )
-# plot(statist$Date, statist$MaxVa,   "p", pch = 16, cex = .5, main = "Maximum Value"        , xlab = "" )
-# plot(statist$Date, statist$AvgVa,   "p", pch = 16, cex = .5, main = "Average Value"        , xlab = "" )
-# plot(statist$Date, statist$MinGL,   "p", pch = 16, cex = .5, main = "Minimum Global"       , xlab = "" )
-# plot(statist$Date, statist$MaxGL,   "p", pch = 16, cex = .5, main = "Maximum Global"       , xlab = "" )
-# plot(statist$Date, statist$AvgGL,   "p", pch = 16, cex = .5, main = "Average Global"       , xlab = "" )
-# plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = "Sun measurements"     , xlab = "" )
-# plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = "Morning Average Dark" , xlab = "" )
-# plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = "Morning Median Dark"  , xlab = "" )
-# plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = "Morning count Dark"   , xlab = "" )
-# plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = "Evening Average Dark" , xlab = "" )
-# plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = "Evening Median Dark"  , xlab = "" )
-# plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = "Evening count Dark"   , xlab = "" )
-# plot(statist$Date, statist$sunMeas/statist$SunUP , "p", pch=16,cex=.5, main = "Sun up measurements / Sun up count" , xlab = "" )
-#
-#
-# #'
-# #' ### Days with average global < -50 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$AvgGL < -50 ) ] ) )
-#
-# #'
-# #' ### Days with average global > 390 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$AvgGL > 390 ) ] ) )
-#
-# # plot(statist$Date[statist$MaxGL<2000], statist$MaxGL[statist$MaxGL<2000], "p", pch=16,cex=.5 )
-#
-# #'
-# #' ### Days with max global > 1500 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$MaxGL > 1500 ) ] ) )
-#
-#
-# # plot(statist$Date[statist$MinGL>-200], statist$MinGL[statist$MinGL>-200], "p", pch=16,cex=.5 )
-# # plot(statist$Date[statist$MinGL<200], statist$MinGL[statist$MinGL<200], "p", pch=16,cex=.5 )
-#
-#
-# #'
-# #' ### Days with min global < -200 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$MinGL < -200 ) ] ) )
-#
-# #'
-# #' ### Days with min global > 200 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$MinGL > 200 ) ] ) )
-#
-#
-# # plot(statist$Date[statist$Ecnt>100], statist$Ecnt[statist$Ecnt>100] , "p", pch=16,cex=.5 )
-#
-#
-# #'
-# #' ### Days with Evening dark data points count < 100 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$Ecnt < 100 ) ] ) )
-#
-# #'
-# #' ### Days with Morning dark data points count < 50 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )
-#
-#
-# # plot(statist$Date[statist$sunMeas<100], statist$sunMeas[statist$sunMeas<100]  , "p", pch=16,cex=.5 )
-#
-#
-# #'
-# #' ### Days with ( sun  measurements / sun up ) < 0.2 .
-# #'
-# unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )
-#
-#
-# #'
-# #' ### Day with the minimum morning median dark .
-# #'
-#
-# statist$Date[ which.min( statist$Mmed ) ]
-#
-#
-# yearlyplots <- list.files( path       = REPORT_DIR,
-#                            pattern    = "Daily_GHI_[0-9]{4}.pdf",
-#                            full.names = T)
-# yearlyplots <- sort(yearlyplots)
-#
-# FirstYear   <- regmatches(yearlyplots[1], regexpr( "[0-9]{4}", yearlyplots[1] ))
-# CurrentYe   <- year(Sys.Date())
-# ## ignore current year
-# yearlyplots <- grep(paste0("_",CurrentYe,".pdf"), yearlyplots, value = T , invert = T)
-# LastYear    <- regmatches(yearlyplots[length(yearlyplots)], regexpr( "[0-9]{4}", yearlyplots[length(yearlyplots)] ))
-#
-# ## collate pdfs
-# system(
-#     paste0("pdftk ",
-#            paste(yearlyplots, collapse = " "),
-#            " cat output ",
-#            REPORT_DIR, "Daily_GHI_",FirstYear,"-",LastYear,".pdf" )
-# )
-# #'
+
 
 
 #' **END**
