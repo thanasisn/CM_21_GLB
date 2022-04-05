@@ -187,7 +187,7 @@ if (!params$ALL_YEARS) {
         NEWDATA   <- TRUE
     }
 
-    missing_years <- 1995
+    missing_years <- 1996
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
@@ -349,18 +349,11 @@ for ( YYYY in years_to_do ) {
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
         abline(v=signal_physical_limits$Date)
 
-
-
-        plot(part$Date, part$CM21value, pch = ".", ylim = c(-2,3))
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        abline(v=signal_physical_limits$Date)
-
         testdata <- extra[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
-        plot(testdata$Date, testdata$WATTTOT , pch = ".", col = "cyan")
-
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
         cat('\n\n')
+
 
         part <- year_data[ Date > as.POSIXct("1995-11-15") &
                            Date < as.POSIXct("1995-12-31") ]
@@ -368,9 +361,12 @@ for ( YYYY in years_to_do ) {
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
         abline(v=signal_physical_limits$Date)
+
+        testdata <- extra[ Date > as.POSIXct("1995-11-15") &
+                           Date < as.POSIXct("1995-12-31") ]
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
         cat('\n\n')
 
-        stop()
     }
 
 
@@ -380,10 +376,15 @@ for ( YYYY in years_to_do ) {
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
-
         abline(v=as.POSIXct("1996-2-08"))
         abline(v=as.POSIXct("1996-2-29 12:00"))
-        ## TODO check with total
+
+        testdata <- extra[ Date > as.POSIXct("1996-02-01") &
+                           Date < as.POSIXct("1996-03-7") ]
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date) , pch = ".", col = "cyan")
+
+        stop()
+
     }
 
     if (YYYY == 2004) {
