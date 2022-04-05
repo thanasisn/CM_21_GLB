@@ -187,7 +187,7 @@ if (!params$ALL_YEARS) {
         NEWDATA   <- TRUE
     }
 
-    missing_years <- 2005:2010
+    missing_years <- 2015:2022
 
     ## decide what to do
     if (length(missing_years) != 0 | NEWDATA) {
@@ -416,6 +416,21 @@ for ( YYYY in years_to_do ) {
 
     }
 
+
+    if (YYYY == 2015) {
+        part <- year_data[ Date > as.POSIXct("2015-04-10") &
+                           Date < as.POSIXct("2015-05-01") ]
+        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+
+        abline(v=signal_physical_limits$Date)
+
+        testdata <- extra[ Date > as.POSIXct("2015-04-10") &
+                           Date < as.POSIXct("2015-05-01") ]
+        points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
+
+    }
 
 
 
