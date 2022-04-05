@@ -105,12 +105,16 @@ DT[ `[W.m-2]` < -8, `[W.m-2]` := NA ]
 DT[  st.dev   < -8,  st.dev   := NA ]
 
 
-## export for validation my process
+## export for validation of my process
 temp <- copy(DT)
+dateess <- paste( temp$Date, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60) )
+temp$Date <- as.POSIXct( strptime(dateess, "%F %H %M") )
 temp[, file    := NULL]
 temp[, TIME_UT := NULL]
 names(temp)[names(temp) == "[W.m-2]"] <- "WATTTOT"
 myRtools::write_RDS(temp, "~/DATA/Broad_Band/CM21_TOT")
+rm(temp)
+
 
 
 
@@ -162,7 +166,7 @@ pander(table(count$N))
 
 
 ## add nice date
-dateess   <- paste( DT$Date, DT$TIME_UT %/% 1, round((DT$TIME_UT %% 1) * 60) )
+dateess <- paste( DT$Date, DT$TIME_UT %/% 1, round((DT$TIME_UT %% 1) * 60) )
 DT$Date <- as.POSIXct( strptime(dateess, "%F %H %M") )
 setorder(DT,Date)
 
