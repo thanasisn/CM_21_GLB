@@ -116,9 +116,6 @@ if (!exists("params")){
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-## PATHS
-
-
 
 
 
@@ -321,7 +318,7 @@ for ( yyyy in years_to_do) {
 
 
         ####    Normal plots    ################################################
-        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             ## fix plot range
             daydata$withdark <- daydata$CM21value * daydata$CM21CF
             dddd <- min(daydata$wattGLB,
@@ -340,8 +337,6 @@ for ( yyyy in years_to_do) {
 
             lines(daydata$Date, daydata$wattGLB, col = "green", lwd = 2)
 
-            plot(daydata$Date, daydata$wattGLB)
-
             abline(h = 0, col = "gray60")
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
                    col = "lightgray", lty = "dotted", lwd = par("lwd"))
@@ -356,13 +351,15 @@ for ( yyyy in years_to_do) {
                    lty = c(1,1,NA), pch = c(NA,NA,"."),
                    col = c("darkgreen", "green", "red"), cex = 0.8,)
 
-        # dev.off()
-stop()
+        dev.off()
 
     }##END loop of days
 
 
     ####    Save data for this year    #########################################
+    gather$CM21CF    <- NA
+    gather$CM21value <- NA
+    gather$CM21sd    <- NA
     write_RDS(object = gather,
               file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L0_", yyyy, ".Rds"))
 
@@ -378,6 +375,11 @@ stop()
     ##  Add time column (same date with original times)
     dummytimes     <-  strftime(   gather$Date, format = "%H:%M:%S")
     gather$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
+
+    cat("\n\n")
+    pander(table(gather$QFlag_1))
+    cat("\n\n")
+
 
     par(mar = c(2,4,2,1))
     plot(gather$Times, gather$wattGLB,
