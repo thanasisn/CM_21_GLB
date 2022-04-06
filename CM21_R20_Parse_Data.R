@@ -87,6 +87,7 @@ if(!interactive()) {
 library(data.table, quietly = T, warn.conflicts = F)
 library(pander,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_write_data.R")
+source("~/CM_21_GLB/Functions_CM21_factor.R")
 
 
 ####  Variables  ####
@@ -181,6 +182,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+years_to_do <- 1993:1995
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -203,11 +205,19 @@ if (length(years_to_do) == 0 ) {
 #'
 #' #### Filter of possible signal values.
 #'
-#' Only signal of range `r paste0("[",MINsgLIM,", " ,MAXsgLIM,"]")` Volts is possible to be recorded normally.
 #'
-#' #### Filter of possible night signal.
+#' Allowed signal of ranges that are possible to be recorded normally.
 #'
-#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow a signal range of `r paste0("[",MINsgLIMnight,", " ,MAXsgLIMnight,"]")` to remove various inconsistencies.
+#'
+pander(signal_physical_limits)
+#'
+#'
+#'
+#' #### Mark of possible night signal.
+#'
+#'
+#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow a radiation range of `r paste0("[",MINLIMnight,", " ,MAXLIMnight,"]")` to remove various inconsistencies.
+#'
 #'
 #' #### Filter negative signal when sun is up.
 #'
@@ -340,12 +350,12 @@ for ( yyyy in years_to_do) {
     ## start flags columns
     rawdata[, QFlag_1 := as.factor(NA)]
 
-    stop()
+
 
     ####    Mark signal physical limits    #####################################
-    rawdata[ CM21value <  MINsgLIM, QFlag_1 := "sgLIM_hit" ]
-    rawdata[ CM21value >  MAXsgLIM, QFlag_1 := "sgLIM_hit" ]
-    NR_signal_limit    <- rawdata[  QFlag_1 == "sgLIM_hit", .N ]
+    rawdata[ CM21value <  sig_lowlim, QFlag_1 := "sgLIM_hit" ]
+    rawdata[ CM21value >  sig_upplim, QFlag_1 := "sgLIM_hit" ]
+    NR_signal_limit    <-   rawdata[  QFlag_1 == "sgLIM_hit", .N ]
     ############################################################################
 
 
@@ -353,11 +363,12 @@ for ( yyyy in years_to_do) {
     ####    Mark night signal possible limits    ###############################
     getnight  <- rawdata$Elevat < DARK_ELEV
     ## mark too negative signal values
-    rawdata[ CM21value < MINsgLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark" ]
+    rawdata[ CM21value * cm21factor(Date) < MINLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark" ]
     ## drop too positive signal values
-    rawdata[ CM21value > MAXsgLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark" ]
+    rawdata[ CM21value * cm21factor(Date) > MAXLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark" ]
     NR_signal_night_limit <- rawdata[QFlag_1 %in% c("ToolowDark","ToohigDark"), .N ]
     ############################################################################
+
 
 
 
@@ -379,15 +390,22 @@ for ( yyyy in years_to_do) {
                 NR_bad_ranges, "** points marked as bad data ranges\n\n" ))
     cat(paste0( "**",
                 NR_signal_limit, "** possible signal error\n\n" ))
-    cat(paste0( "**",
-                NR_signal_night_limit, "** possible extreme night values\n\n" ))
+    # cat(paste0( "**",
+    #             NR_signal_night_limit, "** possible extreme night values\n\n" ))
     # #     cat(paste0( "\"Negative daytime\" removed *",
     # #             NR_negative_daytime, "* data points\n\n" ))
     cat(paste0( "**",
                 rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n" ))
 
 
-    # cat('\\scriptsize\n')
+
+
+    cat('\\scriptsize\n')
+
+    pander(table(rawdata$QFlag_1))
+
+    cat('\\normalsize\n')
+
     # cat('\\footnotesize\n')
     # cat('\\normalsize\n')
     # cat('\n')
