@@ -53,20 +53,25 @@ cm21factor <- function(date) {
 
 ## Possible signal range on acquisition
 signal_physical_limits <- matrix(
-    c( "1991-01-01", -0.5, 3.5,
-       "1995-10-21",   -1,   1,
-       "1995-11-02", -0.5,   2,
-       "2004-07-01", -0.5,   1,
-       "2005-12-05", -0.4,   1,
-       "2011-12-30", -0.4,   1,
-       "2012-01-31", -0.4,   1 ),
-    byrow = TRUE,
+    c( "1991-01-01", -0.5, 5,
+       "1995-10-21", -0.4, 1.2,
+       "1995-11-02", -0.5, 2.5,
+       "2004-07-01", -0.2, 0.6,
+       "2005-12-05", -0.2, 0.6,
+       "2011-12-30", -0.2, 0.6,
+       "2012-01-31", -0.2, 0.6 ),    byrow = TRUE,
     ncol = 3)
 
 ## Format to data frame
 signal_physical_limits <- data.frame(Date      = as.POSIXct(signal_physical_limits[,1]),
                                      Lower_lim = as.numeric(signal_physical_limits[,2]),
                                      Upper_lim = as.numeric(signal_physical_limits[,3]))
+
+signal_physical_limits$Lower_radiation_lim <- cm21factor(signal_physical_limits$Date) * signal_physical_limits$Lower_lim
+signal_physical_limits$Upper_radiation_lim <- cm21factor(signal_physical_limits$Date) * signal_physical_limits$Upper_lim
+
+
+
 signal_lower_limit <- approxfun( x      = signal_physical_limits$Date,
                                  y      = signal_physical_limits$Lower_lim,
                                  method = "constant",

@@ -76,6 +76,10 @@ DARK_ELEV     = -10        ## sun elevation limit
 MINsgLIMnight = -0.02      ## Lower signal limit when dark
 MAXsgLIMnight = +0.10      ## Higher signal limit when dark
 
+MINLIMnight   = -15          ## Lower radiation limit  when dark
+MAXLIMnight   = +15          ## Higher radiation limit when dark
+
+
 ## mark limit (not used)
 SUN_ELEV      = +5         ## When sun is above that
 MINsunup      =  0         ## Exclude signal values below that
