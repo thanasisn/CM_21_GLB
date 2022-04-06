@@ -182,7 +182,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1993:1995
+# years_to_do <- 1993:1995
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -402,7 +402,8 @@ for ( yyyy in years_to_do) {
 
     cat('\\scriptsize\n')
 
-    pander(table(rawdata$QFlag_1))
+    cat(pander(table(rawdata$QFlag_1)))
+    cat("\n\n")
 
     cat('\\normalsize\n')
 
@@ -458,6 +459,12 @@ for ( yyyy in years_to_do) {
     cat('\n\n')
 
     hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
+    abline(v = yearlims[ an == "CM21value", low], col = "cyan")
+    abline(v = yearlims[ an == "CM21value", upe], col = "cyan")
+    abline(v = unique(signal_lower_limit(rawdata$Date)), col = "red")
+    abline(v = unique(signal_upper_limit(rawdata$Date)), col = "red")
+
+
     cat('\n\n')
 
     hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
@@ -467,8 +474,12 @@ for ( yyyy in years_to_do) {
          main = paste("CM21 signal ", yyyy ),
          xlab = "Elevation",
          ylab = "CM21 signal" )
-    abline( h = yearlims[ an == "CM21value", low], col = "red")
-    abline( h = yearlims[ an == "CM21value", upe], col = "red")
+    abline(h = yearlims[ an == "CM21value", low], col = "cyan")
+    abline(h = yearlims[ an == "CM21value", upe], col = "cyan")
+    abline(h = unique(signal_lower_limit(rawdata$Date)), col = "red")
+    abline(h = unique(signal_upper_limit(rawdata$Date)), col = "red")
+
+
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
