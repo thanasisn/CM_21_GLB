@@ -141,6 +141,7 @@ missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if ( length(missing_from_sir) > 0 ) {
     warning(paste("\nThere are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n"))
     cat(missing_from_sir,sep = "\n\n")
+    cat("\n\n")
 }
 rm(rad_names, radmon_files)
 
