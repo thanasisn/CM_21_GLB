@@ -156,7 +156,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1993
+# years_to_do <- 1993
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -448,10 +448,10 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
-    boxplot(gather[sunnupp, CM21value - CM21valueWdark  ] ~ week_vec[sunnupp],
-            ylab = "")
-    title(main = paste(yyyy, "CM21 dark offset (Elevation > 0)"))
-    cat("\n\n")
+    # boxplot(gather[sunnupp, CM21value - CM21valueWdark  ] ~ week_vec[sunnupp],
+    #         ylab = "")
+    # title(main = paste(yyyy, "CM21 dark offset (Elevation > 0)"))
+    # cat("\n\n")
 
 
 
