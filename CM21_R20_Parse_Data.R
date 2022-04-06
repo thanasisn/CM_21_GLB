@@ -182,7 +182,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1993:1995
+# years_to_do <- 1993
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -209,6 +209,7 @@ if (length(years_to_do) == 0 ) {
 #' Allowed signal of ranges that are possible to be recorded normally.
 #'
 #'
+#+ include=T, echo=F
 pander(signal_physical_limits)
 #'
 #'
@@ -223,10 +224,6 @@ pander(signal_physical_limits)
 #'
 #' When sun elevation `r paste(">",SUN_ELEV)` ignore CM-21 signal `r paste("<",MINsunup)`.
 #'
-#+ include=T, echo=F
-
-
-
 #'
 #' Allowed years to do: `r input_years`
 #'
