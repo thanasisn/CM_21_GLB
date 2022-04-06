@@ -153,6 +153,8 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
+years_to_do <- 1993
+
 ## decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
@@ -233,7 +235,7 @@ for ( yyyy in years_to_do) {
 
         ## get all day
         wholeday    <- rawdata[ day == as.Date(theday) ]
-        ## only valid data for dark
+        ## use only valid data for dark
         daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
 
 
@@ -251,7 +253,7 @@ for ( yyyy in years_to_do) {
             NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
             if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
                 cat('\n')
-                cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n")
+                cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n\n")
                 next()
             }
         }
@@ -376,7 +378,9 @@ for ( yyyy in years_to_do) {
     } #END loop of days
 
     ## write all days with data
-    globaldata$day <- NULL
+    globaldata$day        <- NULL
+    globaldata$sig_lowlim <- NULL
+    globaldata$sig_upplim <- NULL
     write_RDS(object = globaldata,
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
 
@@ -394,7 +398,7 @@ for ( yyyy in years_to_do) {
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
     cat(paste0( "**",
-                NR_extreme_SD, "** excluded from dark calculation due to extreme SD\n\n" ))
+                NR_extreme_SD, "** points excluded from dark calculation due to extreme SD\n\n" ))
 
 
     cat('\\scriptsize\n\n')
