@@ -156,7 +156,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1993
+# years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -288,9 +288,12 @@ for ( yyyy in years_to_do) {
     rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup, QFlag_2 := "NegativeGlobal"  ]
 
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup  ]
-    if (nrow(negative)>0 ){
-        unique(as.Date(negative$Date))
+    if ( nrow(negative)>0 ){
+        cat("\n\n")
+        print(unique(as.Date(negative$Date)))
+        cat("\n\n")
         hist(negative$CM21value, main = "Negative Global radiation in daylight")
+        cat("\n\n")
     }
     NR_negative_daytime <- nrow(negative)
     rm(negative)
@@ -414,8 +417,8 @@ for ( yyyy in years_to_do) {
 
 
 
-    cat("\n**",
-        NR_negative_daytime, "negative radiation values while sun was up**\n\n")
+    cat(paste0("\n\n**",
+        NR_negative_daytime, " negative radiation values while sun was up**\n\n"))
 
 
     ####    Yearly plots    ####################################################
@@ -426,6 +429,9 @@ for ( yyyy in years_to_do) {
 
     cat("\n\n")
     cat(pander(table(gather$QFlag_1)))
+    cat("\n\n")
+
+    cat(pander(table(gather$QFlag_2)))
     cat("\n\n")
 
 
