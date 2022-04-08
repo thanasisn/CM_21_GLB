@@ -311,9 +311,22 @@ for ( yyyy in years_to_do) {
         cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
         cat("\n\n")
     }
+    rm(testlow)
     ############################################################################
 
 
+
+    ####    Mark positive global in the night    ###############################
+    rawdata[ Elevat < -5 & wattGLB > 10, QFlag_2 := "TooHighGlobalNight"  ]
+
+    testlow <- rawdata[ QFlag_2 == "TooHighGlobalNight" ]
+    if ( nrow(testlow)>0 ) {
+        cat("\n**Marked too high Global records during night:**\n\n")
+        cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
+        cat("\n\n")
+    }
+    rm(testlow)
+    ############################################################################
 
 
 
