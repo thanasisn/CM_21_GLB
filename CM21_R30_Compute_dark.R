@@ -153,7 +153,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1993
+# years_to_do <- 1993
 
 ## decide what to do
 if (length(years_to_do) == 0 ) {

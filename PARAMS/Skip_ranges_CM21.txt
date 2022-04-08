@@ -145,6 +145,8 @@ From;                Until;               Comment
 2010-07-16 00:00;    2010-07-16 23:59;    missing file
 2010-07-17 00:00;    2010-07-17 23:59;    missing file
 2010-07-18 00:00;    2010-07-18 23:59;    missing file
+2010-07-19 08:20;    2010-07-19 08:56;    undefined problem erratic data observed
+2010-07-19 12:37;    2010-07-19 14:12;    undefined problem erratic data observed
 2010-07-24 00:00;    2010-07-24 23:59;    missing file
 2010-07-25 00:00;    2010-07-25 23:59;    missing file
 2010-07-26 00:00;    2010-07-26 23:59;    missing file
@@ -205,8 +207,12 @@ From;                Until;               Comment
 2011-04-18 09:13;    2011-04-18 09:18;    extreme values
 2011-10-09 00:00;    2011-10-09 23:59;    missing file
 2011-10-20 07:00;    2011-10-20 07:21;    undefined problem erratic data observed
+2011-10-22 08:38;    2011-10-22 09:06;    undefined problem erratic data observed
+2011-10-31 09:48;    2011-10-31 09:54;    undefined problem erratic data observed
+2011-11-07 14:07;    2011-11-07 14:42;    undefined problem erratic data observed
 2011-11-20 00:00;    2011-11-20 23:59;    missing file
 2011-12-06 00:00;    2011-12-06 23:59;    missing file
+2011-12-01 11:32;    2011-12-01 11:37;    undefined problem erratic data observed
 2011-12-06 00:00;    2011-12-06 23:59;    stub file no usable data
 2011-12-07 00:00;    2011-12-07 23:59;    missing file
 2011-12-07 00:00;    2011-12-07 23:59;    stub file no usable data
