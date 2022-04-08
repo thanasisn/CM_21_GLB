@@ -290,7 +290,7 @@ for ( yyyy in years_to_do) {
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup  ]
     if ( nrow(negative)>0 ){
         cat("\n\n")
-        print(unique(as.Date(negative$Date)))
+        cat(paste(unique(as.Date(negative$Date))))
         cat("\n\n")
         hist(negative$CM21value, main = "Negative Global radiation in daylight")
         cat("\n\n")
@@ -301,30 +301,17 @@ for ( yyyy in years_to_do) {
 
 
 
-    # ####   Mark too low Global values    #######################################
-    # rawdata[ Date  < BREAKDATE & wattGLB < GLB_LOW_LIM_01, QFlag_2 := "TooLowGlobal"  ]
-    # rawdata[ Date >= BREAKDATE & wattGLB < GLB_LOW_LIM_02, QFlag_2 := "TooLowGlobal"  ]
-    #
-    # testlow <- rawdata[ QFlag_2 == "TooLowGlobal"]
-    # if ( nrow(testlow)>0 ) {
-    #     cat("\n**Marked too low Global records on:**\n\n")
-    #     cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
-    #     cat("\n\n")
-    # }
-    # ############################################################################
+    ####   Mark too low Global values    #######################################
+    rawdata[Date  < BREAKDATE & wattGLB < GLB_LOW_LIM_01, QFlag_2 := "TooLowGlobal" ]
+    rawdata[Date >= BREAKDATE & wattGLB < GLB_LOW_LIM_02, QFlag_2 := "TooLowGlobal" ]
 
-
-
-
-
-
-
-
-
-
-
-
-
+    testlow <- rawdata[ QFlag_2 == "TooLowGlobal"]
+    if ( nrow(testlow)>0 ) {
+        cat("\n**Marked too low Global records on:**\n\n")
+        cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
+        cat("\n\n")
+    }
+    ############################################################################
 
 
 
@@ -413,7 +400,6 @@ for ( yyyy in years_to_do) {
     system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
                   paste0(DAILYgrDIR,"Daily_GHI_L0_",yyyy,".pdf")),
            ignore.stderr = T )
-
 
 
 
