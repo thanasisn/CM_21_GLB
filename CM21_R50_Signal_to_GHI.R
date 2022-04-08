@@ -50,6 +50,9 @@
 #' - Apply proper gain by the acquisition system
 #' - Use an interpolated sensitivity between calibrations.
 #' - No filtering of data at this point.
+#' - Mark negative global during day
+#' - Mark too low global in the night
+#' - Mark too much global in the night
 #'
 #+ echo=F, include=T
 
