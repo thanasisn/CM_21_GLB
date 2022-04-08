@@ -436,13 +436,6 @@ for ( YYYY in years_to_do ) {
 
 
 
-
-
-
-
-
-
-
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
          main = paste("CM21 signal SD", YYYY ),
          xlab = "Elevation",

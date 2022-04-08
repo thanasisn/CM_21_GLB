@@ -225,6 +225,13 @@ cat("\n\n")
 
 
 
+#'
+#' ### Check for negative global when sun is up
+#'
+#' When elevation is above `r SUN_ELEV` mark
+#' Global radiation less than `r MINglbSUNup`
+
+
 
 #'
 #' ### Check for minimum Global irradiance.
@@ -243,6 +250,7 @@ cat("\n\n")
 
 #+ include=TRUE, echo=F, results="asis"
 for ( yyyy in years_to_do) {
+
     cat("\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
@@ -273,11 +281,23 @@ for ( yyyy in years_to_do) {
     rawdata[ , SZA        := 90     - Elevat         ]
 
 
+    ####  Mark some bad cases
+    rawdata[, QFlag_2 := as.factor(NA)]
 
-    # ##TODO move
-    # ## Init another flag
-    # rawdata[, QFlag_2 := as.factor(NA)]
-    #
+    ####    Mark negative values when sun is up    #############################
+    rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup, QFlag_2 := "NegativeGlobal"  ]
+
+    negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup  ]
+    if (nrow(negative)>0 ){
+        unique(as.Date(negative$Date))
+        hist(negative$CM21value, main = "Negative Global radiation in daylight")
+    }
+    NR_negative_daytime <- nrow(negative)
+    rm(negative)
+    ############################################################################
+
+
+
     # ####   Mark too low Global values    #######################################
     # rawdata[ Date  < BREAKDATE & wattGLB < GLB_LOW_LIM_01, QFlag_2 := "TooLowGlobal"  ]
     # rawdata[ Date >= BREAKDATE & wattGLB < GLB_LOW_LIM_02, QFlag_2 := "TooLowGlobal"  ]
@@ -289,6 +309,28 @@ for ( yyyy in years_to_do) {
     #     cat("\n\n")
     # }
     # ############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -370,6 +412,12 @@ for ( yyyy in years_to_do) {
            ignore.stderr = T )
 
 
+
+
+    cat("\n**",
+        NR_negative_daytime, "negative radiation values while sun was up**\n\n")
+
+
     ####    Yearly plots    ####################################################
 
     ##  Add time column (same date with original times)
@@ -377,7 +425,7 @@ for ( yyyy in years_to_do) {
     gather$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
 
     cat("\n\n")
-    pander(table(gather$QFlag_1))
+    cat(pander(table(gather$QFlag_1)))
     cat("\n\n")
 
 
@@ -432,7 +480,6 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
-
     par(mar = c(2,4,2,1))
     week_vec = strftime(  gather$Date , format = "%W")
     sunnupp = gather$Elevat >= 0
@@ -456,6 +503,7 @@ for ( yyyy in years_to_do) {
 
 
 }
+#'
 #+ include=T, echo=F
 
 
