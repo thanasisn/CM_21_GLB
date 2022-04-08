@@ -222,7 +222,6 @@ pander(signal_physical_limits)
 #'
 #' #### Filter negative signal when sun is up.
 #'
-#' When sun elevation `r paste(">",SUN_ELEV)` ignore CM-21 signal `r paste("<",MINsunup)`.
 #'
 #'
 #' Allowed years to do: `r input_years`
