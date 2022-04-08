@@ -270,9 +270,6 @@ for ( yyyy in years_to_do) {
                          file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",yyyy,"_bad_ranges"),
                          clean  = TRUE)
 
-    rawdata$Bad_ranges
-
-
     rawdata[ Bad_ranges != "", CM21value := NA ]
     rawdata[ Bad_ranges != "", CM21sd    := NA ]
     rawdata[ , Bad_ranges := NULL ]
@@ -367,20 +364,6 @@ for ( yyyy in years_to_do) {
     ############################################################################
 
 
-
-
-    # #    ####    Mark negative values when sun is up    #############################
-    # #    neg_sun   <- rawdata$Eleva > SUN_ELEV & rawdata$CM21value < MINsunup
-    # #    rawdata$CM21value[ neg_sun ]  <- NA
-    # #    rawdata$CM21sd[    neg_sun ]  <- NA
-    # #
-    # #    rawdata[ Elevat <= SUN_ELEV & CM21value > MINsunup ]
-    # #    hist (rawdata[ Elevat <= SUN_ELEV & CM21value < 0 , CM21value])
-    # #    rm( neg_sun )
-    # #    NR_negative_daytime <- pre_count - rawdata[ !is.na(CM21value), .N ]
-    # #    ############################################################################
-
-
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
     cat(paste0( "**",
@@ -393,8 +376,6 @@ for ( yyyy in years_to_do) {
     # #             NR_negative_daytime, "* data points\n\n" ))
     cat(paste0( "**",
                 rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n" ))
-
-
 
 
     cat('\\scriptsize\n')
