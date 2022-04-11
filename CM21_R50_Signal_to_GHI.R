@@ -288,12 +288,13 @@ for ( yyyy in years_to_do) {
     ####    Mark too  negative values when sun is up    ########################
     rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup, QFlag_2 := "NegativeGlobal"  ]
 
-    negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup  ]
+    negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0  ]
     if ( nrow(negative)>0 ){
         cat("\n\n")
         cat(paste(unique(as.Date(negative$Date))))
         cat("\n\n")
         hist(negative$CM21value, main = "Negative Global radiation in daylight")
+        abline(v = MINglbSUNup)
         cat("\n\n")
     }
     NR_negative_daytime <- nrow(negative)
@@ -318,12 +319,14 @@ for ( yyyy in years_to_do) {
 
 
     ####    Mark positive global in the night    ###############################
-    rawdata[ Elevat < -5 & wattGLB > 10, QFlag_2 := "TooHighGlobalNight"  ]
+    rawdata[ Elevat < SUN_TOO_LOW & wattGLB > ERROR_GLOBA, QFlag_2 := "TooHighGlobalNight"  ]
 
     testlow <- rawdata[ QFlag_2 == "TooHighGlobalNight" ]
     if ( nrow(testlow)>0 ) {
         cat("\n**Marked too high Global records during night:**\n\n")
         cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
+        cat("\n\n")
+        unique(as.Date(testlow$Date))
         cat("\n\n")
     }
     rm(testlow)
@@ -501,12 +504,9 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
-    # boxplot(gather[sunnupp, CM21value - CM21valueWdark  ] ~ week_vec[sunnupp],
-    #         ylab = "")
+    # boxplot(gather[sunnupp, CM21value - CM21valueWdark  ] ~ week_vec[sunnupp], ylab = "")
     # title(main = paste(yyyy, "CM21 dark offset (Elevation > 0)"))
     # cat("\n\n")
-
-
 
 }
 #'

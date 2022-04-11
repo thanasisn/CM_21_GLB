@@ -151,7 +151,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1996
+# years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -160,15 +160,10 @@ if (length(years_to_do) == 0 ) {
 
 
 
-
 #'
 #' ## CM21 export global radiation data
 #'
 #+ include=T, echo=F
-
-
-
-
 
 
 
@@ -213,6 +208,7 @@ for ( yyyy in years_to_do) {
                    N, " points droped due to ",qtag," **\n\n"))
         rawdata <- rawdata[ ! QFlag_2 == qtag | is.na(QFlag_2) ]
     }
+
 
 
 
