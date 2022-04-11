@@ -151,7 +151,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1996
+years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -165,6 +165,7 @@ if (length(years_to_do) == 0 ) {
 #'
 #' **Set global values between 0 and `r MINglbSUNup` when sun is above `r SUN_ELEV`, to zero**
 #'
+#' **Drop night time data, when  Elevation < `r NIGHT_DROP`**
 #'
 #'
 #+ include=T, echo=F
@@ -213,96 +214,90 @@ for ( yyyy in years_to_do) {
     }
 
 
+    ####    Set near zero to zero    ###########################################
+    N <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup, .N ]
+    cat(paste0("\n\n**",
+               N, " points with global near zero set to zero**\n\n"))
+    rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup,
+             wattGLB := 0 ]
 
 
-stop()
-
-
-    rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup ]
-
-
+    ####    Drop night data    #################################################
+    rawdata <- rawdata[ Elevat >= NIGHT_DROP ]
+    rawdata <- rawdata[ ! is.na(wattGLB) ]
 
 
 
 
 
-#
-#     ##  Get only days with valid data to loop
-#     daystodo <- rawdata[ , .(N = sum(!is.na(CM21value))), by = .(Days <- as.Date(Date)) ]
-#     daystodo <- daystodo[ N > 0, Days ]
-#
-#     for (aday in sort(daystodo)) {
-#
-#         theday      <- as.Date( aday, origin = "1970-01-01")
-#         test        <- format( theday, format = "%d%m%y06" )
-#         daymimutes  <- data.frame(
-#             Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
-#                         as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
-#         )
-#         daydata     <- rawdata[ as.Date(Date) == as.Date(theday) ]
-#         daydata     <- merge(daydata, daymimutes, all = T)
-#         pbcount     <- pbcount + 1
-#
-#         ## break morning-evening
-#         maxElev         <- max( daydata$Elevat, na.rm = T)
-#         day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
-#         daydata$preNoon <- daydata$Date <= day_noon
-#
-#         ## gather all data for storage!!
-#         gather          <- rbind(gather, daydata)
-#
-#
-#         ####    Normal plots    ################################################
-#         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-#             ## fix plot range
-#             daydata$withdark <- daydata$CM21value * daydata$CM21CF
-#             dddd <- min(daydata$wattGLB,
-#                         daydata$wattGLB_SD,
-#                         daydata$withdark , na.rm = TRUE)
-#             uuuu <- max(daydata$wattGLB,
-#                         daydata$wattGLB_SD,
-#                         daydata$withdark , na.rm = TRUE)
-#             if (dddd > -5  ) { dddd = 0  }
-#             if (uuuu < 190 ) { uuuu = 200}
-#             ylim = c(dddd , uuuu)
-#
-#             plot(daydata$Date, daydata$withdark,
-#                  "l", xlab = "UTC", ylab = expression(W / m^2),
-#                  col  = "darkgreen", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
-#
-#             lines(daydata$Date, daydata$wattGLB, col = "green", lwd = 2)
-#
-#             abline(h = 0, col = "gray60")
-#             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
-#                    col = "lightgray", lty = "dotted", lwd = par("lwd"))
-#             points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
-#             title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
-#             text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.8 )
-#
-#             legend("topright", bty = "n",
-#                    legend = c("Global Irradiance no dark corr.",
-#                               "Global Irradiance with dark cor.",
-#                               "Standard Deviation"),
-#                    lty = c(1,1,NA), pch = c(NA,NA,"."),
-#                    col = c("darkgreen", "green", "red"), cex = 0.8,)
-#
-#         dev.off()
-#
-#     }##END loop of days
-#
-#
-#     ####    Save data for this year    #########################################
-#
-#     write_RDS(object = rawdata,
-#               file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L1_", yyyy, ".Rds"))
-#
-#
-#     ## create pdf with all daily plots
-#     system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
-#                   paste0(DAILYgrDIR,"Daily_GHI_L1_",yyyy,".pdf")),
-#            ignore.stderr = T )
-#
+    ##  Plot only days with valid data to loop
+    daystodo <- rawdata[ , .(N = sum(!is.na(wattGLB))), by = .(Days <- as.Date(Date)) ]
+    daystodo <- daystodo[ N > 0, Days ]
 
+    for (aday in sort(daystodo)) {
+
+        theday      <- as.Date( aday, origin = "1970-01-01")
+        test        <- format( theday, format = "%d%m%y06" )
+        daymimutes  <- data.frame(
+            Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
+                        as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
+        )
+        daydata     <- rawdata[ as.Date(Date) == as.Date(theday) ]
+        daydata     <- merge(daydata, daymimutes, all = T)
+        pbcount     <- pbcount + 1
+
+
+
+        ####    Normal plots    ################################################
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+            # fix plot range
+            daydata$withdark <- daydata$CM21value * daydata$CM21CF
+            dddd <- min(daydata$wattGLB,
+                        daydata$wattGLB_SD,
+                        daydata$withdark , na.rm = TRUE)
+            uuuu <- max(daydata$wattGLB,
+                        daydata$wattGLB_SD,
+                        daydata$withdark , na.rm = TRUE)
+            if (dddd > -5  ) { dddd = 0  }
+            if (uuuu < 190 ) { uuuu = 200}
+            ylim = c(dddd , uuuu)
+
+            plot(daydata$Date, daydata$withdark,
+                 "l", xlab = "UTC", ylab = expression(W / m^2),
+                 col  = "darkgreen", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
+
+            lines(daydata$Date, daydata$wattGLB, col = "green", lwd = 2)
+
+            abline(h = 0, col = "gray60")
+            abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
+                   col = "lightgray", lty = "dotted", lwd = par("lwd"))
+            points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
+            title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.8 )
+
+            legend("topright", bty = "n",
+                   legend = c("Global Irradiance no dark corr.",
+                              "Global Irradiance with dark cor.",
+                              "Standard Deviation"),
+                   lty = c(1,1,NA), pch = c(NA,NA,"."),
+                   col = c("darkgreen", "green", "red"), cex = 0.8,)
+
+        dev.off()
+
+    }##END loop of days
+
+
+    ####    Save data for this year    #########################################
+    rawdata[ , QFlag_1 := NULL ]
+    rawdata[ , QFlag_2 := NULL ]
+    write_RDS(object = rawdata,
+              file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L1_", yyyy, ".Rds"))
+
+
+    ## create pdf with all daily plots
+    system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
+                  paste0(DAILYgrDIR,"Daily_GHI_L1_",yyyy,".pdf")),
+           ignore.stderr = T )
 
 
 
@@ -310,8 +305,7 @@ stop()
 
     ##  Add time column (same date with original times)
     dummytimes     <-  strftime(   rawdata$Date, format = "%H:%M:%S")
-    rawdata$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
-
+    rawdata$Times  <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
 
 
     par(mar = c(2,4,2,1))
@@ -385,18 +379,9 @@ stop()
     # title(main = paste(yyyy, "CM21 dark offset (Elevation > 0)"))
     # cat("\n\n")
 
-
-
 }
 #'
 #+ include=T, echo=F
-
-
-##TODO
-## drop data at next level
-## copy filters from here and Aerosols for level 1
-
-
 
 
 #' **END**
