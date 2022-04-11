@@ -163,6 +163,10 @@ if (length(years_to_do) == 0 ) {
 #'
 #' ## CM21 export global radiation data
 #'
+#' **Set global values between 0 and `r MINglbSUNup` when sun is above `r SUN_ELEV`, to zero**
+#'
+#'
+#'
 #+ include=T, echo=F
 
 
@@ -189,7 +193,6 @@ for ( yyyy in years_to_do) {
 
 
     ####    Drop flagged records    ############################################
-
     for ( qtag  in unique(rawdata$QFlag_1[!is.na(rawdata$QFlag_1)])) {
         N <- rawdata[ QFlag_1 == qtag, .N ]
         # unique(rawdata[ QFlag_1 == qtag, as.Date(Date) ])
@@ -212,7 +215,10 @@ for ( yyyy in years_to_do) {
 
 
 
-    rawdata[ Elevat >= SUN_ELEV & wattGLB < 0  ]
+stop()
+
+
+    rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup ]
 
 
 

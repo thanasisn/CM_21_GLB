@@ -170,6 +170,7 @@ if (length(years_to_do) == 0 ) {
 #'
 #' ## CM21 conversion factor calculation
 #'
+#'
 #+ include=T, echo=F
 
 pander(calibration_data, caption = "CM21 calibrations")
@@ -227,15 +228,15 @@ cat("\n\n")
 
 
 #'
-#' ### Check for negative global when sun is up
+#' ### Mark negative global when sun is up
 #'
 #' When elevation is above `r SUN_ELEV` mark
 #' Global radiation less than `r MINglbSUNup`
-
+#'
 
 
 #'
-#' ### Check for minimum Global irradiance.
+#' ### Mark minimum Global irradiance.
 #'
 #' Reject data when GHI is below an acceptable limit.
 #'
@@ -245,7 +246,17 @@ cat("\n\n")
 #'
 #' This is due to changes in instrumentation.
 #'
+#'
+#' ### Mark positive radiation when sun is down
+#'
+#' when elevation is below `r SUN_TOO_LOW`
+#' mark Global greater than `r ERROR_GLOBA`.
+#'
+#'
 #+ include=T, echo=F
+
+
+
 
 
 
