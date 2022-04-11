@@ -67,8 +67,9 @@ MAXLIMnight <- +15         ## Higher radiation limit when dark       (R20) -> To
 SUN_ELEV    <- +0         ## When sun is above that           (R50)
 MINglbSUNup <- -0.3       ## Exclude signal values below that (R50) above that will set to zero
 
-
-
+####    Positive radiation when sun is down   ##################################
+SUN_TOO_LOW <- -5         ## When sun is down  (R50)
+ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
 
 
@@ -76,8 +77,8 @@ MINglbSUNup <- -0.3       ## Exclude signal values below that (R50) above that w
 ####    Process Range Control    ###############################################
 
 ## Date range to read raw data
-START_DAY   <- as.POSIXct("1993-01-01 00:00:00 UTC")
-END_DAY     <- as.POSIXct("2022-01-01 00:00:00 UTC")
+START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
+END_DAY        <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
 EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
