@@ -22,17 +22,23 @@ REPORT_DIR = "~/CM_21_GLB/REPORTS/"
 TOT_EXPORT = "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 DAILYgrDIR = "~/CM_21_GLB/REPORTS/DAILY/"
 
-####  Parametric files ####
-BAD_RANGES = "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
 
-DARKFILE  = paste0(dirname(GLOBAL_DIR), "/Dark_functions.Rdata")
+####    Parametric files    ####################################################
 
-DARKSTORE <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_data_S0.Rds")
-DARKCONST <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_construction_S0.Rds")
+## Date ranges to exclude, after manual inspection
+BAD_RANGES  <- "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
+## Storage of dark signal details for all days
+DARKSTORE   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_data_S0.Rds")
+## Dark signal details constructed for uncomputable days
+DARKCONST   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_construction_S0.Rds")
+
+## Logging of missing lap input files
+MISSING_INP <- paste0(BASED,"/LOGs/Missing_lap_files.dat")
 
 
-####  Log files  ####
-MISSING_INP = paste0(BASED,"/LOGS/missing_input.dat")
+
+
+
 
 ####  Filtering Variables  ####
 
@@ -45,18 +51,32 @@ GLB_LOW_LIM_01   = -15      ## before break-date
 GLB_LOW_LIM_02   = -7       ## after break-data
 
 
-## Dark Calculations
-DARK_ELEV     = -10         ## sun elevation limit
-DSTRETCH      =  20 * 3600  ## time duration of dark signal for morning and evening of the same day
-DCOUNTLIM     =  10         ## if dark signal has fewer valid measurements than these ignore it
 
 
 
-####  Process Control  ####
 
-## date range to process
+####   Dark Calculations and definitions    ####################################
+DSTRETCH    <-  20 * 3600  ## Extend of dark signal for morning and evening of the same day (R30)
+DCOUNTLIM   <-  10         ## Number of valid measurements to compute dark (R30)
+DARK_ELEV   <- -10         ## Sun elevation limit to get dark signal (R20, R30)
+MINLIMnight <- -15         ## Lower radiation limit  when dark       (R20) -> ToolowDark
+MAXLIMnight <- +15         ## Higher radiation limit when dark       (R20) -> ToohigDark
+
+
+####    Negative radiation when sun is up   ####################################
+SUN_ELEV    <- +0         ## When sun is above that           (R50)
+MINglbSUNup <- -0.3       ## Exclude signal values below that (R50) above that will set to zero
+
+
+
+
+
+
+
+####    Process Range Control    ###############################################
+
+## Date range to read raw data
 START_DAY   <- as.POSIXct("1993-01-01 00:00:00 UTC")
-# START_DAY   <- as.POSIXct("2006-01-01 00:00:00 UTC")
 END_DAY     <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
@@ -64,23 +84,4 @@ EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
 EXPORT_STOP  <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 
-
-#### Signal to L0 variables  #####
-
-## mark all data
-MINsgLIM      = -0.06      ## Lower signal limit (CF~3344.482  0.03V~100watt)
-MAXsgLIM      = +0.5       ## Higher signal limit (from hardware limitations)
-
-## mark when dark (sun below DARK_ELEV )
-DARK_ELEV     = -10        ## sun elevation limit
-MINsgLIMnight = -0.02      ## Lower signal limit when dark
-MAXsgLIMnight = +0.10      ## Higher signal limit when dark
-
-MINLIMnight   = -15        ## Lower radiation limit  when dark
-MAXLIMnight   = +15        ## Higher radiation limit when dark
-
-
-## mark limit
-SUN_ELEV      = +0         ## When sun is above that
-MINglbSUNup   =  0         ## Exclude signal values below that
 

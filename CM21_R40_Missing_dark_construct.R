@@ -28,7 +28,6 @@
 #'     toc:              yes
 #'     fig_width:        6
 #'     fig_height:       4
-#'     urlcolor:         blue
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -45,6 +44,7 @@
 #' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #+ echo=F, include=T
+
 
 ####_  Document options _####
 
@@ -68,7 +68,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 

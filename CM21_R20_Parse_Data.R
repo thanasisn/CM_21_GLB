@@ -78,7 +78,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 

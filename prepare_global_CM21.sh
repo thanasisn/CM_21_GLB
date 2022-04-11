@@ -30,12 +30,11 @@ Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
 info "Construct missing dark for S1"
 Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R"
 
-info "Convert S1 to L1 GHI"
+info "Convert S1 to L0 GHI"
 Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
 
-
-
-
+info "Clean output L0 to L1 GHI"
+Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
 
 
 
