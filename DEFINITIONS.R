@@ -70,6 +70,8 @@ MINglbSUNup <- -0.3       ## Exclude signal values below that (R50) above that w
 SUN_TOO_LOW <- -5         ## When sun is down  (R50)
 ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
+####    Drop night time data    ################################################
+NIGHT_DROP  <- -5         ## Drop when sun is below that (R60)
 
 
 
@@ -77,7 +79,7 @@ ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
 ## Date range to read raw data
 START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
-END_DAY        <- as.POSIXct("2022-01-01 00:00:00 UTC")
+END_DAY      <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 ## date range to export for TOT and WRDC
 EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")

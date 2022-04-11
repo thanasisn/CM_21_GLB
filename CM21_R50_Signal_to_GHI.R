@@ -231,7 +231,8 @@ cat("\n\n")
 #' ### Mark negative global when sun is up
 #'
 #' When elevation is above `r SUN_ELEV` mark
-#' Global radiation less than `r MINglbSUNup`
+#' Global radiation less than `r MINglbSUNup`.
+#' These values are considered to be erronious records.
 #'
 
 
@@ -244,7 +245,7 @@ cat("\n\n")
 #'
 #' **after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.**
 #'
-#' This is due to changes in instrumentation.
+#' This is due to changes in instrumentation. This filter may is superseded by another.
 #'
 #'
 #' ### Mark positive radiation when sun is down
