@@ -28,7 +28,6 @@
 #'     toc:              yes
 #'     fig_width:        8
 #'     fig_height:       5
-#'     urlcolor:         blue
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
@@ -57,6 +56,7 @@
 #'
 #+ echo=F, include=T
 
+
 ####_  Document options _####
 
 #+ echo=F, include=F
@@ -79,7 +79,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 

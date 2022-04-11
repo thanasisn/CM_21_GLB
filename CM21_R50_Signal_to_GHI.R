@@ -69,8 +69,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 
-
-
 #+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
@@ -81,7 +79,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -287,7 +285,7 @@ for ( yyyy in years_to_do) {
     ####  Mark some bad cases
     rawdata[, QFlag_2 := as.factor(NA)]
 
-    ####    Mark negative values when sun is up    #############################
+    ####    Mark too  negative values when sun is up    ########################
     rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup, QFlag_2 := "NegativeGlobal"  ]
 
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup  ]
@@ -403,11 +401,11 @@ for ( yyyy in years_to_do) {
 
     }##END loop of days
 
-
     ####    Save data for this year    #########################################
-    gather$CM21CF    <- NA
-    gather$CM21value <- NA
-    gather$CM21sd    <- NA
+    gather$CM21CF         <- NULL
+    gather$CM21value      <- NULL
+    gather$CM21sd         <- NULL
+    gather$CM21valueWdark <- NULL
     write_RDS(object = gather,
               file   = paste0(GLOBAL_DIR,"/LAP_CM21_H_L0_", yyyy, ".Rds"))
 

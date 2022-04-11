@@ -77,7 +77,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(sub("\\.R$",".lock", Script.Name), timeout = 0)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -110,7 +110,7 @@ STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily 
 
 
 ## PATHS
-missfiles  <- paste0(BASED, "LOGS/", basename(Script.Name),"_missingfilelist.dat" )
+missfiles  <- paste0(BASED, "LOGs/", basename(Script.Name),"_missingfilelist.dat" )
 tmpfolder  <- paste0("/dev/shm/", sub(pattern = "\\..*", "" , basename(Script.Name)))
 dailyplots <- paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Script.Name)), "_daily.pdf")
 daylystat  <- paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "", basename(Script.Name)), "_stats")

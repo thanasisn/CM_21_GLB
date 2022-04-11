@@ -54,14 +54,18 @@ render("./CM21_R50_Signal_to_GHI.R",
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
+
+render("./CM21_R60_GHI_output.R",
+       params = list(  ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+
+
+
 stop()
 
 
 
-render("./CM21_P50_GHI_dark_correction.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./CM21_P60_GHI_Export_WRDC.R",
        params = list( CACHE = F ),
