@@ -151,7 +151,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1996
+# years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -165,7 +165,7 @@ if (length(years_to_do) == 0 ) {
 #'
 #' **Set global values between 0 and `r MINglbSUNup` when sun is above `r SUN_ELEV`, to zero**
 #'
-#' **Drop night time data, when  Elevation < `r NIGHT_DROP`**
+#' **Drop nighttime data, when  Elevation < `r NIGHT_DROP`**
 #'
 #'
 #+ include=T, echo=F
@@ -187,7 +187,7 @@ for ( yyyy in years_to_do) {
 
 
 
-    ## create a new temp dir for each years plots
+    ## create a new temp dir for each year plots
     unlink(tmpfolder, recursive = TRUE)
     dir.create(tmpfolder)
     pbcount  <- 0
@@ -262,12 +262,12 @@ for ( yyyy in years_to_do) {
             abline(h = 0, col = "gray60")
 
             lines(daydata$Date, daydata$wattGLB,
-                 col  = "green", lwd = 1.1, lty = 1,  )
+                 col  = "green", lwd = 1.1, lty = 1 )
 
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
                    col = "lightgray", lty = "dotted", lwd = par("lwd"))
             points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
-            title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
+            title( main = paste(test, format(daydata$Date[1], format = "  %F")))
             text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.8 )
 
             legend("topright", bty = "n",

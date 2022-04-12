@@ -234,7 +234,7 @@ for ( YYYY in years_to_do ) {
                          length.out = 1440,
                          by         = "min" )
 
-        #### . . Read LAP file  ####
+        ####    Read LAP file    ####
         lap <- fread( sirena_files[found], na.strings = "-9" )
         stopifnot( dim(lap)[1] == 1440 )
 

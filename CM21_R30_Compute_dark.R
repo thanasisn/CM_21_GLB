@@ -168,7 +168,7 @@ if (file.exists(DARKSTORE)) {
 } else {
     darkDT <- data.table()
 }
-## Read pre prepared dark
+## Read preprepared dark
 if (file.exists(DARKCONST)) {
     construct <- readRDS(DARKCONST)
     construct <- construct[!is.na(DARK)]
