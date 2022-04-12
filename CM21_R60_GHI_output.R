@@ -151,7 +151,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-years_to_do <- 1996
+# years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -244,22 +244,26 @@ for ( yyyy in years_to_do) {
 
 
         ####    Normal plots    ################################################
-        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             # fix plot range
             dddd <- min(daydata$wattGLB,
                         daydata$wattGLB_SD, na.rm = TRUE)
             uuuu <- max(daydata$wattGLB,
                         daydata$wattGLB_SD, na.rm = TRUE)
+            xlim <- range(daydata$Date)
             if (dddd > -5  ) { dddd = 0  }
             if (uuuu < 190 ) { uuuu = 200}
             ylim = c(dddd , uuuu)
 
-            plot(daydata$Date, daydata$wattGLB,
-                 "l", xlab = "UTC", ylab = expression(W / m^2),
-                 col  = "green", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
 
-
+            plot(1, type = "n",                         # Remove all elements of plot
+                 xlab = "UTC", ylab = expression(W / m^2),
+                 xaxt = "n", ylim = ylim, xlim = xlim, xaxs = "i")
             abline(h = 0, col = "gray60")
+
+            lines(daydata$Date, daydata$wattGLB,
+                 col  = "green", lwd = 1.1, lty = 1,  )
+
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
                    col = "lightgray", lty = "dotted", lwd = par("lwd"))
             points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
@@ -267,13 +271,11 @@ for ( yyyy in years_to_do) {
             text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.8 )
 
             legend("topright", bty = "n",
-                   legend = c("Global Irradiance no dark corr.",
-                              "Global Irradiance with dark cor.",
+                   legend = c("Global Irradiance with dark cor.",
                               "Standard Deviation"),
-                   lty = c(1,1,NA), pch = c(NA,NA,"."),
-                   col = c("darkgreen", "green", "red"), cex = 0.8,)
-stop()
-        # dev.off()
+                   lty = c(1,NA), pch = c(NA,"."),
+                   col = c("green", "red"), cex = 0.8,)
+        dev.off()
 
     }##END loop of days
 
