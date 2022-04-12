@@ -3,12 +3,13 @@
 #' ---
 #' title: "CM21 export GHI data for Sirena."
 #' author: "Natsis Athanasios"
-#' date: "`r format(Sys.time(), '%B %d, %Y')`"
-#' keywords: "CM21, CM21 data validation, global irradiance"
 #' documentclass: article
 #' classoption:   a4paper,oneside
-#' fontsize:      11pt
+#' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' link-citations:  yes
+#' colorlinks:      yes
 #'
 #' header-includes:
 #' - \usepackage{caption}
@@ -24,11 +25,15 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:        7
+#'     fig_height:       4.5
 #'   html_document:
-#'     keep_md:          yes
-#'   odt_document:  default
-#'   word_document: default
-#'
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#' date: "`r format(Sys.time(), '%F')`"
+#' params:
+#'    ALL_YEARS: TRUE
 #' ---
 
 #+ echo=F, include=T
@@ -36,52 +41,52 @@
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE   )
-knitr::opts_chunk$set(cache      = FALSE   )
-# knitr::opts_chunk$set(include    = FALSE   )
-knitr::opts_chunk$set(include    = TRUE    )
+#+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
 
-# pdf output is huge too many point to plot
 # knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"   )
-
-knitr::opts_chunk$set(fig.width  = 8       )
-knitr::opts_chunk$set(fig.height = 6       )
-
-knitr::opts_chunk$set(out.width  = "70%"    )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'     )
+# knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
-####_ Notes _####
 
 
+#+ include=F, echo=F
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name <- funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
-
-#+ echo=F, include=F
-library(data.table, quietly = T)
-library(pander,     quietly = T)
-setwd("~/CM_21_GLB/")
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
+                            return("CM21_R60_") })
+if(!interactive()) {
+    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+}
 
 
-####  . Variables  ####
+
+#+ echo=F, include=T
+####  External code  ####
+library(data.table, quietly = T, warn.conflicts = F)
+library(pander,     quietly = T, warn.conflicts = F)
+source("~/CM_21_GLB/Functions_write_data.R")
+
+
+
+####  Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 
-tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-
+## compute SZA as other broadband
 zenangle <- function(YYYY,min,doy){
-    as.numeric(system(paste("./BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ), intern = T))
+    as.numeric(system(paste("~/CM_21_GLB/BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ), intern = T))
 }
 vzen <- Vectorize(zenangle, "min")
 
@@ -92,7 +97,7 @@ yearstodo   <- seq( year(EXPORT_START), year(EXPORT_STOP) )
 
 ## . get data input files ####
 input_files <- list.files( path       = GLOBAL_DIR,
-                           pattern    = "LAP_CM21H_GHI_[0-9]{4}_L2.Rds",
+                           pattern    = "LAP_CM21_H_L1_[0-9]{4}.Rds",
                            full.names = T )
 input_files <- sort(input_files)
 
@@ -104,7 +109,6 @@ input_files <- input_files[
         )
     )]
 stopifnot(length(input_files) == length(yearstodo))
-
 
 
 #'
@@ -132,13 +136,14 @@ for (afile in input_files) {
 
     #### Get raw data ####
     ayear        <- readRDS(afile)
-    NR_loaded    <- ayear[ !is.na(CM21value), .N ]
+    NR_loaded    <- ayear[ !is.na(wattGLB), .N ]
     yyyy         <- year(ayear$Date[1])
 
     cat('\\normalsize\n')
 
-    cat(paste("\\newpage\n\n"))
-    cat(paste("## ",yyyy,"\n\n"))
+    cat("\n\n\\FloatBarrier\n\n")
+    cat("\\newpage\n\n")
+    cat("\n## Year:", yyyy, "\n\n" )
 
     cat('\\begin{multicols}{3}')
     cat('\\scriptsize\n')
@@ -168,13 +173,12 @@ for (afile in input_files) {
 
 
     ## don't allow negative values at the output
-    ayear$Global[ ayear$Global < 0 ]    <- 0L
-    ayear$GLstd[  ayear$Global < 0 ]    <- NA
+    ayear$wattGLB[    ayear$wattGLB < 0 ]    <- 0L
+    ayear$wattGLB_SD[ ayear$wattGLB < 0 ]    <- NA
 
     ## convert NA to -9
-    ayear$Global[ is.na(ayear$Global) ] <- -9L
-    ayear$GLstd[  is.na(ayear$GLstd ) ] <- -9L
-
+    ayear$wattGLB[   is.na(ayear$wattGLB)    ] <- -9L
+    ayear$wattGLB_SD[is.na(ayear$wattGLB_SD) ] <- -9L
 
     alldays <- sort(unique(ayear$day))
 
@@ -183,8 +187,8 @@ for (afile in input_files) {
     dir.create( outputdir, showWarnings = F )
 
     ## plot the whole year before output
-    plot(ayear$Date, ayear$Global, main = paste(yyyy, "GLOBAL"))
-    plot(ayear$Date, ayear$GLstd,, main = paste(yyyy, "Global SD")  )
+    plot(ayear$Date, ayear$wattGLB,    main = paste(yyyy, "GLOBAL"))
+    plot(ayear$Date, ayear$wattGLB_SD, main = paste(yyyy, "Global SD"))
 
 
     ## export each day
@@ -202,17 +206,14 @@ for (afile in input_files) {
         filename <- paste0(outputdir, strftime(dateD, format = "TOT%3j%y.DAT"))
 
         ## may skip output if day has no global data
-        if (all(aday$Global == -9)) {
+        if (all(aday$wattGLB == -9)) {
             cat("\\textbf{",paste0(dateD,": NO GHI DATA}\\\\\n"))
             # cat(paste(dateD,"\n"), file = missingday, append = T )
             next()
         }
 
-
-        ## Calculate another SZA for the output
-        ## FIXME should use other algorithm for sza to be consistent with other instruments.
+        ## my definition of sza
         SZA     <- -(aday$Eleva - 90)
-
 
         if (any(is.na(SZA))) {
             stop("SZA should be always defined for TOT output files (", dateD,") \nHave to correct this!!")
@@ -224,6 +225,10 @@ for (afile in input_files) {
 
         ## calculate zenith angles
         lapzen <- vzen(yyyy,1:1440,doy)
+        if (any(is.na(lapzen))) {
+            stop("SZA should be always defined for TOT output files (", dateD,") \nHave to correct this!!")
+        }
+
 
         # plot(SZA)
         # plot(lapzen)
@@ -231,17 +236,17 @@ for (afile in input_files) {
 
         ## data to export
         output <- data.frame( TIME_UT = TIME_UT,
-                              # SZA     = SZA,
-                              SZA     = lapzen,
-                              Wm2     = round(aday$Global, digits = 3),
-                              st.dev  = round(aday$GLstd,  digits = 3) )
+                              # SZA     = SZA,   ## my sza calculation pysolar
+                              SZA     = lapzen,  ## sza similar to other broadband
+                              Wm2     = round(aday$wattGLB,    digits = 3),
+                              st.dev  = round(aday$wattGLB_SD, digits = 3) )
 
 
         ## custom header of the daily file
         cat(" TIME_UT    SZA    [W.m-2]   st.dev",
             file = filename,
             eol  = "\r\n")
-        ## write formated data to file
+        ## write formatted data to file
         write.table(format( output,
                             digits    = 3,
                             width     = 8,
@@ -254,7 +259,6 @@ for (afile in input_files) {
                     col.names = FALSE,
                     row.names = FALSE,
                     eol = "\r\n")
-
 
         # cat(paste("Written: ", basename(filename), "\r"))
         cat(paste0(dateD, ": ", basename(filename), " \\\\\n"))
