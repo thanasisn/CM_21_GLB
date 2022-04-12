@@ -1,15 +1,18 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
-#'
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title: "CM21 export GHI data for WRDC."
-#' author: "Natsis Athanasios"
-#' date: "`r format(Sys.time(), '%B %d, %Y')`"
-#' keywords: "CM21, CM21 data validation, global irradiance"
+#' title:         "Global from CM21. **L0 -> L1**"
+#' author:        "Natsis Athanasios"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
+#' abstract:      "Read signal and dark correction and convert to global radiation."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      11pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' link-citations:  yes
+#' colorlinks:      yes
 #'
 #' header-includes:
 #' - \usepackage{caption}
@@ -23,61 +26,77 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:        7
+#'     fig_height:       4.5
 #'   html_document:
-#'     keep_md:          yes
-#'   odt_document:  default
-#'   word_document: default
-#'
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#' date: "`r format(Sys.time(), '%F')`"
+#' params:
+#'    ALL_YEARS: TRUE
 #' ---
 
+#'
+#' **L1 -> WRDC**
+#'
+#'
+#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#'
+#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+#'
+#'
+#' - Drop marked data
+#'
 #+ echo=F, include=T
 
 
 ####_  Document options _####
 
-knitr::opts_chunk$set(echo       = FALSE   )
-knitr::opts_chunk$set(cache      = FALSE   )
-# knitr::opts_chunk$set(include    = FALSE   )
-knitr::opts_chunk$set(include    = TRUE    )
+#+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
 
-# pdf output is huge too many point to plot
 # knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"   )
-
-knitr::opts_chunk$set(fig.width  = 8       )
-knitr::opts_chunk$set(fig.height = 6       )
-
-knitr::opts_chunk$set(out.width  = "70%"    )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'     )
-
-
-####_ Notes _####
+# knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 
-
+#+ include=F, echo=F
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name <- funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
+tic <- Sys.time()
+Script.Name <- tryCatch({ funr::sys.script() },
+                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
+                            return("CM21_R60_") })
+if(!interactive()) {
+    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+}
 
 
-#+ echo=F, include=F
-library(data.table, quietly = T)
-library(pander,     quietly = T)
-#'
+## FIXME this is for pdf output
+# options(warn=-1) ## hide warnings
+# options(warn=2)  ## stop on warnings
 
-####  . Variables  ####
+
+#+ echo=F, include=T
+####  External code  ####
+library(data.table, quietly = T, warn.conflicts = F)
+library(pander,     quietly = T, warn.conflicts = F)
+source("~/CM_21_GLB/Functions_write_data.R")
+
+
+
+####  Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
+panderOptions('table.alignment.default', 'right')
+panderOptions('table.split.table',        120   )
 
-tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
 
@@ -92,18 +111,13 @@ yearstodo   <- seq( year(EXPORT_START), year(EXPORT_STOP) )
 
 ## . get data input files ####
 input_files <- list.files( path       = GLOBAL_DIR,
-                           pattern    = "LAP_CM21H_GHI_[0-9]{4}_L2.Rds",
+                           pattern    = "LAP_CM21_H_L1_[0-9]{4}.Rds",
                            full.names = T )
-input_files <- sort(input_files)
+input_years <- as.numeric(
+    sub(".rds", "",
+        sub(".*_L1_","",
+            basename(input_files),),ignore.case = T))
 
-## keep only input for desired output
-input_files <- input_files[
-    as.logical(
-        rowSums(
-            sapply(yearstodo, function(x) grepl(as.character(x), input_files ))
-        )
-    )]
-stopifnot(length(input_files) == length(yearstodo))
 
 
 
@@ -129,12 +143,15 @@ for (afile in input_files) {
 
     #### Get raw data ####
     ayear        <- readRDS(afile)
-    NR_loaded    <- ayear[ !is.na(CM21value), .N ]
+    NR_loaded    <- ayear[ !is.na(wattGLB), .N ]
 
     yyyy         <- year(ayear$Date[1])
 
-    cat(paste("\\newpage\n\n"))
-    cat(paste("## ",yyyy,"\n\n"))
+
+    cat("\n\n\\FloatBarrier\n\n")
+    cat("\\newpage\n\n")
+    cat("\n## Year:", yyyy, "\n\n" )
+
 
     ## create all minutes
     allminutes <- seq( as.POSIXct( paste0(yyyy, "-01-01 00:00:30") ),
@@ -152,23 +169,23 @@ for (afile in input_files) {
 
     #### run on all quarter of the hour #####################################
     ayear$quarter <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
-    qposic        <- as.POSIXct( ayear$quarter * (3600/4), origin = "1970-01-01" )
+    qposic        <- as.POSIXct(   ayear$quarter * (3600/4), origin = "1970-01-01" )
 
     # qDates     = aggregate(ayear$Date30, by = list(qposic), FUN = min)
 
     selectqua  <- list(ayear$quarter)
 
-    qDates     <- aggregate(ayear$Date,   by = selectqua, FUN = min)
+    qDates     <- aggregate(ayear$Date,       by = selectqua, FUN = min)
 
-    qGlobal    <- aggregate(ayear$Global, by = selectqua, FUN = mean, na.rm = TRUE )
-    qGlobalCNT <- aggregate(ayear$Global, by = selectqua, FUN = function(x) sum(!is.na(x)) )
-    qGlobalSTD <- aggregate(ayear$Global, by = selectqua, FUN = sd,   na.rm = TRUE )
+    qGlobal    <- aggregate(ayear$wattGLB,    by = selectqua, FUN = mean, na.rm = TRUE )
+    qGlobalCNT <- aggregate(ayear$wattGLB,    by = selectqua, FUN = function(x) sum(!is.na(x)) )
+    qGlobalSTD <- aggregate(ayear$wattGLB,    by = selectqua, FUN = sd,   na.rm = TRUE )
 
-    qElevaMEAN <- aggregate(ayear$Eleva,  by = selectqua, FUN = mean, na.rm = TRUE )
+    qElevaMEAN <- aggregate(ayear$Eleva,      by = selectqua, FUN = mean, na.rm = TRUE )
 
-    qGLstd     <- aggregate(ayear$GLstd,  by = selectqua, FUN = mean, na.rm = TRUE )
-    qGLstdCNT  <- aggregate(ayear$GLstd,  by = selectqua, FUN = function(x) sum(!is.na(x)) )
-    qGLstdSTD  <- aggregate(ayear$Global, by = selectqua, FUN = sd,   na.rm = TRUE )
+    qGLstd     <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = mean, na.rm = TRUE )
+    qGLstdCNT  <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = function(x) sum(!is.na(x)) )
+    qGLstdSTD  <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = sd,   na.rm = TRUE )
 
     #### output of quarterly data #######################################
     ayearquarter <- data.frame( Dates      = qDates$x,
@@ -179,13 +196,6 @@ for (afile in input_files) {
                                 qGLstd     = qGLstd$x,
                                 qGLstdCNT  = qGLstdCNT$x,
                                 qGLstdSTD  = qGLstdSTD$x)
-
-
-
-    ## TODO do we need them?
-    capture.output(
-        RAerosols::write_RDS( ayearquarter, paste0(EXPORT_DIR, sub("_L2","_QRT",basename(afile))) ),
-        file = "/dev/null")
 
 
     #### run on 4 quarters of every hour ################################
@@ -203,7 +213,7 @@ for (afile in input_files) {
     ## check we don't want gaps in days
     alloutput <- data.frame( Dates  = hDates$x - 30,
                              Global = hGlobal$x  )
-    allhours  <- data.frame( Dates = allhours - 30 )
+    allhours  <- data.frame( Dates  = allhours - 30 )
     stopifnot( dim(alloutput)[1] == dim(allhours)[1] )
 
     ## output for all hours of the year
@@ -227,7 +237,7 @@ for (afile in input_files) {
                                 time   = hour(  test$Dates ) + 0.5,
                                 global = test$Global)
 
-    wrdcfile = paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
+    wrdcfile <- paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
 
     ## add headers
     cat("#Thessaloníki global radiation\r\n" ,
