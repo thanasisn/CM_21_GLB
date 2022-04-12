@@ -151,7 +151,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1996
+years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -177,7 +177,7 @@ if (length(years_to_do) == 0 ) {
 #+ include=TRUE, echo=F, results="asis"
 for ( yyyy in years_to_do) {
 
-    cat("\n\\FloatBarrier\n\n")
+    cat("\n\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
 
@@ -227,15 +227,11 @@ for ( yyyy in years_to_do) {
     rawdata <- rawdata[ ! is.na(wattGLB) ]
 
 
-
-
-
-    ##  Plot only days with valid data to loop
+    ####    Plot daily    ######################################################
     daystodo <- rawdata[ , .(N = sum(!is.na(wattGLB))), by = .(Days <- as.Date(Date)) ]
     daystodo <- daystodo[ N > 0, Days ]
 
     for (aday in sort(daystodo)) {
-
         theday      <- as.Date( aday, origin = "1970-01-01")
         test        <- format( theday, format = "%d%m%y06" )
         daymimutes  <- data.frame(
@@ -247,26 +243,21 @@ for ( yyyy in years_to_do) {
         pbcount     <- pbcount + 1
 
 
-
         ####    Normal plots    ################################################
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+        # pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
             # fix plot range
-            daydata$withdark <- daydata$CM21value * daydata$CM21CF
             dddd <- min(daydata$wattGLB,
-                        daydata$wattGLB_SD,
-                        daydata$withdark , na.rm = TRUE)
+                        daydata$wattGLB_SD, na.rm = TRUE)
             uuuu <- max(daydata$wattGLB,
-                        daydata$wattGLB_SD,
-                        daydata$withdark , na.rm = TRUE)
+                        daydata$wattGLB_SD, na.rm = TRUE)
             if (dddd > -5  ) { dddd = 0  }
             if (uuuu < 190 ) { uuuu = 200}
             ylim = c(dddd , uuuu)
 
-            plot(daydata$Date, daydata$withdark,
+            plot(daydata$Date, daydata$wattGLB,
                  "l", xlab = "UTC", ylab = expression(W / m^2),
-                 col  = "darkgreen", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
+                 col  = "green", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
 
-            lines(daydata$Date, daydata$wattGLB, col = "green", lwd = 2)
 
             abline(h = 0, col = "gray60")
             abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
@@ -281,8 +272,8 @@ for ( yyyy in years_to_do) {
                               "Standard Deviation"),
                    lty = c(1,1,NA), pch = c(NA,NA,"."),
                    col = c("darkgreen", "green", "red"), cex = 0.8,)
-
-        dev.off()
+stop()
+        # dev.off()
 
     }##END loop of days
 
