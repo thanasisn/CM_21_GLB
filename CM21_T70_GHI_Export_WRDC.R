@@ -8,7 +8,7 @@
 #' abstract:      "Read signal and dark correction and convert to global radiation."
 #' documentclass: article
 #' classoption:   a4paper,oneside
-#' fontsize:      11pt
+#' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
 #' link-citations:  yes
@@ -398,5 +398,5 @@ for (afile in input_files) {
 
 
 #' **END**
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

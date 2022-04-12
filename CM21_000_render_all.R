@@ -61,7 +61,13 @@ render("./CM21_R60_GHI_output.R",
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
-render("./CM21_T60_GHI_Export_WRDC.R",
+render("./CM21_T70_GHI_Export_WRDC.R",
+       params = list(  ALL_YEARS = TRUE ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+
+
+render("./CM21_T71_GHI_Export_TOT.R",
        params = list(  ALL_YEARS = TRUE ),
        clean                = T  ,
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
@@ -74,10 +80,6 @@ stop()
 
 
 
-render("./CM21_P60_GHI_Export_WRDC.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./CM21_P70_GHI_Export_TOT.R",
        params = list( CACHE = F ),

@@ -8,7 +8,7 @@
 #' abstract:      "Read signal and dark correction and convert to global radiation."
 #' documentclass: article
 #' classoption:   a4paper,oneside
-#' fontsize:      11pt
+#' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
 #' link-citations:  yes

@@ -37,6 +37,17 @@ info "Clean output L0 to L1 GHI"
 Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
 
 
+## extra output
+# info "Export for WRDC"
+# Rscript "$(dirname "$0")/CM21_T70_GHI_Export_WRDC.R"
+
+# info "Export for Sirena"
+# Rscript "$(dirname "$0")/CM21_T71_GHI_Export_TOT.R"
+
+
+
+
+
 
 
 
