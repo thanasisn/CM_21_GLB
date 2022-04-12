@@ -46,8 +46,6 @@
 #' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #'
-#' - Drop marked data
-#'
 #+ echo=F, include=T
 
 
@@ -102,14 +100,14 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 
-#### .  . Export range  ####
+####    Export range  ####
 yearstodo   <- seq( year(EXPORT_START), year(EXPORT_STOP) )
 
 
 
 
 
-## . get data input files ####
+####    get data input files ####
 input_files <- list.files( path       = GLOBAL_DIR,
                            pattern    = "LAP_CM21_H_L1_[0-9]{4}.Rds",
                            full.names = T )
@@ -131,6 +129,8 @@ input_years <- as.numeric(
 #' The mean hourly values are produced only for the cases where all four of the quarters of each hour are present in the data set.
 #' If there is any missing quarterly value the hourly value is not exported.
 #'
+#'
+#+ echo=F, include=T
 
 
 
@@ -281,7 +281,7 @@ for (afile in input_files) {
 
 
 } #END loop of years
-
+#+ echo=F, include=T
 
 
 

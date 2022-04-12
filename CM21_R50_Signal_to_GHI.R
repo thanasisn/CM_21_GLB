@@ -219,7 +219,7 @@ legend("right",
 cat("\n\n")
 
 
-plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sensitivity))/calibration_data$Sensitivity ,
+plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sensitivity))/calibration_data$Sensitivity,
      main = "CM21 Sensitivity change %",
      xlab = "", ylab = "%", col = "blue")
 cat("\n\n")
@@ -303,6 +303,7 @@ for ( yyyy in years_to_do) {
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0  ]
     if ( nrow(negative)>0 ){
         cat("\n\n")
+        cat("\n**Days with negative global raditaion in dyalight**\n\n")
         cat(paste(unique(as.Date(negative$Date))))
         cat("\n\n")
         hist(negative$CM21value, main = "Negative Global radiation in daylight")
