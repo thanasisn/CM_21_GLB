@@ -237,6 +237,8 @@ for ( YYYY in years_to_do ) {
 
         ####    Read LAP file    ####
         lap <- fread( sirena_files[found], na.strings = "-9" )
+        lap[ V1 < -8, V1 := NA ]
+        lap[ V2 < -8, V2 := NA ]
         stopifnot( dim(lap)[1] == 1440 )
 
         #### . . Read SUN file  ####
@@ -248,14 +250,14 @@ for ( YYYY in years_to_do ) {
                                 strip.white = TRUE,
                                 as.is       = TRUE)
 
-        #### . . Day table to save  ####
+        ####  Day table to save  ####
         day_data <- data.table( Date        = D_minutes,      # Date of the data point
                                 CM21value   = lap$V1,         # Raw value for CM21
                                 CM21sd      = lap$V2,         # Raw SD value for CM21
                                 Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
                                 Elevat      = sun_temp$ELEV ) # Elevation sun angle
 
-        #### . . Gather data  ####
+        ####  Gather data  ####
         year_data <- rbind( year_data, day_data )
     }
     ## order data
@@ -288,9 +290,7 @@ for ( YYYY in years_to_do ) {
     year_data[ , sig_lowlim := signal_lower_limit(Date) ]
     year_data[ , sig_upplim := signal_upper_limit(Date) ]
 
-    ####  Save signal data to file  ####
-    write_RDS(object = year_data,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+
 
 
     ####    Yearly Plots    ####################################################
@@ -309,6 +309,10 @@ for ( YYYY in years_to_do ) {
         }
     })
 
+    cat("\n\n### Proposed outliers limits \n")
+    cat("\n\n")
+    cat(pander(yearlims))
+    cat("\n\n")
 
 
     # cat('\\scriptsize\n')
