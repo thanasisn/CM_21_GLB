@@ -48,7 +48,7 @@ Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
 
 
 ## rclone options
-bwlim=${1:-110}  # if not set to 110
+bwlim=500
 rclone="$HOME/PROGRAMS/rclone"
 config="$HOME/Documents/rclone.conf"
 otheropt=" --checkers=20 --delete-before --stats=300s"
