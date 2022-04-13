@@ -8,7 +8,7 @@ SOURCE="/media/sirena_lapdata_ro"
 
 if mountpoint -q "$SOURCE" ; then
 
-    echo "get signal files 'LAP' of CM21"
+    echo "get CM21 signal files 'LAP'"
     rsync -rhvt                                    \
         --include '*/'                             \
         --include '*.LAP'                          \
@@ -19,7 +19,7 @@ if mountpoint -q "$SOURCE" ; then
         "$HOME/DATA_RAW/Bband/AC21_LAP.GLB"
 
 
-    echo "get chp1 signal files"
+    echo "get CHP1 signal files"
     rsync -rhvt                                    \
         "$SOURCE/archive/Bband/CHP1_lap.DIR/"      \
         "$HOME/DATA_RAW/Bband/CHP1_lap.DIR"
