@@ -209,6 +209,7 @@ for ( YYYY in years_to_do ) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
 
+    cat("\n\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", YYYY, "\n\n" )
 
