@@ -21,7 +21,7 @@ OUTPUT_FORMAT = NULL
 
 
 ####  update raw data  ####
-system("~/Aerosols/BASH_help/update_data_from_sirena.sh")
+system("./get_data_from_sirena.sh")
 
 
 
@@ -61,16 +61,16 @@ render("./CM21_R60_GHI_output.R",
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
-render("./CM21_T70_GHI_Export_WRDC.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+# render("./CM21_T70_GHI_Export_WRDC.R",
+#        params = list(  ALL_YEARS = TRUE ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
-render("./CM21_T71_GHI_Export_TOT.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+# render("./CM21_T71_GHI_Export_TOT.R",
+#        params = list(  ALL_YEARS = TRUE ),
+#        clean                = T  ,
+#        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
 
@@ -78,13 +78,6 @@ render("./CM21_T71_GHI_Export_TOT.R",
 stop()
 
 
-
-
-
-render("./CM21_P70_GHI_Export_TOT.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS")
 
 render("./check_export_sirena.R",
        params = list( CACHE = F ),
