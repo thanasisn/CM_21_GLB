@@ -452,23 +452,24 @@ for ( yyyy in years_to_do) {
     plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = paste("Evening Median Dark" , yyyy) , xlab = "" )
     plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = paste("Evening count Dark"  , yyyy) , xlab = "" )
 
-    cat(paste("#### Days with Evening dark data points count < 100\n\n\n"))
+    cat(paste("#### Days with Evening dark data points count < 100\n"))
+    cat('\n\n')
     cat(paste(unique(as.Date( statist$Date[ which(statist$Ecnt < 100 )]))),"\n\n")
+    cat('\n\n')
 
+    cat(paste("#### Days with Morning dark data points count < 50\n"))
+    cat('\n\n')
+    cat(paste(unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ]))),"\n\n")
+    cat('\n\n')
 
-    cat(paste("#### Days with Morning dark data points count < 50\n\n\n"))
+    cat(paste("#### Days with ( sun  measurements / sun up ) < 0.2\n"))
+    cat('\n\n')
+    cat(paste(unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 )]))),"\n\n")
+    cat('\n\n')
 
-    cat(paste(unique( as.Date( statist$Date[ which(statist$Mcnt < 50 ) ] ) )),"\n\n")
-
-    cat(paste("#### Days with ( sun  measurements / sun up ) < 0.2\n\n\n"))
-
-    cat(paste(unique( as.Date( statist$Date[ which(statist$sunMeas/statist$SunUP < .20 ) ] ) )),"\n\n")
-
-
-    cat(paste("#### Day with the minimum morning median dark\n\n"))
-
+    cat(paste("#### Day with the minimum morning median dark\n"))
+    cat('\n\n')
     cat(paste(statist$Date[ which.min( statist$Mmed ) ]),"\n\n")
-
     cat('\n\n')
 
 }

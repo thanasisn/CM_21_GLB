@@ -75,24 +75,24 @@ render("./CM21_R60_GHI_output.R",
 
 
 
-stop()
 
 
 
-render("./check_export_sirena.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_format        = NULL,
-       output_dir           = "~/CM_21_GLB/REPORTS")
-
-
-
-
-## some more nice plots
-
-source("./CM21_P98_Plot_all_years_LAP.R")
-
-source("./CM21_P99_Plot_all_daily_LAP.R")
+#
+# render("./check_export_sirena.R",
+#        params = list( CACHE = F ),
+#        clean                = T  ,
+#        output_format        = NULL,
+#        output_dir           = "~/CM_21_GLB/REPORTS")
+#
+#
+#
+#
+# ## some more nice plots
+#
+# source("./CM21_P98_Plot_all_years_LAP.R")
+#
+# source("./CM21_P99_Plot_all_daily_LAP.R")
 
 
 
