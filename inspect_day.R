@@ -19,6 +19,19 @@ library(plotly,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
 
+# options("viewer")
+# options("browser")
+#
+# options("viewer" = NULL)
+# options("browser")
+#
+
+
+BROWSER_CMD <- "qutebrowser --backend webengine "
+# BROWSER_CMD <- "brave-browser --incognito -app=file://"
+
+
+
 ## Data folder
 # FOLDER <- "/home/athan/DATA_RAW/Raddata"
 FOLDER <- "/home/athan/DATA_RAW/Bband"
@@ -100,7 +113,7 @@ for (ap in daystodo) {
         glbfile   <- grep( strday, globalfiles, value = T )[1]
         dirfile   <- grep( strday, directfiles, value = T )[1]
 
-        D_minutes <- seq(from       = as.POSIXct(paste(theday,"00:00:30 UTC")),
+        D_minutes <- seq(from       = as.POSIXct(paste(theday,"00:00:00 UTC")),
                          length.out = 1440,
                          by         = "min" )
 
@@ -159,27 +172,38 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
                      name = "Direct beam",
                      line = list(color = "blue"),
+                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$DIRsig,1)),
+                     hoverinfo = 'text',
                      mode = "lines", type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
                      name = "Global",
                      line = list(color = "green"),
+                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsig,1)),
+                     hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
                      name = "Direct beam SD",
                      marker = list(color = "blue", symbol = "asterisk-open", size = 2),
+                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$DIRsd,1)),
+                     hoverinfo = 'text',
                      showlegend = FALSE,
                      mode = 'markers', type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLBsd,
                      name = "Global SD",
                      marker = list(color = "green", symbol = "asterisk-open", size = 2),
+                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsd,1)),
+                     hoverinfo = 'text',
                      showlegend = FALSE,
                      mode = 'markers', type = "scatter")
 
     fig <- layout(fig, legend = list(x = 0.85, y = 0.95))
 
-    # fig
-    # print(fig)
+    fig
+    print(fig)
+
+
+    stop()
 
     # Generate random file name
     temp <- paste(tempfile('plotly'), 'html', sep = '.')
@@ -188,9 +212,22 @@ for (ap in daystodo) {
     # Save. Note, leaving selfcontained=TRUE created files that froze my browser
     htmlwidgets::saveWidget(fig, temp, selfcontained = FALSE)
 
-    # Launch with desired application
-    system(sprintf("brave-browser -app=file://%s", temp),
-            wait = TRUE)
+    ## Launch with desired application
+
+    ## must not have other plottly open
+    # system(sprintf("brave-browser --incognito -app=file://%s ", temp),
+    #        wait = TRUE)
+
+    ## ugly
+    # system(sprintf("qutebrowser --backend webengine %s", temp),
+    #        wait = TRUE)
+
+    ## slow
+    # system(sprintf("firefox %s", temp),
+    #        wait = TRUE)
+
+
+    system(paste0(BROWSER_CMD, temp), wait = TRUE)
 
     file.remove(temp)
 
