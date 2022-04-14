@@ -7,15 +7,33 @@ tic <- Sys.time()
 
 
 library(data.table, quietly = T, warn.conflicts = F)
+library(optparse)
+
+
+option_list <-  list(
+    make_option(c("-d", "--day"),
+                type    = "character",
+                default = paste0(year(Sys.Date()), "-01-01"),
+                help    = "Start day of ploting yyyy-mm-dd",
+                metavar = "yyyy-mm-dd"),
+    make_option(c("-s", "--step"),
+                type    = "integer",
+                default = 3,
+                help    = "Step width in days",
+                metavar = "integer")
+)
+opt_parser <- OptionParser(option_list = option_list)
+args       <- parse_args(opt_parser)
+
+
+STARTDAY <- args$day
+STARTDAY <- as.Date(STARTDAY)
+STEP     <- args$step
 
 
 
-## Get shell arguments
-args <- commandArgs( trailingOnly = TRUE )
-## override test from shell
-if ( length(args) > 0 ) {
-    # if ( any(args == "NOTEST") ) { TEST      = FALSE }
-    if ( any(args == "NOTALL") ) { ALL_YEARS = FALSE }
-}
 
+
+cat("Start day:", paste(STARTDAY),"\n")
+cat("Step     :", STEP, "\n")
 
