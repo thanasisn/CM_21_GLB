@@ -15,9 +15,9 @@ tic <- Sys.time()
 library(data.table, quietly = T, warn.conflicts = F)
 library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
+
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
-
 
 ## Data folder
 # FOLDER <- "/home/athan/DATA_RAW/Raddata"
@@ -76,7 +76,6 @@ directfiles <- list.files(path        = FOLDER,
                           ignore.case = TRUE,
                           full.names  = TRUE)
 
-
 if (STEP == 1) {
     MOVE <- 1
 } else {
@@ -84,6 +83,9 @@ if (STEP == 1) {
 }
 
 daystodo <- seq(STARTDAY, MAXDATE, by = MOVE)
+
+
+daystodo <- daystodo[1:3]
 
 ## loop plots
 for (ap in daystodo) {
@@ -164,17 +166,32 @@ for (ap in daystodo) {
                      mode = "lines", type = "scatter")
 
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
+                     name = "Direct beam SD",
                      marker = list(color = "blue", symbol = "asterisk-open", size = 2),
+                     showlegend = FALSE,
                      mode = 'markers', type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLBsd,
+                     name = "Global SD",
                      marker = list(color = "green", symbol = "asterisk-open", size = 2),
+                     showlegend = FALSE,
                      mode = 'markers', type = "scatter")
 
+    fig <- layout(fig, legend = list(x = 0.85, y = 0.95))
 
-    print(fig)
+    # fig
+    # print(fig)
 
+    # Generate random file name
+    temp <- paste(tempfile('plotly'), 'html', sep = '.')
+    cat(paste(temp),"\n")
 
-    stop()
+    # Save. Note, leaving selfcontained=TRUE created files that froze my browser
+    htmlwidgets::saveWidget(fig, temp, selfcontained = FALSE)
+
+    # Launch with desired application
+    system(sprintf("brave-browser -app=file://%s", temp),
+            wait = TRUE)
+
+    file.remove(temp)
+
 }
-
-
