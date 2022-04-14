@@ -19,13 +19,6 @@ library(plotly,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
 
-# options("viewer")
-# options("browser")
-#
-# options("viewer" = NULL)
-# options("browser")
-#
-
 
 # BROWSER_CMD <- "qutebrowser --backend webengine "
 BROWSER_CMD <- "brave-browser --incognito -app=file://"
