@@ -6,8 +6,15 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 
 
+## TODO
+## plot steps
+## plot async
+## plot sun
+
+
 library(data.table, quietly = T, warn.conflicts = F)
-library(optparse)
+library(optparse,   quietly = T, warn.conflicts = F)
+library(plotly,     quietly = T, warn.conflicts = F)
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
 
@@ -69,6 +76,7 @@ directfiles <- list.files(path        = FOLDER,
                           ignore.case = TRUE,
                           full.names  = TRUE)
 
+
 if (STEP == 1) {
     MOVE <- 1
 } else {
@@ -79,7 +87,7 @@ daystodo <- seq(STARTDAY, MAXDATE, by = MOVE)
 
 ## loop plots
 for (ap in daystodo) {
-    toplot <- as.Date(ap:(ap+STEP), origin = "1970-01-01")
+    toplot <- seq.Date( as.Date(ap, origin = "1970-01-01"), length.out = STEP, by = "day")
     gather <- data.table()
 
     ## loop days to plot with step
@@ -127,8 +135,43 @@ for (ap in daystodo) {
     gather$DIRsig <- gather$DIRsig * chp1factor(gather$Date)
     gather$DIRsd  <- gather$DIRsd  * chp1factor(gather$Date)
 
-    stop()
+    ## Base Plot
+    # xlim <- range(gather$Date)
+    # ylim <- range(0, 300, gather$GLBsig, gather$DIRsig, gather$GLBsd, gather$DIRsd, na.rm = T)
+    #
+    # plot(NULL, xlab="", ylab="", xlim = xlim, ylim = ylim, xaxt = "n")
+    # axis.POSIXct(1, gather$Date, format = "%F")
+    # axis.POSIXct(1, at = seq(min(gather$Date), max(gather$Date), "2 hours"),
+    #           labels = FALSE, tcl = -0.2)
+    #
+    # lines(gather$Date, gather$GLBsig, col = "green")
+    # lines(gather$Date, gather$DIRsig, col = "blue")
+    #
+    # points(gather$Date, gather$GLBsd, col = "green", pch = 8, cex = 0.3)
+    # points(gather$Date, gather$DIRsd, col = "blue" , pch = 8, cex = 0.3)
 
+
+    ## Plotly
+
+    fig <- plot_ly()
+    fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
+                     name = "Direct beam",
+                     line = list(color = "blue"),
+                     mode = "lines", type = "scatter")
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
+                     name = "Global",
+                     line = list(color = "green"),
+                     mode = "lines", type = "scatter")
+
+    fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
+                     marker = list(symbol = "asterisk-open"),
+                     mode = 'markers', type = "scatter")
+
+
+    print(fig)
+
+
+    stop()
 }
 
 
