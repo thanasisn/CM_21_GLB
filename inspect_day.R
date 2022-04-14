@@ -164,7 +164,10 @@ for (ap in daystodo) {
                      mode = "lines", type = "scatter")
 
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
-                     marker = list(symbol = "asterisk-open"),
+                     marker = list(color = "blue", symbol = "asterisk-open", size = 2),
+                     mode = 'markers', type = "scatter")
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsd,
+                     marker = list(color = "green", symbol = "asterisk-open", size = 2),
                      mode = 'markers', type = "scatter")
 
 
