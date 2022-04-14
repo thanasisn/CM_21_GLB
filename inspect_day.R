@@ -199,11 +199,9 @@ for (ap in daystodo) {
 
     fig <- layout(fig, legend = list(x = 0.85, y = 0.95))
 
-    fig
-    print(fig)
-
-
-    stop()
+    # fig
+    # print(fig)
+    # stop()
 
     # Generate random file name
     temp <- paste(tempfile('plotly'), 'html', sep = '.')
@@ -226,7 +224,7 @@ for (ap in daystodo) {
     # system(sprintf("firefox %s", temp),
     #        wait = TRUE)
 
-
+    ## call the file in browser
     system(paste0(BROWSER_CMD, temp), wait = TRUE)
 
     file.remove(temp)
