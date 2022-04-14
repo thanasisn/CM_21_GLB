@@ -27,8 +27,8 @@ source("~/CHP_1_DIR/Functions_CHP1.R")
 #
 
 
-BROWSER_CMD <- "qutebrowser --backend webengine "
-# BROWSER_CMD <- "brave-browser --incognito -app=file://"
+# BROWSER_CMD <- "qutebrowser --backend webengine "
+BROWSER_CMD <- "brave-browser --incognito -app=file://"
 
 
 
@@ -98,7 +98,7 @@ if (STEP == 1) {
 daystodo <- seq(STARTDAY, MAXDATE, by = MOVE)
 
 
-daystodo <- daystodo[1:3]
+# daystodo <- daystodo[1:3]
 
 ## loop plots
 for (ap in daystodo) {
@@ -172,32 +172,38 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
                      name = "Direct beam",
                      line = list(color = "blue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$DIRsig,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIRsig,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
                      name = "Global",
                      line = list(color = "green"),
-                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsig,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
+                     # text = paste(round(gather$GLBsig,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
                      name = "Direct beam SD",
                      marker = list(color = "blue", symbol = "asterisk-open", size = 2),
-                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$DIRsd,1)),
+                     # text = paste(format(gather$Date, "%F %R"),"\n",round(gather$DIRsd,1)),
+                     text = paste("DBI SD:",round(gather$DIRsd,1)),
                      hoverinfo = 'text',
-                     showlegend = FALSE,
+                     # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLBsd,
                      name = "Global SD",
                      marker = list(color = "green", symbol = "asterisk-open", size = 2),
-                     text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsd,1)),
+                     # text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsd,1)),
+                     text = paste("GHI SD:",round(gather$GLBsd,1)),
                      hoverinfo = 'text',
-                     showlegend = FALSE,
+                     # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
 
     fig <- layout(fig, legend = list(x = 0.85, y = 0.95))
+    # fig <- layout(fig, xaxis  = list(showcrossline = T))
+    # fig <- layout(fig, hovermode = "x unified")
+    fig <- layout(fig, hovermode = "x")
 
     # fig
     # print(fig)
