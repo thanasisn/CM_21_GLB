@@ -7,33 +7,49 @@
 #'
 
 
-## Project root folder
-BASED      = "~/CM_21_GLB/"
+####    Project root folder    #################################################
+BASED      <- "~/CM_21_GLB/"
 
 
-####  Data location  ####
-SUN_FOLDER = "~/DATA_RAW/SUN/PySolar_LAP/"
-SIRENA_DIR = "~/DATA_RAW/Bband/AC21_LAP.GLB/"
-RADMON_DIR = "~/DATA_RAW/Raddata/6"
-SIGNAL_DIR = "~/DATA/Broad_Band/CM21_H_signal/"
-GLOBAL_DIR = "~/DATA/Broad_Band/CM21_H_global/"
-EXPORT_DIR = "~/DATA/Broad_Band/CM21_H_exports/"
-REPORT_DIR = "~/CM_21_GLB/REPORTS/"
-TOT_EXPORT = "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
-DAILYgrDIR = "~/CM_21_GLB/REPORTS/DAILY/"
+
+####    Process Range Control    ###############################################
+
+## Date range to read raw data
+START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
+END_DAY      <- as.POSIXct("2022-02-01 00:00:00 UTC")
+
+## date range to export for TOT and WRDC
+EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
+EXPORT_STOP  <- as.POSIXct("2022-02-01 00:00:00 UTC")
+
+
+
+####    Input paths    #########################################################
+SUN_FOLDER <- "~/DATA_RAW/SUN/PySolar_LAP/"
+SIRENA_DIR <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
+RADMON_DIR <- "~/DATA_RAW/Raddata/6"
+
+
+
+####    Output paths    ########################################################
+DAILYgrDIR <- paste0(BASED, "/REPORTS/DAILY/")
+REPORT_DIR <- paste0(BASED, "/REPORTS/")
+SIGNAL_DIR <- "~/DATA/Broad_Band/CM21_H_signal/"
+GLOBAL_DIR <- "~/DATA/Broad_Band/CM21_H_global/"
+EXPORT_DIR <- "~/DATA/Broad_Band/CM21_H_exports/"
+TOT_EXPORT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 
 
 ####    Parametric files    ####################################################
 
 ## Date ranges to exclude, after manual inspection
-BAD_RANGES  <- "~/CM_21_GLB/PARAMS/Skip_ranges_CM21.txt"
+BAD_RANGES  <- paste0(BASED,      "/PARAMS/Skip_ranges_CM21.txt")
 ## Storage of dark signal details for all days
 DARKSTORE   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_data_S0.Rds")
 ## Dark signal details constructed for uncomputable days
 DARKCONST   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_construction_S0.Rds")
-
 ## Logging of missing lap input files
-MISSING_INP <- paste0(BASED,"/LOGs/Missing_lap_files.dat")
+MISSING_INP <- paste0(BASED,      "/PARAMS/Missing_lap_files.dat")
 
 
 
@@ -72,18 +88,6 @@ ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
 ####    Drop night time data    ################################################
 NIGHT_DROP  <- -5         ## Drop when sun is below that (R60)
-
-
-
-####    Process Range Control    ###############################################
-
-## Date range to read raw data
-START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
-END_DAY      <- as.POSIXct("2022-01-01 00:00:00 UTC")
-
-## date range to export for TOT and WRDC
-EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
-EXPORT_STOP  <- as.POSIXct("2022-01-01 00:00:00 UTC")
 
 
 
