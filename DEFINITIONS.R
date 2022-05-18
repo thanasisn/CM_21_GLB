@@ -17,7 +17,7 @@ BASED      <- "~/CM_21_GLB/"
 ## Date range to read raw data
 START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
 # END_DAY      <- as.POSIXct("2022-03-31 00:00:00 UTC")
-END_DAY      <- Sys.Date()
+END_DAY      <- Sys.time()
 
 ## date range to export for TOT and WRDC
 EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
