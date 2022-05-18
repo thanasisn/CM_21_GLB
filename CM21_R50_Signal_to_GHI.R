@@ -173,18 +173,18 @@ if (length(years_to_do) == 0 ) {
 #'
 #+ include=T, echo=F
 
-pander(calibration_data, caption = "CM21 calibrations")
+pander(cm21_calibration_data, caption = "CM21 calibrations")
 
 
 ## create some plot data
-dates <- seq(calibration_data$Date[1],Sys.time(),by="day")
+dates <- seq(cm21_calibration_data$Date[1],Sys.time(),by="day")
 
 
 
-plot(dates, sensitivity(dates),
+plot(dates, cm21_sensitivity(dates),
      pch = 19, main = "CM21 Sensitivity",
      xlab = "", ylab = "", cex = .3)
-points(calibration_data$Date, calibration_data$Sens, col = "green")
+points(cm21_calibration_data$Date, cm21_calibration_data$Sens, col = "green")
 legend("bottomleft",
        legend = c("Sensitivity Interpolation", "Sensitivity calibration"),
        pch    = c( 19, 1 ),
@@ -193,10 +193,10 @@ legend("bottomleft",
 cat("\n\n")
 
 
-plot(dates, gain(dates),
+plot(dates, cm21_gain(dates),
      pch = 19, main = "CM21 Acquisition gain",
      xlab = "", ylab = "", cex = .3)
-points(calibration_data$Date, calibration_data$Gain,  col = "cyan")
+points(cm21_calibration_data$Date, cm21_calibration_data$Gain,  col = "cyan")
 legend("right",
        legend = c("Acquisition gain Constant", "Acquisition gain data"),
        pch    = c( 19, 1 ),
@@ -209,7 +209,7 @@ cat("\n\n")
 plot(dates, cm21factor(dates),
      pch = 19, main = "CM21 convertion factor",
      xlab = "", ylab = "", cex = .3)
-points(calibration_data$Date, calibration_data$Gain / calibration_data$Sensitivity,
+points(cm21_calibration_data$Date, cm21_calibration_data$Gain / cm21_calibration_data$Sensitivity,
        col = "orange" )
 legend("right",
        legend = c("Convertion factor interpolated", "Convertion factor calibrated"),
@@ -219,7 +219,7 @@ legend("right",
 cat("\n\n")
 
 
-plot(calibration_data$Date, 100*c(NA, diff(calibration_data$Sensitivity))/calibration_data$Sensitivity,
+plot(cm21_calibration_data$Date, 100*c(NA, diff(cm21_calibration_data$Sensitivity))/cm21_calibration_data$Sensitivity,
      main = "CM21 Sensitivity change %",
      xlab = "", ylab = "%", col = "blue")
 cat("\n\n")
