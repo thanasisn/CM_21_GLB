@@ -121,6 +121,7 @@ From;                Until;               Comment
 2009-09-27 00:00;    2009-09-27 23:59;    missing file
 2009-10-13 00:00;    2009-10-13 23:59;    only few data at night
 2010-01-14 00:00;    2010-01-14 23:59;    missing file
+2010-01-15 13:10;    2010-01-15 13:13;    undefined problem erratic data observe
 2010-01-30 00:00;    2010-01-30 23:59;    missing file
 2010-01-31 00:00;    2010-01-31 23:59;    missing file
 2010-02-01 00:00;    2010-02-01 23:59;    missing file
@@ -698,8 +699,10 @@ From;                Until;               Comment
 2022-02-22 05:00;    2022-02-24 09:02;    signal error
 2022-02-28 09:13;    2022-02-28 10:00;    undefined problem erratic data observed
 
+
+
 ## GLOBAL ##
-# TODO after 2022-01-01
+# TODO after 2022-03-31
 # chp1 with temperature  from start
 # check comments in maintenance log
 # change last date on QCRad
