@@ -283,7 +283,7 @@ for ( yyyy in years_to_do) {
     rawdata[ , CM21CF := cm21factor(Date) ]
 
     ####  Check dark conditions
-    if (rawdata[!is.na(CM21valueWdark) & is.na(CM21valueWdark), .N ] != 0) {
+    if (rawdata[ ! is.na(CM21valueWdark) & is.na(CM21valueWdark), .N ] != 0) {
         cat("\n**There are missing dark correction values!!!!**\n\n")
     }
 
@@ -301,7 +301,7 @@ for ( yyyy in years_to_do) {
     rawdata[ Elevat >= SUN_ELEV & wattGLB < MINglbSUNup, QFlag_2 := "NegativeGlobal"  ]
 
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0  ]
-    if ( nrow(negative)>0 ){
+    if ( nrow(negative) > 0 ){
         cat("\n\n")
         cat("\n**Days with negative global raditaion in dyalight**\n\n")
         cat(paste(unique(as.Date(negative$Date))))
@@ -323,7 +323,7 @@ for ( yyyy in years_to_do) {
     testlow <- rawdata[ QFlag_2 == "TooLowGlobal"]
     if ( nrow(testlow)>0 ) {
         cat("\n**Marked too low Global records on:**\n\n")
-        cat(pander(testlow[ ,.N,by = .(Date=as.Date(Date)) ]))
+        cat(pander(testlow[ , .N, by = .(Date=as.Date(Date)) ]))
         cat("\n\n")
     }
     rm(testlow)
