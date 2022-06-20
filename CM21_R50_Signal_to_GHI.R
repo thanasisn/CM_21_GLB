@@ -157,7 +157,7 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1996
+years_to_do <- 1996
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -347,8 +347,10 @@ for ( yyyy in years_to_do) {
 
 
 
-
-
+    ####    Mark data before and after local noon    ###########################
+    rawdata[ Azimuth <=  180 , preNoon := TRUE  ]
+    rawdata[ Azimuth >   180 , preNoon := FALSE ]
+    ############################################################################
 
 
 
@@ -370,10 +372,12 @@ for ( yyyy in years_to_do) {
         daydata     <- merge(daydata, daymimutes, all = T)
         pbcount     <- pbcount + 1
 
-        ## break morning-evening
-        maxElev         <- max( daydata$Elevat, na.rm = T)
-        day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
-        daydata$preNoon <- daydata$Date <= day_noon
+        # ## break morning-evening
+        # maxElev         <- max( daydata$Elevat, na.rm = T)
+        # day_noon        <- daydata$Date[ daydata$Elevat == maxElev ]
+        # daydata$preNoon <- daydata$Date <= day_noon
+
+
 
         ## gather all data for storage!!
         gather          <- rbind(gather, daydata)
