@@ -1,4 +1,3 @@
-# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title:         "CM21 signal to radiation. **S1 -> L0**"
@@ -120,7 +119,6 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 
-
 ####  Get data input files  ####
 input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21_H_S1_[0-9]{4}.Rds",
@@ -131,7 +129,7 @@ input_years <- as.numeric(
             basename(input_files),),ignore.case = T))
 
 
-## Get storage files
+####  Get storage files  ####
 output_files <- list.files( path    = GLOBAL_DIR,
                             pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
                             full.names = T )
@@ -351,7 +349,6 @@ for ( yyyy in years_to_do) {
     rawdata[ Azimuth <=  180 , preNoon := TRUE  ]
     rawdata[ Azimuth >   180 , preNoon := FALSE ]
     ############################################################################
-
 
 
 

@@ -1,4 +1,3 @@
-# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title:         "Global from CM21. **L0 -> L1**"
@@ -113,8 +112,6 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 
-
-
 ####  Get data input files  ####
 input_files <- list.files( path    = GLOBAL_DIR,
                            pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
@@ -125,7 +122,7 @@ input_years <- as.numeric(
             basename(input_files),),ignore.case = T))
 
 
-## Get storage files
+####  Get storage files  ####
 output_files <- list.files( path    = GLOBAL_DIR,
                             pattern = "LAP_CM21_H_L1_[0-9]{4}.Rds",
                             full.names = T )

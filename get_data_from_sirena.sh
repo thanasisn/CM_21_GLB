@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### Get data from sirena
+#### Get data from sirena for local processing.
 
 ## this sould be mounted
 SOURCE="/media/sirena_lapdata_ro"

@@ -1,4 +1,3 @@
-# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title:         "CM21 signal filtering. **SIG -> S0** "

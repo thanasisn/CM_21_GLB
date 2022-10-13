@@ -1,3 +1,6 @@
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+
+#### Functions including the calibration factors of the instruments and the acquisition system.
 
 Sys.setenv(TZ = "UTC")
 
@@ -83,9 +86,3 @@ signal_upper_limit <- approxfun( x      = signal_physical_limits$Date,
                                  y      = signal_physical_limits$Upper_lim,
                                  method = "constant",
                                  rule   = 1:2  )
-
-
-
-
-
-

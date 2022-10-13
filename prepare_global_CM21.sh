@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2022-03-29
 
-#### This is for daily usage.
+#### Run daily the data process.
 ## For building reports there is an R scirpt
 
 

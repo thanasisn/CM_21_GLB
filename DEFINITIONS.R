@@ -1,3 +1,7 @@
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+
+#### Variables of this project.
+
 #'
 #' Here are some global or common variables for this project.
 #' This variables define:
@@ -89,6 +93,3 @@ ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
 ####    Drop night time data    ################################################
 NIGHT_DROP  <- -5         ## Drop when sun is below that (R60)
-
-
-
