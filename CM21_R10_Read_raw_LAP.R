@@ -1,4 +1,3 @@
-# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title:         "Read raw CM21 data. **LAP -> SIG** "

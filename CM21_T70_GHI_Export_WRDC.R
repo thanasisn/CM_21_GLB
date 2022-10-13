@@ -1,4 +1,3 @@
-# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title:         "Global from CM21. **L0 -> L1**"
@@ -98,16 +97,12 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 
 
-
-
-####    Export range  ####
+####  Export range  ####
 yearstodo   <- seq( year(EXPORT_START), year(EXPORT_STOP) )
 
 
 
-
-
-####    get data input files ####
+####  get data input files ####
 input_files <- list.files( path       = GLOBAL_DIR,
                            pattern    = "LAP_CM21_H_L1_[0-9]{4}.Rds",
                            full.names = T )
@@ -115,7 +110,6 @@ input_years <- as.numeric(
     sub(".rds", "",
         sub(".*_L1_","",
             basename(input_files),),ignore.case = T))
-
 
 
 
@@ -144,9 +138,7 @@ for (afile in input_files) {
     #### Get raw data ####
     ayear        <- readRDS(afile)
     NR_loaded    <- ayear[ !is.na(wattGLB), .N ]
-
     yyyy         <- year(ayear$Date[1])
-
 
     cat("\n\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
@@ -287,16 +279,11 @@ for (afile in input_files) {
 
 
 
-
-
 # ooooo      <- read.table("output3.dat" )
 # ooooo$date <- as.POSIXct(paste0(ooooo$V1,"-",ooooo$V2,"-",ooooo$V3," ",ooooo$V4-0.5,":00") )
 #
-#
 # kkkk       <- read.table("~/Aerosols/CM21datavalidation/fwdatasubmissionthessaloniki/wrdc_lap_2017.dat")
 # kkkk$date  <- as.POSIXct(paste0(kkkk$V1,"-",kkkk$V2,"-",kkkk$V3," ",kkkk$V4-0.5,":00") )
-#
-#
 #
 #
 # (kkkk$V5[kkkk$V5<0 & kkkk$V5>-99])

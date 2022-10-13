@@ -1,4 +1,3 @@
-# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
 #' title: "CM21 export GHI data for Sirena."
@@ -52,7 +51,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 
-
 #+ include=F, echo=F
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
@@ -65,7 +63,6 @@ if(!interactive()) {
     sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
     filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
-
 
 
 #+ echo=F, include=T
@@ -265,11 +262,7 @@ for (afile in input_files) {
     } #END of days
 
     cat('\\end{multicols}')
-} #END of years
-
-
-
-
+} #END of year loop
 
 
 #' **END**

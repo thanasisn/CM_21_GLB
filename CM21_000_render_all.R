@@ -75,9 +75,6 @@ render("./CM21_R60_GHI_output.R",
 
 
 
-
-
-
 #
 # render("./check_export_sirena.R",
 #        params = list( CACHE = F ),

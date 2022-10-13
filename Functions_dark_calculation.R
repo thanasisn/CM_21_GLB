@@ -1,3 +1,6 @@
+# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+
+#### Functions to calculate the dark signal and apply corrections.
 
 Sys.setenv(TZ = "UTC")
 
@@ -146,7 +149,3 @@ dark_function <- function( dark_day,
     }
     return(dark_line)
 }
-
-
-
-
