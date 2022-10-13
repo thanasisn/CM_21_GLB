@@ -4,7 +4,11 @@ Data processing of CM-21 data to produce Total Irradiance data.
 
 ## Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
+This is a non real-time precessing procedure of the data of an
+CM-21 instrument, measuring the Global/Total whole sky Irradiance.
 
+
+Features:
 - Convert CM-21 instrument signal data to Global Irradiance.
 - Apply dark correction.
 - Clean data.
