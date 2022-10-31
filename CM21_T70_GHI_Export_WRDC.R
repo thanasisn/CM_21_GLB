@@ -159,10 +159,11 @@ for (afile in input_files) {
     ayear$day <- as.Date(ayear$Date)
 
 
+    stop("A different technic may exist!!\n Check documentation!!!")
+
     #### run on all quarter of the hour #####################################
     ayear$quarter <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
-    qposic        <- as.POSIXct(   ayear$quarter * (3600/4), origin = "1970-01-01" )
-
+    # qposic        <- as.POSIXct(   ayear$quarter * (3600/4), origin = "1970-01-01" )
     # qDates     = aggregate(ayear$Date30, by = list(qposic), FUN = min)
 
     selectqua  <- list(ayear$quarter)
