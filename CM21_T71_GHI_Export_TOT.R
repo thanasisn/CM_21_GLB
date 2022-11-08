@@ -142,8 +142,8 @@ for (afile in input_files) {
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
 
-    cat('\\begin{multicols}{3}')
-    cat('\\scriptsize\n')
+    # cat('\\begin{multicols}{3}')
+    # cat('\\scriptsize\n')
 
     ## create all minutes
     allminutes <- seq( as.POSIXct( paste0(yyyy, "-01-01 00:00:30") ),
@@ -186,6 +186,9 @@ for (afile in input_files) {
     ## plot the whole year before output
     plot(ayear$Date, ayear$wattGLB,    main = paste(yyyy, "GLOBAL"))
     plot(ayear$Date, ayear$wattGLB_SD, main = paste(yyyy, "Global SD"))
+
+    cat('\\begin{multicols}{3}')
+    cat('\\scriptsize\n')
 
 
     ## export each day
