@@ -609,7 +609,7 @@ From;                Until;               Comment
 2018-08-29 07:49;    2018-08-29 07:50;    shades from cleaning
 2018-09-06 07:22;    2018-09-06 07:23;    shades from cleaning
 2018-09-12 07:36;    2018-09-12 07:37;    shades from cleaning
-2018-09-13 08:29;    2018-09-13 08:30;    shades from cleaning
+2018-09-14 08:29;    2018-09-14 08:30;    shades from cleaning
 2018-09-19 07:20;    2018-09-19 07:21;    shades from cleaning
 2018-09-20 07:06;    2018-09-20 07:07;    shades from cleaning
 2018-09-27 07:27;    2018-09-27 07:28;    shades from cleaning
@@ -622,7 +622,7 @@ From;                Until;               Comment
 2018-12-07 12:56;    2018-12-07 23:59;    undefined problem erratic data observed
 2018-12-12 08:58;    2018-12-12 08:59;    shades from cleaning
 2018-12-19 08:28;    2018-12-19 08:29;    shades from cleaning
-2018-12-28 08:44;    2018-12-28 08:45;    shades from cleaning
+2018-12-28 08:45;    2018-12-28 08:46;    shades from cleaning
 2019-01-02 13:20;    2019-01-02 13:25;    disconnection
 2019-01-14 08:27;    2019-01-14 08:28;    shades from cleaning
 2019-01-16 08:32;    2019-01-16 08:33;    shades from cleaning
@@ -650,6 +650,10 @@ From;                Until;               Comment
 2019-07-12 07:28;    2019-07-12 07:29;    shades from cleaning
 2019-07-26 06:01;    2019-07-26 06:02;    shades from cleaning
 2019-07-29 07:38;    2019-07-29 07:39;    shades from cleaning?
+2019-07-30 08:52;    2019-07-30 08:53;    shades from cleaning?
+2019-08-13 07:22;    2019-08-13 07:23;    shades from cleaning?
+2019-09-04 07:33;    2019-09-04 07:34;    shades from cleaning?
+2019-09-10 07:00;    2019-09-10 07:00;    shades from cleaning
 2019-10-17 07:30;    2019-10-17 07:31;    shades from cleaning?
 2019-11-05 07:56;    2019-11-05 07:59;    shades from cleaning?
 2019-11-25 07:22;    2019-11-25 13:29;    disconnection
