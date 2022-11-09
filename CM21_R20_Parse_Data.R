@@ -83,8 +83,8 @@ if (!interactive()) {
 
 #+ echo=F, include=F
 ####  External code  ####
-library(data.table, quietly = T, warn.conflicts = F)
-library(pander,     quietly = T, warn.conflicts = F)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 
@@ -104,9 +104,9 @@ if (!exists("params")){
 }
 ## When executing
 args <- commandArgs( trailingOnly = TRUE )
-if ( length(args) > 0 ) {
-    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
-    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+if (length(args) > 0) {
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE }
 }
 params <- list( ALL_YEARS = ALL_YEARS)
 
@@ -120,14 +120,15 @@ params <- list( ALL_YEARS = ALL_YEARS)
 ####  Load exclusion list  ####
 
 ranges       <- read.table( BAD_RANGES,
-                            sep         = ";",
-                            colClasses  = "character",
-                            strip.white = TRUE,
-                            header      = TRUE,
+                            sep          = ";",
+                            colClasses   = "character",
+                            strip.white  = TRUE,
+                            header       = TRUE,
                             comment.char = "#" )
 ranges$From     <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
 ranges$Until    <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
 ranges$HourSpan <- as.numeric(ranges$Until - ranges$From) / 3600
+ranges$Comment[ranges$Comment == ""] <- "NO DESCRIPTION"
 
 #'
 #' Check inverted time ranges
@@ -160,15 +161,14 @@ input_files <- list.files( path    = SIGNAL_DIR,
                            full.names = T )
 input_years <- as.numeric(
     sub(".rds", "",
-        sub(".*_SIG_","",
-            basename(input_files),),ignore.case = T))
+        sub(".*_SIG_", "", basename(input_files)),
+        ignore.case = T))
 
 
 ## Get storage files
 output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                             full.names = T )
-
 
 
 if (!params$ALL_YEARS) {
@@ -193,7 +193,7 @@ if (!params$ALL_YEARS) {
 # years_to_do <- 1993
 
 ## Decide what to do
-if (length(years_to_do) == 0 ) {
+if (length(years_to_do) == 0) {
     stop("NO new data! NO need to parse!")
 }
 
@@ -252,7 +252,7 @@ for (yyyy in years_to_do) {
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
-    cat("\n## Year:", yyyy, "\n\n" )
+    cat("\n## Year:", yyyy, "\n\n")
 
     NR_loaded <- rawdata[ !is.na(CM21value), .N ]
 
@@ -263,8 +263,8 @@ for (yyyy in years_to_do) {
     rangestemp <- ranges
     rangestemp <- rangestemp[year(rangestemp$From)  >= yyyy - 1 &
                              year(rangestemp$Until) <= yyyy + 1, ]
-    if (nrow(rangestemp) > 0) stop("jjjj")
-    for (i in 1:nrow(rangestemp) ) {
+
+    for (i in 1:nrow(rangestemp)) {
         lower <- rangestemp$From[   i]
         upper <- rangestemp$Until[  i]
         comme <- rangestemp$Comment[i]
@@ -273,12 +273,12 @@ for (yyyy in years_to_do) {
     }
     NR_bad_ranges <- rawdata[Bad_ranges != "", .N]
 
-    ## remove and store bad ranges data
+    ## store bad ranges data
     myRtools::write_dat( object = rawdata[ Bad_ranges != "", ],
                          file   = paste0(SIGNAL_DIR,
                                          "/LAP_CM21_H_SIG_", yyyy, "_bad_ranges"),
                          clean  = TRUE)
-
+    ## remove bad ranges
     rawdata[ Bad_ranges != "", CM21value := NA ]
     rawdata[ Bad_ranges != "", CM21sd    := NA ]
     rawdata[ , Bad_ranges := NULL ]
@@ -290,17 +290,17 @@ for (yyyy in years_to_do) {
 
     ## Plot with some checks after bad regions
     yearlims <- data.table()
-    for (an in grep("CM21", names(rawdata), value = T)){
+    for (an in grep("CM21", names(rawdata), value = T)) {
         suppressWarnings({
-            daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-                                   dmax =  max(get(an),na.rm = T))  , by = as.Date(Date) ]
-            low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
-            upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
+            daily <- rawdata[ , .(dmin = min(get(an), na.rm = TRUE),
+                                  dmax = max(get(an), na.rm = TRUE)), by = as.Date(Date)]
+            low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
+            upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
         })
 
         ## check if we can decide
         if (is.na(low) | is.na(upe)) next()
-        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+        yearlims <- rbind(yearlims, data.table(an = an, low = low, upe = upe))
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
         if ( nrow(test) > 0 ) {
@@ -313,10 +313,10 @@ for (yyyy in years_to_do) {
     cat('\n\n')
 
     rawdata[!is.na(CM21value)]
-    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",   yyyy))
     cat('\n\n')
 
-    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy))
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
@@ -342,11 +342,11 @@ for (yyyy in years_to_do) {
                            list(month_vec), FUN = summary, digits = 6 )
 
     boxplot(rawdata$CM21value ~ month_vec )
-    title(main = paste("CM21value by month", yyyy) )
+    title(main = paste("CM21value by month", yyyy))
     cat('\n\n')
 
     boxplot(rawdata$CM21sd ~ month_vec )
-    title(main = paste("CM21sd by month", yyyy) )
+    title(main = paste("CM21sd by month", yyyy))
     cat('\n\n')
 
 
@@ -376,7 +376,7 @@ for (yyyy in years_to_do) {
     cat(paste0( "**",
                 NR_loaded, "** non NA data points loaded\n\n" ))
     cat(paste0( "**",
-                NR_bad_ranges, "** points marked as bad data ranges\n\n" ))
+                NR_bad_ranges, "** points marked as bad data ranges set to NA\n\n" ))
     cat(paste0( "**",
                 NR_signal_limit, "** possible signal error\n\n" ))
     # cat(paste0( "**",
@@ -418,13 +418,10 @@ for (yyyy in years_to_do) {
               file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S0_",yyyy,".Rds") )
 
 
-
     cat("\\FloatBarrier\n\n")
     cat('\n\n')
     cat(paste("### Only non flagged data.\n\n"))
     cat('\n\n')
-
-
 
     rawdata <- rawdata[ is.na(QFlag_1) ]
 
@@ -437,23 +434,23 @@ for (yyyy in years_to_do) {
             low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
             upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
         })
-        yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
+        yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
 
         test <- data.table(day = paste(rawdata[ get(an) > upe | get(an) < low , unique(as.Date(Date)) ]))
     }
 
     cat('\n\n')
 
-    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",  yyyy ) )
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy))
     abline(v = yearlims[ an == "CM21value", low], col = "cyan")
     abline(v = yearlims[ an == "CM21value", upe], col = "cyan")
     abline(v = unique(signal_lower_limit(rawdata$Date)), col = "red")
     abline(v = unique(signal_upper_limit(rawdata$Date)), col = "red")
 
-
     cat('\n\n')
 
-    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy ) )
+    hist(rawdata$CM21sd, breaks = 50, main = paste("CM21 signal SD", yyyy))
+
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
@@ -465,7 +462,6 @@ for (yyyy in years_to_do) {
     abline(h = unique(signal_lower_limit(rawdata$Date)), col = "red")
     abline(h = unique(signal_upper_limit(rawdata$Date)), col = "red")
 
-
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
@@ -474,22 +470,22 @@ for (yyyy in years_to_do) {
          ylab = "CM21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
-    cat('\n\n')
 
+    cat('\n\n')
 
     par(mar = c(2,4,2,1))
     month_vec <- strftime(  rawdata$Date, format = "%m")
     dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
                             list(month_vec), FUN = summary, digits = 6 )
-
     boxplot(rawdata$CM21value ~ month_vec )
     title(main = paste("CM21value by month", yyyy) )
+
     cat('\n\n')
 
     boxplot(rawdata$CM21sd ~ month_vec )
     title(main = paste("CM21sd by month", yyyy) )
-    cat('\n\n')
 
+    cat('\n\n')
 }
 #'
 
