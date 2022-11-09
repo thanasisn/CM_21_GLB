@@ -31,6 +31,7 @@ From;                Until;               Comment
 2006-06-13 00:00;    2006-06-13 23:59;    missing file
 2006-06-14 00:00;    2006-06-14 23:59;    missing file
 2006-06-15 00:00;    2006-06-15 23:59;    missing file
+2006-07-18 04:44;    2006-07-18 04:45;    unexpected spike
 2006-08-24 00:00;    2006-08-24 23:59;    missing file
 2006-10-07 00:00;    2006-10-07 23:59;    missing file
 2006-10-08 00:00;    2006-10-08 23:59;    missing file
@@ -386,7 +387,7 @@ From;                Until;               Comment
 2016-06-10 06:45;    2016-06-10 06:46;    shades from cleaning
 2016-06-14 08:14;    2016-06-14 08:16;    shades from cleaning
 2016-06-15 06:56;    2016-06-15 06:57;    shades from cleaning
-2016-06-15 07:25;    2016-06-15 07:30;    inconsistent with chp1
+2016-06-15 07:25;    2016-06-15 07:30;    inconsistent with CHP1
 2016-06-16 07:06;    2016-06-16 07:55;    pyranometer table compromised works on building
 2016-06-17 06:55;    2016-06-17 06:56;    shades from cleaning
 2016-06-21 08:00;    2016-06-21 08:02;    shades from cleaning
@@ -524,7 +525,7 @@ From;                Until;               Comment
 2017-08-14 10:01;    2017-08-14 10:02;    shades from cleaning
 2017-08-15 09:14;    2017-08-15 09:16;    disconnection
 2017-08-16 00:00;    2017-08-17 06:52;    undefined problem erratic data observed
-2017-08-16 00:00;    2017-08-16 23:59;    irradical data
+2017-08-16 00:00;    2017-08-16 23:59;    radical data
 2017-08-22 07:34;    2017-08-22 07:35;    shades from cleaning
 2017-08-23 07:28;    2017-08-23 07:29;    shades from cleaning
 2017-08-24 07:38;    2017-08-24 07:39;    shades from cleaning
@@ -552,7 +553,7 @@ From;                Until;               Comment
 2017-11-07 07:35;    2017-11-07 09:15;    erratic data observed
 2017-11-07 09:15;    2017-11-07 12:45;    power out
 2017-11-08 00:00;    2017-11-08 23:59;    undefined problem erratic data observed
-2017-11-08 00:00;    2017-11-08 23:59;    irradical data
+2017-11-08 00:00;    2017-11-08 23:59;    radical data
 2017-11-10 00:00;    2017-11-10 08:37;    disconnection
 2017-11-21 08:01;    2017-11-21 08:02;    shades from cleaning
 2017-11-23 07:28;    2017-11-23 07:29;    shades from cleaning
@@ -607,6 +608,7 @@ From;                Until;               Comment
 2018-08-13 06:30;    2018-08-13 06:31;    shades from cleaning
 2018-08-23 06:59;    2018-08-23 07:00;    shades from cleaning
 2018-08-29 07:49;    2018-08-29 07:50;    shades from cleaning
+2018-09-05 07:48;    2018-09-05 07:50;    shades from cleaning
 2018-09-06 07:22;    2018-09-06 07:23;    shades from cleaning
 2018-09-12 07:36;    2018-09-12 07:37;    shades from cleaning
 2018-09-14 08:29;    2018-09-14 08:30;    shades from cleaning
@@ -653,7 +655,7 @@ From;                Until;               Comment
 2019-07-30 08:52;    2019-07-30 08:53;    shades from cleaning?
 2019-08-13 07:22;    2019-08-13 07:23;    shades from cleaning?
 2019-09-04 07:33;    2019-09-04 07:34;    shades from cleaning?
-2019-09-10 07:00;    2019-09-10 07:00;    shades from cleaning
+2019-09-10 07:00;    2019-09-10 07:01;    shades from cleaning
 2019-10-17 07:30;    2019-10-17 07:31;    shades from cleaning?
 2019-11-05 07:56;    2019-11-05 07:59;    shades from cleaning?
 2019-11-25 07:22;    2019-11-25 13:29;    disconnection
