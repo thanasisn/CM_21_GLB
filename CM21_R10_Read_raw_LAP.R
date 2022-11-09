@@ -102,11 +102,27 @@ OutliersPlot <- 4
 extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 
 
+args <- commandArgs( trailingOnly = TRUE )
+## override test from shell
+if ( length(args) > 0 ) {
+    if ( any(args == "NOTEST") ) { TEST      = FALSE }
+    if ( any(args == "NOTALL") ) { ALL_YEARS = FALSE }
+}
+
+
 ####  Execution control  ####
-ALL_YEARS = FALSE
+ALL_YEARS <- FALSE
+## When knitting
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
+## When executing
+args <- commandArgs( trailingOnly = TRUE )
+if ( length(args) > 0 ) {
+    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
+    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+}
+params <- list( ALL_YEARS = ALL_YEARS)
 
 
 #+ include=TRUE, echo=FALSE, results = 'asis'

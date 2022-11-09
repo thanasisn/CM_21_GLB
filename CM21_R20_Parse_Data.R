@@ -98,9 +98,17 @@ OutliersPlot <- 5
 
 ####  Execution control  ####
 ALL_YEARS <- FALSE
+## When knitting
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
+## When executing
+args <- commandArgs( trailingOnly = TRUE )
+if ( length(args) > 0 ) {
+    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
+    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+}
+params <- list( ALL_YEARS = ALL_YEARS)
 
 
 
