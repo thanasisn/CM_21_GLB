@@ -20,6 +20,10 @@ From;                Until;               Comment
 # 2017-05-23 12:55;    2017-05-14 15:58;    disconnection
 # 2017-05-23 14:55;    2017-05-14 14:58;    disconnection
 # 2017-05-23 16:55;    2017-05-14 16:58;    disconnection
+1993-06-08 17:50;    1993-06-08 17:51;    extreme low signal
+1994-01-25 11:05;    1994-01-25 11:06;    extreme low signal
+1995-10-15 22:58;    1995-10-15 22:59;    extreme low signal
+1995-12-13 00:00;    1995-12-14 00:00;    bad recorded data
 2006-02-11 00:00;    2006-02-11 23:59;    missing file
 2006-02-12 00:00;    2006-02-12 23:59;    missing file
 2006-04-29 00:00;    2006-04-29 23:59;    missing file
