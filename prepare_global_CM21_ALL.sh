@@ -25,7 +25,7 @@ info "Filter raw data to S0"
 Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R" "ALL"
 
 info "Compute dark to S1"
-Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
+Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R" "ALL"
 
 info "Construct missing dark for S1"
 Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R"
