@@ -642,6 +642,7 @@ From;                Until;               Comment
 2019-05-04 00:00;    2019-05-04 11:04;    radmon out
 2019-05-06 07:56;    2019-05-06 07:58;    shades from cleaning
 2019-05-08 07:40;    2019-05-08 07:41;    shades from cleaning
+2019-05-11 09:19;    2019-05-11 09:20;    shades from cleaning
 2019-05-13 10:34;    2019-05-13 10:35;    unknown extreme signal
 2019-05-21 07:24;    2019-05-21 07:25;    shades from cleaning
 2019-05-30 07:15;    2019-05-30 07:16;    shades from cleaning
