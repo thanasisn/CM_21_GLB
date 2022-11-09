@@ -102,27 +102,26 @@ OutliersPlot <- 4
 extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 
 
-args <- commandArgs( trailingOnly = TRUE )
-## override test from shell
-if ( length(args) > 0 ) {
-    if ( any(args == "NOTEST") ) { TEST      = FALSE }
-    if ( any(args == "NOTALL") ) { ALL_YEARS = FALSE }
-}
 
 
 ####  Execution control  ####
+## Default
 ALL_YEARS <- FALSE
+TEST      <- FALSE
+## When running
+args <- commandArgs( trailingOnly = TRUE )
+if ( length(args) > 0 ) {
+    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
+}
 ## When knitting
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
-## When executing
-args <- commandArgs( trailingOnly = TRUE )
-if ( length(args) > 0 ) {
-    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
-    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
-}
-params <- list( ALL_YEARS = ALL_YEARS)
+cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
+cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
@@ -136,7 +135,7 @@ sirena_files <- list.files( path        = SIRENA_DIR,
                             full.names  = TRUE )
 cat("\n**Found:",paste(length(sirena_files), "files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
-sirena_files <-grep("OLD", sirena_files, ignore.case = T, invert = T, value = T )
+sirena_files <- grep("OLD", sirena_files, ignore.case = T, invert = T, value = T )
 
 
 radmon_files <- list.files( path        = RADMON_DIR,
@@ -144,7 +143,7 @@ radmon_files <- list.files( path        = RADMON_DIR,
                             pattern     = "[0-9]*06.LAP$",
                             ignore.case = TRUE,
                             full.names  = TRUE )
-cat("\n**Found:",paste(length(radmon_files), "files from Radmon**\n"))
+cat("\n**Found:", paste(length(radmon_files), "files from Radmon**\n"))
 
 
 ####  Check files between Radmon and Sirena  ####
@@ -212,6 +211,8 @@ if (!params$ALL_YEARS) {
         stop("NO new data! NO need to parse!")
     }
 }
+cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
 #'
 #' Years to do: `r years_to_do`
 #'
