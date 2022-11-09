@@ -85,8 +85,8 @@ if (!interactive()) { options(warn=-1) }
 
 #+ echo=F, include=F
 ####  External code  ####
-library(data.table, quietly = T, warn.conflicts = F)
-library(pander,     quietly = T, warn.conflicts = F)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 source("~/CM_21_GLB/Functions_write_data.R")
 
@@ -95,19 +95,25 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
+
 ####  Execution control  ####
+## Default
 ALL_YEARS <- FALSE
-## When knitting
-if (!exists("params")){
-    params <- list( ALL_YEARS = ALL_YEARS)
-}
-## When executing
+TEST      <- FALSE
+## When running
 args <- commandArgs( trailingOnly = TRUE )
 if ( length(args) > 0 ) {
+    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
     if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
 }
-params <- list( ALL_YEARS = ALL_YEARS)
+## When knitting
+if (!exists("params")) {
+    params <- list( ALL_YEARS = ALL_YEARS)
+}
+cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
+cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -162,11 +168,11 @@ if (!params$ALL_YEARS) {
 
 # years_to_do <- 1993
 
-## decide what to do
+## Decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
 }
-
+cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
 
 ## Keep record of dark signal
