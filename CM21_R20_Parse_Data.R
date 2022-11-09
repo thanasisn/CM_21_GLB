@@ -96,19 +96,26 @@ panderOptions('table.split.table',        120   )
 
 OutliersPlot <- 5
 
+
+
 ####  Execution control  ####
+## Default
 ALL_YEARS <- FALSE
-## When knitting
-if (!exists("params")){
-    params <- list( ALL_YEARS = ALL_YEARS)
-}
-## When executing
+TEST      <- FALSE
+## When running
 args <- commandArgs( trailingOnly = TRUE )
 if (length(args) > 0) {
+    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE }
 }
-params <- list( ALL_YEARS = ALL_YEARS)
+## When knitting
+if (!exists("params")) {
+    params <- list( ALL_YEARS = ALL_YEARS)
+}
+cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
+cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 
 
@@ -196,6 +203,7 @@ if (!params$ALL_YEARS) {
 if (length(years_to_do) == 0) {
     stop("NO new data! NO need to parse!")
 }
+cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
 
 #'

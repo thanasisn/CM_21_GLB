@@ -84,8 +84,8 @@ if(!interactive()) {
 
 #+ echo=F, include=F
 ####  External code  ####
-library(data.table, quietly = T, warn.conflicts = F)
-library(pander,     quietly = T, warn.conflicts = F)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 
@@ -117,11 +117,12 @@ if ( length(args) > 0 ) {
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
 }
 ## When knitting
-if (!exists("params")){
+if (!exists("params")) {
     params <- list( ALL_YEARS = ALL_YEARS)
 }
 cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
 cat(paste("\n**TEST     :", TEST,      "**\n"))
+
 
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
