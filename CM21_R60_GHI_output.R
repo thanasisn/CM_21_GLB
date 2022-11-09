@@ -102,10 +102,18 @@ wattlimit <- 50  ## radiation limit for histograms
 
 
 ####  Execution control  ####
-ALL_YEARS = FALSE
+ALL_YEARS <- FALSE
+## When knitting
 if (!exists("params")){
     params <- list( ALL_YEARS = ALL_YEARS)
 }
+## When executing
+args <- commandArgs( trailingOnly = TRUE )
+if ( length(args) > 0 ) {
+    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
+    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+}
+params <- list( ALL_YEARS = ALL_YEARS)
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
