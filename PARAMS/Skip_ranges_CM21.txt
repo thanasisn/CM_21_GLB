@@ -3,15 +3,15 @@
 # Ranges to be excluded from CM21 data
 #
 # Natsis Athanasios <natsisthanasis@gmail.com>
-# 2021-12-23
 #
 # Dates in UTC
-# The from date is excluded, the until date is kept
-# (start <= time < end)
-# Start: 2006-01-01
+# The 'From' second is excluded, the 'Until' second is kept
+# test( From <= time < Until )
+#
+# This file is created be manual inspection of the data and
+# the references in the instruments log book.
 #
 
-## all day ranges
 From;                Until;               Comment
 
 # 2016-07-04 9:40LC start roof constructions
