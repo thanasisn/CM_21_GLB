@@ -74,10 +74,10 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R20_") })
-if(!interactive()) {
-    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+if (!interactive()) {
+    pdf(    file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf",  Script.Name))))
+    sink(   file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out",  Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",    basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -125,8 +125,9 @@ ranges       <- read.table( BAD_RANGES,
                             strip.white = TRUE,
                             header      = TRUE,
                             comment.char = "#" )
-ranges$From  <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
-ranges$Until <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
+ranges$From     <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
+ranges$Until    <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
+ranges$HourSpan <- as.numeric(ranges$Until - ranges$From) / 3600
 
 #'
 #' Check inverted time ranges
@@ -141,9 +142,9 @@ stopifnot(!all(ranges$From < ranges$Until))
 #' Check time ranges span in hours
 #'
 #+ include=T, echo=F
-hist(as.numeric(ranges$Until - ranges$From)/3600)
+hist(ranges$HourSpan)
 cat('\n\n')
-temp <- ranges[ ranges$Until - ranges$From > 24*3600 , ]
+temp <- ranges[ ranges$HourSpan > 12 , ]
 row.names(temp) <- NULL
 pander( temp )
 cat('\n\n')
@@ -243,37 +244,39 @@ pander(signal_physical_limits)
 ####  Loop all years  ####
 
 #+ include=TRUE, echo=F, results="asis"
-for ( yyyy in years_to_do) {
+for (yyyy in years_to_do) {
 
     #### Get raw data ####
-    afile    <- grep(yyyy, input_files,  value = T)
-    rawdata  <- readRDS(afile)
+    afile   <- grep(yyyy, input_files,  value = T)
+    rawdata <- readRDS(afile)
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
 
-    NR_loaded  <- rawdata[ !is.na(CM21value), .N ]
+    NR_loaded <- rawdata[ !is.na(CM21value), .N ]
 
 
     ####    Mark bad date ranges    ############################################
     rawdata[ , Bad_ranges := "" ]
     ## loop only relevant
     rangestemp <- ranges
-    rangestemp <- rangestemp[ year(rangestemp$From)  >= yyyy &
-                                  year(rangestemp$Until) <= yyyy, ]
-    for ( i in 1:nrow(rangestemp) ) {
-        lower <- rangestemp$From[    i ]
-        upper <- rangestemp$Until[   i ]
-        comme <- rangestemp$Comment[ i ]
+    rangestemp <- rangestemp[year(rangestemp$From)  >= yyyy - 1 &
+                             year(rangestemp$Until) <= yyyy + 1, ]
+    if (nrow(rangestemp) > 0) stop("jjjj")
+    for (i in 1:nrow(rangestemp) ) {
+        lower <- rangestemp$From[   i]
+        upper <- rangestemp$Until[  i]
+        comme <- rangestemp$Comment[i]
         ## mark bad regions of data
-        rawdata[ Date >= lower & Date <= upper, Bad_ranges := comme ]
+        rawdata[Date >= lower & Date <= upper, Bad_ranges := comme]
     }
-    NR_bad_ranges <- rawdata[ Bad_ranges != "", .N ]
+    NR_bad_ranges <- rawdata[Bad_ranges != "", .N]
 
     ## remove and store bad ranges data
-    myRtools::write_dat( object = rawdata[ Bad_ranges != "",  ],
-                         file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",yyyy,"_bad_ranges"),
+    myRtools::write_dat( object = rawdata[ Bad_ranges != "", ],
+                         file   = paste0(SIGNAL_DIR,
+                                         "/LAP_CM21_H_SIG_", yyyy, "_bad_ranges"),
                          clean  = TRUE)
 
     rawdata[ Bad_ranges != "", CM21value := NA ]
@@ -383,13 +386,12 @@ for ( yyyy in years_to_do) {
     cat(paste0( "**",
                 rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n" ))
 
-
-    cat('\\scriptsize\n')
-
-    cat(pander(table(rawdata$QFlag_1)))
-    cat("\n\n")
-
-    cat('\\normalsize\n')
+    if (!all(is.na(rawdata$QFlag_1))) {
+        cat('\\scriptsize\n')
+        cat(pander(table(rawdata$QFlag_1)))
+        cat("\n\n")
+        cat('\\normalsize\n')
+    }
 
     # cat('\\footnotesize\n')
     # cat('\\normalsize\n')
@@ -419,7 +421,7 @@ for ( yyyy in years_to_do) {
 
     cat("\\FloatBarrier\n\n")
     cat('\n\n')
-    cat(paste("### Only un flaged data.\n\n"))
+    cat(paste("### Only non flagged data.\n\n"))
     cat('\n\n')
 
 
