@@ -679,6 +679,7 @@ From;                Until;               Comment
 2019-11-25 07:22;    2019-11-25 13:29;    disconnection
 2019-11-27 08:31;    2019-11-27 08:32;    shades from cleaning?
 2020-03-25 00:00;    2020-03-27 12:21;    No Data
+2020-06-10 08:01;    2020-06-10 08:02;    shades from cleaning
 2021-01-19 08:50;    2021-01-19 08:53;    shades from cleaning
 2021-02-26 07:55;    2021-02-26 07:58;    shades from cleaning
 2021-05-10 05:58;    2021-05-10 06:01;    shades from cleaning
