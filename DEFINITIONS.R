@@ -48,14 +48,13 @@ TOT_EXPORT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 ####    Parametric files    ####################################################
 
 ## Date ranges to exclude, after manual inspection
-BAD_RANGES  <- paste0(BASED,      "/PARAMS/Skip_ranges_CM21.txt")
+BAD_RANGES  <- paste0(BASED,      "/PARAMS/Skip_ranges_CM21.dat")
 ## Storage of dark signal details for all days
 DARKSTORE   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_data_S0.Rds")
 ## Dark signal details constructed for uncomputable days
 DARKCONST   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_construction_S0.Rds")
 ## Logging of missing lap input files
 MISSING_INP <- paste0(BASED,      "/PARAMS/Missing_lap_files.dat")
-
 
 
 
@@ -68,8 +67,8 @@ BREAKDATE  = as.POSIXct("2014-02-05 00:00:00")
 
 
 ## Lower global limit any Global value below this should be erroneous data
-GLB_LOW_LIM_01   = -15      ## before break-date
-GLB_LOW_LIM_02   = -7       ## after break-data
+GLB_LOW_LIM_01  <- -15      ## before break-date
+GLB_LOW_LIM_02  <- -7       ## after break-data
 
 
 
@@ -93,3 +92,4 @@ ERROR_GLOBA <-  5         ## Positive radiation in the night (R50)
 
 ####    Drop night time data    ################################################
 NIGHT_DROP  <- -5         ## Drop when sun is below that (R60)
+
