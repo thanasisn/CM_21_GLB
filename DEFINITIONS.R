@@ -49,7 +49,7 @@ TOT_EXPORT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW/"
 ####    Parametric files    ####################################################
 
 ## Date ranges to exclude, after manual inspection
-BAD_RANGES  <- paste0(BASED,      "/PARAMS/Skip_ranges_CM21.txt")
+BAD_RANGES  <- paste0(BASED,      "/PARAMS/Skip_ranges_CM21.dat")
 ## Storage of dark signal details for all days
 DARKSTORE   <- paste0(SIGNAL_DIR, "/LAP_CM21_Dark_data_S0.Rds")
 ## Dark signal details constructed for uncomputable days

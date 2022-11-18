@@ -32,6 +32,7 @@
 #'     toc:        true
 #'     fig_width:  7.5
 #'     fig_height: 5
+#'
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
@@ -142,9 +143,10 @@ ranges$Comment[ranges$Comment == ""] <- "NO DESCRIPTION"
 #'
 #+ include=T, echo=F
 pander(
-    ranges[ ranges$From > ranges$Until, ]
+    ranges[ !ranges$From < ranges$Until, ]
 )
-stopifnot(!all(ranges$From < ranges$Until))
+stopifnot(!all(!ranges$From < ranges$Until))
+
 
 #'
 #' Check time ranges span in hours
