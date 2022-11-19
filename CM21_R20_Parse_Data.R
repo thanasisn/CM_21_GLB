@@ -279,7 +279,7 @@ for (yyyy in years_to_do) {
         upper <- rangestemp$Until[  i]
         comme <- rangestemp$Comment[i]
         ## mark bad regions of data
-        rawdata[Date >= lower & Date <= upper, Bad_ranges := comme]
+        rawdata[Date >= lower & Date < upper, Bad_ranges := comme]
     }
     NR_bad_ranges <- rawdata[Bad_ranges != "", .N]
 
