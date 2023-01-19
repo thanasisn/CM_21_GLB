@@ -4,27 +4,29 @@
 
 Sys.setenv(TZ = "UTC")
 
-## Check date help function
+####  Check input date help function  ####
 is.POSIXct <- function(x) inherits(x, "POSIXct")
 
-## Calibration values from CM21_caldata_06.txt
+####  Calibration values from CM21_caldata_06.txt  ####
 cm21_calibration_data <- matrix(
        c( "1991-01-01", 11.98E-6, 0.5E-2,
           "1995-10-21", 11.98E-6,   2E-2,
           "1995-11-02", 11.98E-6,   1E-2,  ## <- this is correct!!!
-          "2004-07-01", 11.98E-6,   4E-2,  ## <- this date is not correct needs a shift
+          "2004-07-01", 11.98E-6,   4E-2,  ## <- date is not correct needs a shift
           "2005-12-05", 11.99E-6,   4E-2,
           "2011-12-30", 11.96E-6,   4E-2,
-          "2012-01-31", 11.96E-6,   4E-2  ),
+          "2012-01-31", 11.96E-6,   4E-2,
+          "2022-06-04", 12.02E-6,   4E-2  ),
        byrow = TRUE,
        ncol = 3)
+
 
 ## Format to data frame
 cm21_calibration_data <- data.frame(Date        = as.POSIXct( cm21_calibration_data[,1] ),
                                     Sensitivity = as.numeric( cm21_calibration_data[,2] ),
                                     Gain        = as.numeric( cm21_calibration_data[,3] ))
 
-## Interpolation functions with extend right rule
+####  Interpolation functions with extend to right rule  ####
 cm21_sensitivity <- approxfun( x      = cm21_calibration_data$Date,
                                y      = cm21_calibration_data$Sensitivity,
                                rule   = 1:2  )
@@ -35,14 +37,16 @@ cm21_gain        <- approxfun( x      = cm21_calibration_data$Date,
                                rule   = 1:2  )
 
 
-#' Conversion factor from volt to watt for CM21
 #'
-#' @details This uses both the sensitivity of the instruments and the gain
-#' factor of the measurement device.
+#' Conversion factor from volt to watt for CM-21
 #'
-#' @param date POSIXct date for the factor
+#' @details      This uses both the sensitivity of the instruments and
+#'               the gain factor of the measurement device.
+#'
+#' @param  date  POSIXct date input for the conversion factor
 #'
 #' @return (numeric) Conversion factor
+#'
 #' @export
 cm21factor <- function(date) {
     if (is.POSIXct(date)) {
@@ -54,15 +58,17 @@ cm21factor <- function(date) {
 
 
 
-## Possible signal range on acquisition
+####  Set possible signal range on acquisition  ####
 signal_physical_limits <- matrix(
-    c( "1991-01-01", -1, 5,
+    c( "1991-01-01", -1.0, 5.0,
        "1995-10-21", -0.4, 1.2,
        "1995-11-02", -0.6, 2.5,
        "2004-07-01", -0.2, 0.6,
        "2005-12-05", -0.2, 0.6,
        "2011-12-30", -0.2, 0.6,
-       "2012-01-31", -0.2, 0.6 ),    byrow = TRUE,
+       "2012-01-31", -0.2, 0.6,
+       "2022-06-04", -0.2, 0.6
+        ),    byrow = TRUE,
     ncol = 3)
 
 ## Format to data frame
@@ -77,12 +83,14 @@ signal_physical_limits$Lower_radiation_lim <- cm21factor(signal_physical_limits$
 signal_physical_limits$Upper_radiation_lim <- cm21factor(signal_physical_limits$Date) * signal_physical_limits$Upper_lim
 
 
+####  Functions to get upper and lower limit for acquisition signal  ####
+signal_lower_limit <- approxfun(x      = signal_physical_limits$Date,
+                                y      = signal_physical_limits$Lower_lim,
+                                method = "constant",
+                                rule   = 1:2  )
 
-signal_lower_limit <- approxfun( x      = signal_physical_limits$Date,
-                                 y      = signal_physical_limits$Lower_lim,
-                                 method = "constant",
-                                 rule   = 1:2  )
-signal_upper_limit <- approxfun( x      = signal_physical_limits$Date,
-                                 y      = signal_physical_limits$Upper_lim,
-                                 method = "constant",
-                                 rule   = 1:2  )
+signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
+                                y      = signal_physical_limits$Upper_lim,
+                                method = "constant",
+                                rule   = 1:2  )
+
