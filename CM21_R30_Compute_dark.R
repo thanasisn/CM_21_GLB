@@ -300,7 +300,7 @@ for ( yyyy in years_to_do) {
                     dark_flag              <- "MISSING"
                     missingdark            <- NA
                 } else {
-                    ## get data from recontracted dark database
+                    ## get data from recomputed dark database
                     todays_dark_correction <- construct[ Date == theday, DARK]
                     dark_flag              <- "CONSTRUCTED"
                 }

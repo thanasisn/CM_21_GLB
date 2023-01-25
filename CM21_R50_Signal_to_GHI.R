@@ -116,8 +116,8 @@ args <- commandArgs( trailingOnly = TRUE )
 if ( length(args) > 0 ) {
     if (any(args == "NOTEST"  )) { TEST      <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
-    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
-    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE }
 }
 ## When knitting
 if (!exists("params")) {
@@ -219,12 +219,12 @@ cat("\n\n")
 
 
 plot(dates, cm21factor(dates),
-     pch = 19, main = "CM21 convertion factor",
+     pch = 19, main = "CM21 conversion factor",
      xlab = "", ylab = "", cex = .3)
 points(cm21_calibration_data$Date, cm21_calibration_data$Gain / cm21_calibration_data$Sensitivity,
        col = "orange" )
 legend("right",
-       legend = c("Convertion factor interpolated", "Convertion factor calibrated"),
+       legend = c("Conversion factor interpolated", "Conversion factor calibrated"),
        pch    = c( 19, 1 ),
        col    = c(  1, "orange"),
        bty    = "n", cex = 0.8)
@@ -244,7 +244,7 @@ cat("\n\n")
 #'
 #' When elevation is above `r SUN_ELEV` mark
 #' Global radiation less than `r MINglbSUNup`.
-#' These values are considered to be erronious records.
+#' These values are considered to be erroneous records.
 #'
 
 
@@ -315,7 +315,7 @@ for ( yyyy in years_to_do) {
     negative <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0  ]
     if ( nrow(negative) > 0 ){
         cat("\n\n")
-        cat("\n**Days with negative global raditaion in dyalight**\n\n")
+        cat("\n**Days with negative global radiation in daylight**\n\n")
         cat(paste(unique(as.Date(negative$Date))))
         cat("\n\n")
         hist(negative$CM21value, main = "Negative Global radiation in daylight")
