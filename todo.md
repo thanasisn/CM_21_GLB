@@ -1,7 +1,7 @@
 
 # CM_21_GLB
 
-## May use QCrad for processing
+## May use QCrad for pre processing
 
 We already do some filtering of bad data in CM-21
 
@@ -14,11 +14,7 @@ Period 2004-07-03 to 2004-07-22 seems the conversion factor is wrong.
 - ask Bais [ ]
 
 
-## Use the new calibration data [ ]
-
-- check the validity? [ ]
-
-
+    
 ## Do a comparison with inclined CM-21 
 
 For the period CM-21 was missing for calibration
