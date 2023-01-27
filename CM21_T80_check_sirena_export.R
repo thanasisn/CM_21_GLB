@@ -1,12 +1,17 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "Read and export global radiation data from sirena"
+#' title:         "??"
 #' author:        "Natsis Athanasios"
-#' date:          "`r format(Sys.time(), '%B %d, %Y')`"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
+#' abstract:      " todo  "
 #' documentclass: article
 #' classoption:   a4paper,oneside
-#' fontsize:      11pt
+#' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' link-citations:  yes
+#' colorlinks:      yes
 #'
 #' header-includes:
 #' - \usepackage{caption}
@@ -45,29 +50,28 @@ knitr::opts_chunk$set(comment    = ""      )
 # pdf output is huge too many point to plot
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"   )
-# knitr::opts_chunk$set(fig.width  = 8       )
-# knitr::opts_chunk$set(fig.height = 6       )
-# knitr::opts_chunk$set(out.width  =  "50%"       )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  =  "center"       )
-
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
-#+ echo=F, include=F
+
+#+ include=F, echo=F
 ####  Set environment  ####
-# rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
                             return("check_export_sirena.R") })
 if(!interactive()) {
-    pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+    pdf(    file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf",  Script.Name))))
+    sink(   file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out",  Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/",    basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 Script.Base = sub("\\.R$","",Script.Name)
 
-
+#+ echo=F, include=F
+####  External code  ####
 library(data.table)
 library(pander)
 
@@ -82,7 +86,7 @@ files <- list.files(folder,
                      ignore.case = T,
                      full.names  = T)
 
-## check if we have to read
+## cache data check if we have to read
 if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
     DT <- data.table()
     for (af in files) {
@@ -92,10 +96,12 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
         temp$Date <- date
         temp$file <- af
         DT        <- rbind(DT, temp)
-        print(date)
+        cat(print(date),"\r")
     }
+    cat("Cache data\n")
     myRtools::writeDATA(DT, rdsfile)
 } else {
+    cat("Load cached data\n")
     DT <- readRDS(rdsfile)
 }
 
@@ -123,7 +129,9 @@ rm(temp)
 pander(
     DT[ , .(Files      = length(unique(file)),
             Datapoints = .N,
-            Missing = sum(is.na(`[W.m-2]`))), by = year(Date)]
+            Missing    = sum(is.na(`[W.m-2]`)),
+            MissPerC   = round(100*sum(is.na(`[W.m-2]`))/.N, digits = 1 )),
+        by = year(Date)]
 )
 #'
 #' Unique files: `r length(unique(DT$file))`
@@ -133,11 +141,13 @@ pander(
 
 missing <- DT[, .(Missing = sum(is.na(`[W.m-2]`))), by = as.Date(Date)]
 missing[ Missing == 0, Missing := NA]
-plot(missing$as.Date, missing$Missing,pch = 19, cex=0.5, main = "Missing data by day")
+plot(missing$as.Date, missing$Missing,
+     pch = 19, cex = 0.5, main = "Missing data by day")
 
 missing <- DT[, .(Missing = sum(is.na(`[W.m-2]`))), by = .(year(Date), month(Date)) ]
 missing[, as.Date := as.Date(paste(year, month, "01"),"%Y %m %d")]
-plot(missing$as.Date, missing$Missing,pch = 19, cex=0.5, main = "Missing data by month")
+plot(missing$as.Date, missing$Missing,
+     pch = 19, cex = 0.5, main = "Missing data by month")
 
 
 
@@ -204,9 +214,9 @@ hist(DT$`[W.m-2]`)
 
 #' ## Monthly values
 #+ echo=F
-temp <- DT[ , .( Mean   = mean(`[W.m-2]`,   na.rm = T),
-                 Max    = max(`[W.m-2]`,    na.rm = T),
-                 Min    = min(`[W.m-2]`,    na.rm = T),
+temp <- DT[ , .( Mean   = mean(  `[W.m-2]`, na.rm = T),
+                 Max    = max(   `[W.m-2]`, na.rm = T),
+                 Min    = min(   `[W.m-2]`, na.rm = T),
                  Median = median(`[W.m-2]`, na.rm = T)),
             by = .(year(Date),month(Date)) ]
 temp$Date <- as.POSIXct(strptime( paste( temp$year, temp$month, "1"), "%Y %m %d" ))
@@ -263,5 +273,6 @@ points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
 
 
 #' **END**
+#+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

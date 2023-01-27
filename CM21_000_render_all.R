@@ -73,17 +73,13 @@ render("./CM21_T71_GHI_Export_TOT.R",
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
+render("./CM21_T80_check_sirena_export.R",
+       params = list( CACHE = F ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
-#
-# render("./check_export_sirena.R",
-#        params = list( CACHE = F ),
-#        clean                = T  ,
-#        output_format        = NULL,
-#        output_dir           = "~/CM_21_GLB/REPORTS")
-#
-#
-#
+
 #
 # ## some more nice plots
 #
