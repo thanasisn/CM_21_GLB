@@ -127,6 +127,17 @@ input_years <- as.numeric(
 #+ echo=F, include=T
 
 
+#'
+#' ## Aggregation method
+#'
+#' TODO: describe current method
+#'
+#' **WARNING: A different method may exist!!**
+#'
+#+ echo=F, include=T
+
+
+
 
 ## loop all input files
 
@@ -144,22 +155,18 @@ for (afile in input_files) {
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n" )
 
-
     ## create all minutes
-    allminutes <- seq( as.POSIXct( paste0(yyyy, "-01-01 00:00:30") ),
-                       as.POSIXct( paste0(yyyy, "-12-31 23:59:30") ),
-                       by = "mins" )
-    allhours    <- seq(as.POSIXct( paste0(yyyy, "-01-01 00:00:30")),
-                       as.POSIXct( paste0(yyyy, "-12-31 23:59:30") ), by = "hour")
+    allminutes <- seq(as.POSIXct( paste0(yyyy, "-01-01 00:00:30") ),
+                      as.POSIXct( paste0(yyyy, "-12-31 23:59:30") ),
+                      by = "mins")
+    allhours   <- seq(as.POSIXct( paste0(yyyy, "-01-01 00:00:30")),
+                      as.POSIXct( paste0(yyyy, "-12-31 23:59:30") ), by = "hour")
 
     ayear <- merge( ayear,
                     data.frame(Date = allminutes),
                     by = "Date", all = T)
 
     ayear$day <- as.Date(ayear$Date)
-
-
-    stop("A different technic may exist!!\n Check documentation!!!")
 
     #### run on all quarter of the hour #####################################
     ayear$quarter <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
@@ -224,10 +231,10 @@ for (afile in input_files) {
     ## create the format they like
 
     library(lubridate, quietly = T)
-    hourlyoutput <- data.frame( year   = year(  test$Dates ),
-                                month  = month( test$Dates ),
-                                day    = day(   test$Dates ),
-                                time   = hour(  test$Dates ) + 0.5,
+    hourlyoutput <- data.frame( year   = year( test$Dates ),
+                                month  = month(test$Dates ),
+                                day    = day(  test$Dates ),
+                                time   = hour( test$Dates ) + 0.5,
                                 global = test$Global)
 
     wrdcfile <- paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
