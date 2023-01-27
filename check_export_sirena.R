@@ -105,8 +105,8 @@ DT[  st.dev   < -8,  st.dev   := NA ]
 
 
 ## export for validation of my process
-temp <- copy(DT)
-dateess <- paste( temp$Date, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60) )
+temp      <- copy(DT)
+dateess   <- paste( temp$Date, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60) )
 temp$Date <- as.POSIXct( strptime(dateess, "%F %H %M") )
 temp[, file    := NULL]
 temp[, TIME_UT := NULL]
