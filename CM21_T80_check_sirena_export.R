@@ -1,10 +1,9 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:         "??"
+#' title:         "Check total radiation export for sirena"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      " todo  "
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -20,7 +19,7 @@
 #'
 #' output:
 #'   bookdown::html_document2:
-#'     keep_md:          yes
+#'     keep_md:          no
 #'     out_width:        100%
 #'     toc:              yes
 #'     number_sections:  no
