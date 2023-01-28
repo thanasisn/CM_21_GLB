@@ -79,6 +79,19 @@ render("./CM21_T80_check_sirena_export.R",
        output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
+render("./CM21_T81_check_wrdc_output.R",
+       params = list( CACHE = F ),
+       clean                = T  ,
+       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+
+
+
+
+
+cat("Run to create the graphs:\n")
+cat("./CM21_P98_Plot_all_years_LAP.R\n")
+cat("./CM21_P99_Plot_all_daily_LAP.R\n")
+
 
 #
 # ## some more nice plots

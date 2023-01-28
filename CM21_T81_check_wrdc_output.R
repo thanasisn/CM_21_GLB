@@ -4,7 +4,7 @@
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Just a simple plot of the submited data"
+#' abstract:      "Just a simple plot of the submitted data"
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -20,7 +20,7 @@
 #'
 #' output:
 #'   bookdown::html_document2:
-#'     keep_md:          yes
+#'     keep_md:          no
 #'     out_width:        100%
 #'     toc:              yes
 #'     number_sections:  no
@@ -77,11 +77,16 @@ if(!interactive()) {
 ####  External code  ####
 library(data.table)
 
-file <- "~/DATA/cm21_data_validation/CM21_exports/sumbit_to_WRDC_2021.dat"
 
 
+
+#'
+#' ## 2022
+#'
+#'
+file <- "~/DATA/Broad_Band/CM21_H_exports/sumbit_to_WRDC_2022.dat"
+file.mtime(file)
 data <- fread(file)
-
 plot(data$global)
 
 
