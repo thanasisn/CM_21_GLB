@@ -32,7 +32,7 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 CREATE_PDF = TRUE
 
 ## for video
-# CREATE_PDF = FALSE
+CREATE_PDF = FALSE
 
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
