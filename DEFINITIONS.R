@@ -13,7 +13,7 @@
 
 
 ####    Project root folder    #################################################
-BASED      <- "~/CM_21_GLB/"
+BASED        <- "~/CM_21_GLB/"
 
 
 
@@ -25,8 +25,14 @@ START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
 END_DAY      <- Sys.time()
 
 ## date range to export for TOT and WRDC
-EXPORT_START <- as.POSIXct("2006-01-01 00:00:00 UTC")
+EXPORT_START <- as.POSIXct("2005-01-01 00:00:00 UTC")
 EXPORT_STOP  <- as.POSIXct("2023-01-01 00:00:00 UTC")
+
+#'
+#' - There are some problems to resolve in 2004
+#' - Have to manual inspect data before 2005-01-01
+#'
+
 
 
 
@@ -65,12 +71,12 @@ MISSING_INP <- paste0(BASED,      "/PARAMS/Missing_lap_files.dat")
 ####  Filtering Variables  ####
 
 ## break between 2014-02-04 and 2014-02-05
-BREAKDATE  = as.POSIXct("2014-02-05 00:00:00")
+BREAKDATE      <- as.POSIXct("2014-02-05 00:00:00")
 
 
 ## Lower global limit any Global value below this should be erroneous data
-GLB_LOW_LIM_01   = -15      ## before break-date
-GLB_LOW_LIM_02   = -7       ## after break-data
+GLB_LOW_LIM_01 <- -15      ## before break-date
+GLB_LOW_LIM_02 <- -7       ## after break-data
 
 
 
