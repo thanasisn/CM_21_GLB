@@ -94,3 +94,7 @@ signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 method = "constant",
                                 rule   = 1:2  )
 
+
+# dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
+# plot(dd, cm21factor(dd))
+
