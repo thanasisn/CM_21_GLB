@@ -108,6 +108,8 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
+TEST      <- TRUE
+ALL_YEARS <- TRUE
 ## When running
 args <- commandArgs( trailingOnly = TRUE )
 if ( length(args) > 0 ) {
@@ -165,6 +167,10 @@ rm(rad_names, radmon_files)
 
 ####  Read files of all years  ####
 
+## TEST
+START_DAY  <- as.POSIXct("2004-01-01 00:00:00 UTC")
+END_DAY    <- as.POSIXct("2004-01-01 00:00:00 UTC")
+
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
 
@@ -206,7 +212,7 @@ if (!params$ALL_YEARS) {
     # missing_years <- 2015:2022
 
     ## decide what to do
-    if (length(missing_years) != 0 | NEWDATA) {
+    if (TEST | length(missing_years) != 0 | NEWDATA) {
         years_to_do <- sort(unique(c(missing_years,new_to_do)))
     } else {
         stop("NO new data! NO need to parse!")
