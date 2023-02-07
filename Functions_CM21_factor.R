@@ -13,6 +13,7 @@ cm21_calibration_data <- matrix(
           "1995-10-21", 11.98E-6,   2E-2,
           "1995-11-02", 11.98E-6,   1E-2,  ## <- this is correct!!!
           "2004-07-01", 11.98E-6,   4E-2,  ## <- date is not correct needs a shift
+          "2004-07-22", 11.98E-6,   4E-2,  ## <- date is not correct needs a shift
           "2005-12-05", 11.99E-6,   4E-2,
           "2011-12-30", 11.96E-6,   4E-2,
           "2012-01-31", 11.96E-6,   4E-2,
@@ -95,6 +96,6 @@ signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 rule   = 1:2  )
 
 
-# dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
-# plot(dd, cm21factor(dd))
+dd <- seq.POSIXt(as.POSIXct("2004-05-01"), as.POSIXct("2004-09-01"), by = "day")
+plot(dd, cm21factor(dd))
 
