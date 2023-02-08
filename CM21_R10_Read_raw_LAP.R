@@ -39,9 +39,9 @@
 #'
 #'  **LAP -> SIG**
 #'
-#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#' **Source code: [`github.com/thanasisn/CM_21_GLB`](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display/2-cm21_global/`](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #' Read **LAP files** with CM_21 signal data to **Signal** rds files
 #'
@@ -76,9 +76,9 @@ Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R10_") })
 if(!interactive()) {
-    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+    pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -108,8 +108,8 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
-ALL_YEARS <- TRUE
+# TEST      <- TRUE
+# ALL_YEARS <- TRUE
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if ( length(args) > 0 ) {
@@ -129,18 +129,17 @@ cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
-## Files for import
-
-sirena_files <- list.files( path        = SIRENA_DIR,
-                            recursive   = TRUE,
-                            pattern     = "[0-9]*06.LAP$",
-                            ignore.case = TRUE,
-                            full.names  = TRUE )
+## Source data files for import from stoarage
+sirena_files <- list.files(path        = SIRENA_DIR,
+                           recursive   = TRUE,
+                           pattern     = "[0-9]*06.LAP$",
+                           ignore.case = TRUE,
+                           full.names  = TRUE )
 cat("\n**Found:",paste(length(sirena_files), "files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
 sirena_files <- grep("OLD", sirena_files, ignore.case = T, invert = T, value = T )
 
-
+## Source data files for import from recording machine
 radmon_files <- list.files( path        = RADMON_DIR,
                             recursive   = TRUE,
                             pattern     = "[0-9]*06.LAP$",
@@ -154,7 +153,7 @@ cat("\n**Found:", paste(length(radmon_files), "files from Radmon**\n"))
 sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
-missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
+missing_from_sir <- rad_names[ !rad_names %in% sir_names ]
 if ( length(missing_from_sir) > 0 ) {
     warning(paste("\nThere are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n"))
     cat(missing_from_sir,sep = "\n\n")
@@ -168,11 +167,11 @@ rm(rad_names, radmon_files)
 ####  Read files of all years  ####
 
 ## TEST
-START_DAY  <- as.POSIXct("2004-01-01 00:00:00 UTC")
-END_DAY    <- as.POSIXct("2004-01-01 00:00:00 UTC")
+# START_DAY  <- as.POSIXct("2004-01-01 00:00:00 UTC")
+# END_DAY    <- as.POSIXct("2004-01-01 00:00:00 UTC")
 
 ## all allowed years
-years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y" )
+years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y")
 
 
 #'
@@ -185,7 +184,8 @@ if (!params$ALL_YEARS) {
     NEWDATA            <- FALSE
     sirena_files_dates <- file.mtime(sirena_files)
     storagefiles       <- list.files(SIGNAL_DIR, "LAP_CM21_H_SIG.*.rds",
-                                     full.names = T, ignore.case = T)
+                                     full.names  = TRUE,
+                                     ignore.case = TRUE)
     last_storage_date  <- max(file.mtime(storagefiles))
     newfiles           <- sirena_files[sirena_files_dates > last_storage_date]
 
@@ -198,12 +198,12 @@ if (!params$ALL_YEARS) {
 
     ## check new data
     new_to_do <- c()
-    if (length(newfiles)>0) {
+    if (length(newfiles) > 0) {
         ## find years to do
         newyears <- unique(
             year(
                 strptime(
-                    sub("06\\.lap","", basename(newfiles), ignore.case = T),
+                    sub("06\\.lap", "", basename(newfiles), ignore.case = T),
                     "%d%m%y")))
         new_to_do <- years_to_do[years_to_do %in% newyears]
         NEWDATA   <- TRUE
@@ -227,7 +227,7 @@ cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
 ## loop all years
 for (YYYY in years_to_do) {
-    yy           <- substr(YYYY, 3,4)
+    yy           <- substr(YYYY, 3, 4)
     year_data    <- data.table()
     days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
                              as.Date(paste0(YYYY,"-12-31")), by = "day")
@@ -243,9 +243,9 @@ for (YYYY in years_to_do) {
 
         found <- grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
         ## check file names
-        if ( length(found) > 1 ) {
+        if (length(found) > 1) {
             stop("Found more file than we should") }
-        if ( length(found) == 0 ) {
+        if (length(found) == 0) {
             missing_files <- c(missing_files, paste0(YYYY,"/", format(aday, "%d%m%y06")))
             cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n",
                 file = MISSING_INP, append = T )
@@ -324,8 +324,9 @@ for (YYYY in years_to_do) {
         ## Try to find outliers
         yearlims <- data.table()
         for (an in grep("CM21", names(year_data), value = T)){
-            daily <- year_data[ , .( dmin =  min(get(an),na.rm = T),
-                                     dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+            daily <- year_data[ , .(dmin =  min(get(an),na.rm = T),
+                                    dmax =  max(get(an),na.rm = T) ),
+                                by = as.Date(Date)]
             low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
             upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
             yearlims <- rbind(yearlims,  data.table(an = an,low = low, upe = upe))
@@ -350,22 +351,30 @@ for (YYYY in years_to_do) {
     hist(year_data$CM21sd,    breaks = 50, main = paste("CM21 signal SD",YYYY ) )
     cat('\n\n')
 
+    ylim <- range(year_data$sig_lowlim,
+                  year_data$sig_upplim,
+                  year_data$CM21value,
+                  na.rm = TRUE)
+
     plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", YYYY ),
+         main = paste("CM21 signal ", YYYY),
          xlab = "Elevation",
-         ylab = "CM21 signal" )
+         ylab = "CM21 signal",
+         ylim = ylim)
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
 
 
     plot(year_data$Date, year_data$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", YYYY ),
+         main = paste("CM21 signal ", YYYY),
          xlab = "Elevation",
-         ylab = "CM21 signal" )
+         ylab = "CM21 signal",
+         ylim = ylim)
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(v = signal_physical_limits$Date)
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
     cat('\n\n')
 
 
@@ -377,23 +386,25 @@ for (YYYY in years_to_do) {
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-2,3))
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        abline(v=signal_physical_limits$Date)
+        ## plot config changes
+        abline(v = signal_physical_limits$Date, lty = 3)
 
         testdata <- extra[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
         cat('\n\n')
 
-
         part <- year_data[ Date > as.POSIXct("1995-11-15") &
                            Date < as.POSIXct("1995-12-31") ]
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        abline(v=signal_physical_limits$Date)
+        ## plot config changes
+        abline(v = signal_physical_limits$Date, lty = 3)
 
         testdata <- extra[ Date > as.POSIXct("1995-11-15") &
                            Date < as.POSIXct("1995-12-31") ]
+        ## reverse sirena TOT to signal
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
         cat('\n\n')
 
@@ -409,22 +420,23 @@ for (YYYY in years_to_do) {
         abline(v=as.POSIXct("1996-2-08"))
         abline(v=as.POSIXct("1996-2-29 12:00"))
 
-        testdata <- extra[ Date > as.POSIXct("1996-02-01") &
-                           Date < as.POSIXct("1996-03-7") ]
+        testdata <- extra[Date > as.POSIXct("1996-02-01") &
+                          Date < as.POSIXct("1996-03-7") ]
+        ## reverse sirena TOT to signal
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
     }
 
     if (YYYY == 2004) {
-        cat("### BEWARE!
-            There is an +2.5V offset in the recording singal for
-            2004-07-03 00:00 until 2004-07-22 00:00. We changed
-            the allowed signal limit to copensate.
-            Have to check dark calculation and the final output.\n")
+        cat("\n### BEWARE!\n\n")
+        cat("There is an un expected +2.5V offset in the recording singal for
+            2004-07-03 00:00 until 2004-07-22 00:00.
+            We changed the allowed physical signal limits to copensate.
+            Have to check dark calculation and the final output for problems.\n")
 
 
-        part <- year_data[ Date > as.POSIXct("2004-06-01") &
-                           Date < as.POSIXct("2004-08-01") ]
+        part <- year_data[Date > as.POSIXct("2004-06-01") &
+                          Date < as.POSIXct("2004-08-01") ]
 
         ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
 
@@ -435,8 +447,8 @@ for (YYYY in years_to_do) {
         ## plot config changes
         abline(v = signal_physical_limits$Date, lty = 3)
 
-        testdata <- extra[ Date > as.POSIXct("2004-06-01") &
-                           Date < as.POSIXct("2004-08-01") ]
+        testdata <- extra[Date > as.POSIXct("2004-06-01") &
+                          Date < as.POSIXct("2004-08-01") ]
         ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
@@ -444,8 +456,8 @@ for (YYYY in years_to_do) {
 
 
     if (YYYY == 2005) {
-        part <- year_data[ Date > as.POSIXct("2005-11-15") &
-                           Date < as.POSIXct("2005-12-31") ]
+        part <- year_data[Date > as.POSIXct("2005-11-15") &
+                          Date < as.POSIXct("2005-12-31") ]
 
         ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
 
@@ -456,17 +468,16 @@ for (YYYY in years_to_do) {
         ## plot config changes
         abline(v = signal_physical_limits$Date, lty = 3)
 
-        testdata <- extra[ Date > as.POSIXct("2005-11-15") &
-                           Date < as.POSIXct("2005-12-31") ]
+        testdata <- extra[Date > as.POSIXct("2005-11-15") &
+                          Date < as.POSIXct("2005-12-31") ]
         ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
-
     }
 
 
     if (YYYY == 2015) {
-        part <- year_data[ Date > as.POSIXct("2015-04-10") &
-                           Date < as.POSIXct("2015-05-01") ]
+        part <- year_data[Date > as.POSIXct("2015-04-10") &
+                          Date < as.POSIXct("2015-05-01") ]
 
         ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
 
@@ -477,11 +488,10 @@ for (YYYY in years_to_do) {
         ## plot config changes
         abline(v = signal_physical_limits$Date, lty = 3)
 
-        testdata <- extra[ Date > as.POSIXct("2015-04-10") &
-                           Date < as.POSIXct("2015-05-01") ]
+        testdata <- extra[Date > as.POSIXct("2015-04-10") &
+                          Date < as.POSIXct("2015-05-01") ]
         ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
-
     }
 
 
@@ -497,9 +507,9 @@ for (YYYY in years_to_do) {
 
 
     par(mar = c(2,4,2,1))
-    month_vec <- strftime(  year_data$Date, format = "%m")
-    dd        <- aggregate( year_data[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
-                            list(month_vec), FUN = summary, digits = 6 )
+    month_vec <- strftime( year_data$Date, format = "%m")
+    dd        <- aggregate(year_data[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
+                           list(month_vec), FUN = summary, digits = 6 )
 
 
     # cat("\n\n### CM 21 measurements, monthly aggregation\n")
@@ -517,19 +527,19 @@ for (YYYY in years_to_do) {
     # cat(pander(dd$Azimuth))
 
     boxplot(year_data$CM21value ~ month_vec )
-    title(main = paste("CM21value by month", YYYY) )
+    title(main = paste("CM21value by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$CM21sd ~ month_vec )
-    title(main = paste("CM21sd by month", YYYY) )
+    title(main = paste("CM21sd by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$Elevat ~ month_vec )
-    title(main = paste("Elevation by month", YYYY) )
+    title(main = paste("Elevation by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$Azimuth ~ month_vec )
-    title(main = paste("Azimuth by month", YYYY) )
+    title(main = paste("Azimuth by month", YYYY))
     cat('\n\n')
 
     ####  Save signal data to file  ####
