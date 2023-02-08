@@ -31,6 +31,7 @@
 #'     toc:        true
 #'     fig_width:  7.5
 #'     fig_height: 5
+#'
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
@@ -64,7 +65,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'     )
+# knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 
@@ -75,9 +76,9 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R10_") })
-if(!interactive()) {
+if (!interactive()) {
     pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
     filelock::lock(paste0("~/CM_21_GLB/LOGs/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
@@ -110,10 +111,11 @@ ALL_YEARS <- FALSE
 TEST      <- FALSE
 # TEST      <- TRUE
 # ALL_YEARS <- TRUE
+
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
-if ( length(args) > 0 ) {
-    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+if (length(args) > 0) {
+    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
@@ -172,6 +174,11 @@ rm(rad_names, radmon_files)
 
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y")
+
+# ## TEST
+# if (TEST) {
+#     years_to_do <- 2004
+# }
 
 
 #'

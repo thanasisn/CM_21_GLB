@@ -41,9 +41,9 @@
 #'
 #' **SIG -> S0**
 #'
-#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#' **Source code: [`github.com/thanasisn/CM_21_GLB`](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display/2-cm21_global/`](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #' Read **raw signal** data and create **Signal 0** data
 #'
@@ -76,9 +76,9 @@ Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R20_") })
 if (!interactive()) {
-    pdf(    file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf",  Script.Name))))
-    sink(   file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out",  Script.Name))), split = TRUE)
-    filelock::lock(paste0("~/CM_21_GLB/LOGs/",    basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+    pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -103,13 +103,16 @@ OutliersPlot <- 5
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
+# TEST      <- TRUE
+# ALL_YEARS <- TRUE
+
 ## When running
-args <- commandArgs( trailingOnly = TRUE )
+args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
-    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE }
-    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE }
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
 }
 ## When knitting
 if (!exists("params")) {
@@ -127,7 +130,7 @@ cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 ####  Load exclusion list  ####
 
-ranges       <- read.table( BAD_RANGES,
+ranges        <- read.table(BAD_RANGES,
                             sep          = ";",
                             colClasses   = "character",
                             strip.white  = TRUE,
@@ -142,9 +145,7 @@ ranges$Comment[ranges$Comment == ""] <- "NO DESCRIPTION"
 #' Check inverted time ranges
 #'
 #+ include=T, echo=F
-pander(
-    ranges[ !ranges$From < ranges$Until, ]
-)
+pander(ranges[ !ranges$From < ranges$Until, ])
 stopifnot(!all(!ranges$From < ranges$Until))
 
 
@@ -165,9 +166,9 @@ cat('\n\n')
 
 
 ####  Get data input files  ####
-input_files <- list.files( path    = SIGNAL_DIR,
-                           pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
-                           full.names = T )
+input_files <- list.files(path       = SIGNAL_DIR,
+                          pattern    = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
+                          full.names = TRUE )
 input_years <- as.numeric(
     sub(".rds", "",
         sub(".*_SIG_", "", basename(input_files)),
@@ -175,9 +176,9 @@ input_years <- as.numeric(
 
 
 ## Get storage files
-output_files <- list.files( path    = SIGNAL_DIR,
-                            pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
-                            full.names = T )
+output_files <- list.files(path       = SIGNAL_DIR,
+                           pattern    = "LAP_CM21_H_S0_[0-9]{4}.Rds",
+                           full.names = TRUE )
 
 
 if (!params$ALL_YEARS) {
@@ -199,10 +200,14 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1993
+# ## TEST
+# if (TEST) {
+#     years_to_do <- 2004
+# }
+
 
 ## Decide what to do
-if (length(years_to_do) == 0) {
+if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
 }
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
@@ -251,20 +256,19 @@ pander(signal_physical_limits)
 
 
 
-####  Loop all years  ####
 
 #+ include=TRUE, echo=F, results="asis"
 for (yyyy in years_to_do) {
 
     #### Get raw data ####
-    afile   <- grep(yyyy, input_files,  value = T)
+    afile   <- grep(yyyy, input_files, value = T)
     rawdata <- readRDS(afile)
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n")
 
-    NR_loaded <- rawdata[ !is.na(CM21value), .N ]
+    NR_loaded <- rawdata[!is.na(CM21value), .N]
 
 
     ####    Mark bad date ranges    ############################################
@@ -383,18 +387,18 @@ for (yyyy in years_to_do) {
     ############################################################################
 
 
-    cat(paste0( "**",
-                NR_loaded, "** non NA data points loaded\n\n" ))
-    cat(paste0( "**",
-                NR_bad_ranges, "** points marked as bad data ranges set to NA\n\n" ))
-    cat(paste0( "**",
-                NR_signal_limit, "** possible signal error\n\n" ))
+    cat(paste0("**", NR_loaded,
+               "** non NA data points loaded\n\n"))
+    cat(paste0("**", NR_bad_ranges,
+               "** points marked as bad data ranges set to NA\n\n"))
+    cat(paste0("**", NR_signal_limit,
+               "** possible signal error\n\n"))
     # cat(paste0( "**",
     #             NR_signal_night_limit, "** possible extreme night values\n\n" ))
     # #     cat(paste0( "\"Negative daytime\" removed *",
     # #             NR_negative_daytime, "* data points\n\n" ))
     cat(paste0( "**",
-                rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n" ))
+                rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n"))
 
     if (!all(is.na(rawdata$QFlag_1))) {
         cat('\\scriptsize\n')
@@ -424,9 +428,10 @@ for (yyyy in years_to_do) {
 
 
     ####  Save signal data to file  ####
-    write_RDS(object = rawdata,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S0_",yyyy,".Rds") )
-
+    if (!TEST) {
+        write_RDS(object = rawdata,
+                  file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S0_",yyyy,".Rds"))
+    }
 
     cat("\\FloatBarrier\n\n")
     cat('\n\n')
@@ -439,8 +444,9 @@ for (yyyy in years_to_do) {
     yearlims <- data.table()
     for (an in grep("CM21",names(rawdata),value = T)){
         suppressWarnings({
-            daily <- rawdata[ , .( dmin =  min(get(an),na.rm = T),
-                                   dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
+            daily <- rawdata[ , .(dmin =  min(get(an),na.rm = T),
+                                  dmax =  max(get(an),na.rm = T)),
+                              by = as.Date(Date) ]
             low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
             upe <- daily[ !is.infinite(dmax) , mean(dmax) + OutliersPlot * sd(dmax)]
         })
@@ -488,12 +494,12 @@ for (yyyy in years_to_do) {
     dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
                             list(month_vec), FUN = summary, digits = 6 )
     boxplot(rawdata$CM21value ~ month_vec )
-    title(main = paste("CM21value by month", yyyy) )
+    title(main = paste("CM21value by month", yyyy))
 
     cat('\n\n')
 
     boxplot(rawdata$CM21sd ~ month_vec )
-    title(main = paste("CM21sd by month", yyyy) )
+    title(main = paste("CM21sd by month", yyyy))
 
     cat('\n\n')
 }
