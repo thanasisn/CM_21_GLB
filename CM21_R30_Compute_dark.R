@@ -32,6 +32,7 @@
 #'     toc:        true
 #'     fig_width:  7.5
 #'     fig_height: 5
+#'
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
@@ -57,7 +58,7 @@
 ####_  Document options _####
 
 #+ echo=F, include=F
-knitr::opts_chunk$set(comment    = ""       )
+knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
@@ -73,10 +74,10 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R30_") })
-if(!interactive()) {
-    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+if (!interactive()) {
+    pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -100,13 +101,16 @@ panderOptions('table.split.table',        120   )
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
+# TEST      <- TRUE
+# ALL_YEARS <- TRUE
+
 ## When running
-args <- commandArgs( trailingOnly = TRUE )
-if ( length(args) > 0 ) {
-    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) > 0) {
+    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
-    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
-    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
 }
 ## When knitting
 if (!exists("params")) {
@@ -166,7 +170,11 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1993
+# ## TEST
+# if (TEST) {
+#     years_to_do <- 2004
+# }
+
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -199,7 +207,7 @@ if (file.exists(DARKCONST)) {
 #' Excludes calculation when there are less than `r STD_ret_ap_for`
 #' valid data points for a day
 #'
-#+ echo=F, include=T
+#+ include=T, echo=F
 
 
 
@@ -233,7 +241,7 @@ for ( yyyy in years_to_do) {
 
     cat("\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
-    cat("\n## Year:", yyyy, "\n\n" )
+    cat("\n## Year:", yyyy, "\n\n")
 
     for (ddd in daystodo) {
         theday      <- as.POSIXct( as.Date(ddd, origin = "1970-01-01"))

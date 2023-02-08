@@ -145,7 +145,9 @@ ranges$Comment[ranges$Comment == ""] <- "NO DESCRIPTION"
 #' Check inverted time ranges
 #'
 #+ include=T, echo=F
-pander(ranges[ !ranges$From < ranges$Until, ])
+pander(
+    ranges[ !ranges$From < ranges$Until, ]
+)
 stopifnot(!all(!ranges$From < ranges$Until))
 
 
@@ -166,9 +168,9 @@ cat('\n\n')
 
 
 ####  Get data input files  ####
-input_files <- list.files(path       = SIGNAL_DIR,
-                          pattern    = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
-                          full.names = TRUE )
+input_files <- list.files(path    = SIGNAL_DIR,
+                          pattern = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
+                          full.names = T )
 input_years <- as.numeric(
     sub(".rds", "",
         sub(".*_SIG_", "", basename(input_files)),
@@ -200,15 +202,15 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# ## TEST
+## TEST
 # if (TEST) {
 #     years_to_do <- 2004
 # }
 
 
 ## Decide what to do
-if (length(years_to_do) == 0 ) {
-    stop("NO new data! NO need to parse!")
+if (length(years_to_do) == 0) {
+    stop("NO new years to do! NO need to parse!")
 }
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
@@ -256,6 +258,7 @@ pander(signal_physical_limits)
 
 
 
+####  Loop all years  ####
 
 #+ include=TRUE, echo=F, results="asis"
 for (yyyy in years_to_do) {
@@ -387,12 +390,12 @@ for (yyyy in years_to_do) {
     ############################################################################
 
 
-    cat(paste0("**", NR_loaded,
-               "** non NA data points loaded\n\n"))
-    cat(paste0("**", NR_bad_ranges,
-               "** points marked as bad data ranges set to NA\n\n"))
-    cat(paste0("**", NR_signal_limit,
-               "** possible signal error\n\n"))
+    cat(paste0("**",
+               NR_loaded, "** non NA data points loaded\n\n"))
+    cat(paste0("**",
+               NR_bad_ranges, "** points marked as bad data ranges set to NA\n\n"))
+    cat(paste0("**",
+               NR_signal_limit, "** possible signal error\n\n"))
     # cat(paste0( "**",
     #             NR_signal_night_limit, "** possible extreme night values\n\n" ))
     # #     cat(paste0( "\"Negative daytime\" removed *",
