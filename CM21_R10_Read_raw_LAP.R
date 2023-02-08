@@ -61,8 +61,8 @@
 #+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"    )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'     )
 
@@ -98,7 +98,7 @@ panderOptions('table.split.table',        120   )
 OutliersPlot <- 4
 
 
-## read magic data
+## read existing TOT files form sirena
 extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 
 
@@ -111,7 +111,7 @@ TEST      <- FALSE
 TEST      <- TRUE
 ALL_YEARS <- TRUE
 ## When running
-args <- commandArgs( trailingOnly = TRUE )
+args <- commandArgs(trailingOnly = TRUE)
 if ( length(args) > 0 ) {
     if (any(args == "NOTEST"  )) { TEST      <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
@@ -213,7 +213,7 @@ if (!params$ALL_YEARS) {
 
     ## decide what to do
     if (TEST | length(missing_years) != 0 | NEWDATA) {
-        years_to_do <- sort(unique(c(missing_years,new_to_do)))
+        years_to_do <- sort(unique(c(missing_years, new_to_do)))
     } else {
         stop("NO new data! NO need to parse!")
     }
@@ -226,7 +226,7 @@ cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 #+ include=TRUE, echo=FALSE, results="asis"
 
 ## loop all years
-for ( YYYY in years_to_do ) {
+for (YYYY in years_to_do) {
     yy           <- substr(YYYY, 3,4)
     year_data    <- data.table()
     days_of_year <- seq.Date(as.Date(paste0(YYYY,"-01-01")),
@@ -237,7 +237,7 @@ for ( YYYY in years_to_do ) {
     cat("\n## Year:", YYYY, "\n\n" )
 
     missing_files <- c()
-    for ( aday in days_of_year ) {
+    for (aday in days_of_year) {
         aday  <- as.Date(aday, origin = "1970-01-01")
         sunfl <- paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
 
@@ -323,7 +323,7 @@ for ( YYYY in years_to_do ) {
     suppressWarnings({
         ## Try to find outliers
         yearlims <- data.table()
-        for (an in grep("CM21",names(year_data),value = T)){
+        for (an in grep("CM21", names(year_data), value = T)){
             daily <- year_data[ , .( dmin =  min(get(an),na.rm = T),
                                      dmax =  max(get(an),na.rm = T) )  , by = as.Date(Date) ]
             low <- daily[ !is.infinite(dmin) , mean(dmin) - OutliersPlot * sd(dmin)]
@@ -365,10 +365,11 @@ for ( YYYY in years_to_do ) {
          ylab = "CM21 signal" )
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(v=signal_physical_limits$Date)
+    abline(v = signal_physical_limits$Date)
     cat('\n\n')
 
 
+    ## Plots for exceptions ------
 
     if (YYYY == 1995) {
         part <- year_data[ Date > as.POSIXct("1995-10-8") &
@@ -415,16 +416,28 @@ for ( YYYY in years_to_do ) {
     }
 
     if (YYYY == 2004) {
+        cat("### BEWARE!
+            There is an +2.5V offset in the recording singal for
+            2004-07-03 00:00 until 2004-07-22 00:00. We changed
+            the allowed signal limit to copensate.
+            Have to check dark calculation and the final output.\n")
+
+
         part <- year_data[ Date > as.POSIXct("2004-06-01") &
                            Date < as.POSIXct("2004-08-01") ]
-        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+
+        ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
+
+        plot(  part$Date, part$CM21value,  pch = ".", ylim = ylim)
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
-        abline(v=signal_physical_limits$Date)
+        ## plot config changes
+        abline(v = signal_physical_limits$Date, lty = 3)
 
         testdata <- extra[ Date > as.POSIXct("2004-06-01") &
                            Date < as.POSIXct("2004-08-01") ]
+        ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
     }
@@ -433,14 +446,19 @@ for ( YYYY in years_to_do ) {
     if (YYYY == 2005) {
         part <- year_data[ Date > as.POSIXct("2005-11-15") &
                            Date < as.POSIXct("2005-12-31") ]
-        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+
+        ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
+
+        plot(  part$Date, part$CM21value,  pch = ".", ylim = ylim)
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
-        abline(v=signal_physical_limits$Date)
+        ## plot config changes
+        abline(v = signal_physical_limits$Date, lty = 3)
 
         testdata <- extra[ Date > as.POSIXct("2005-11-15") &
                            Date < as.POSIXct("2005-12-31") ]
+        ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
     }
@@ -449,14 +467,19 @@ for ( YYYY in years_to_do ) {
     if (YYYY == 2015) {
         part <- year_data[ Date > as.POSIXct("2015-04-10") &
                            Date < as.POSIXct("2015-05-01") ]
-        plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
+
+        ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
+
+        plot(  part$Date, part$CM21value, pch = ".", ylim = ylim)
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
-        abline(v=signal_physical_limits$Date)
+        ## plot config changes
+        abline(v = signal_physical_limits$Date, lty = 3)
 
         testdata <- extra[ Date > as.POSIXct("2015-04-10") &
                            Date < as.POSIXct("2015-05-01") ]
+        ## Plot existing sirena data
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
 
     }
@@ -510,8 +533,10 @@ for ( YYYY in years_to_do ) {
     cat('\n\n')
 
     ####  Save signal data to file  ####
-    write_RDS(object = year_data,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+    if (!TEST) {
+        write_RDS(object = year_data,
+                  file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+    }
 }
 ## sort list of missing files
 system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
