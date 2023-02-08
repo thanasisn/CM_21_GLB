@@ -80,10 +80,10 @@ datfile <- "~/DATA/cm21_data_validation/export_all_total.dat"
 folder  <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
 files <- list.files(folder,
-                     pattern     = "[0-9]*\\TOT.*.dat",
-                     recursive   = T,
-                     ignore.case = T,
-                     full.names  = T)
+                    pattern     = "[0-9]*\\TOT.*.dat",
+                    recursive   = T,
+                    ignore.case = T,
+                    full.names  = T)
 
 ## cache data check if we have to read
 if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {

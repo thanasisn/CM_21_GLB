@@ -61,14 +61,16 @@ cm21factor <- function(date) {
 
 ####  Set possible signal range on acquisition  ####
 signal_physical_limits <- matrix(
-    c( "1991-01-01", -1.0, 5.0,
-       "1995-10-21", -0.4, 1.2,
-       "1995-11-02", -0.6, 2.5,
-       "2004-07-01", -0.2, 0.6,
-       "2005-12-05", -0.2, 0.6,
-       "2011-12-30", -0.2, 0.6,
-       "2012-01-31", -0.2, 0.6,
-       "2022-06-04", -0.2, 0.6
+    c( "1991-01-01",       -1.0, 5.0,
+       "1995-10-21",       -0.4, 1.2,
+       "1995-11-02",       -0.6, 2.5,
+       "2004-07-01",       -0.2, 0.6,
+       "2004-07-03 00:00", -0.2 + 2.5, 0.6 + 2.5, ## there is a siglnal offset
+       "2004-07-22 00:00", -0.2, 0.6,
+       "2005-12-05",       -0.2, 0.6,
+       "2011-12-30",       -0.2, 0.6,
+       "2012-01-31",       -0.2, 0.6,
+       "2022-06-04",       -0.2, 0.6
         ),    byrow = TRUE,
     ncol = 3)
 
@@ -96,6 +98,8 @@ signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 rule   = 1:2  )
 
 
-dd <- seq.POSIXt(as.POSIXct("2004-05-01"), as.POSIXct("2004-09-01"), by = "day")
+dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
 plot(dd, cm21factor(dd))
+plot(dd, signal_upper_limit(dd))
+
 
