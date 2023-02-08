@@ -25,7 +25,7 @@ START_DAY    <- as.POSIXct("1993-01-01 00:00:00 UTC")
 END_DAY      <- Sys.time()
 
 ## date range to export for TOT and WRDC
-EXPORT_START <- as.POSIXct("2005-01-01 00:00:00 UTC")
+EXPORT_START <- as.POSIXct("2000-01-01 00:00:00 UTC")
 EXPORT_STOP  <- as.POSIXct("2023-01-01 00:00:00 UTC")
 
 #'
