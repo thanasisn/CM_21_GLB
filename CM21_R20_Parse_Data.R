@@ -103,7 +103,7 @@ OutliersPlot <- 5
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
+# TEST      <- TRUE
 # ALL_YEARS <- TRUE
 
 ## When running
@@ -201,10 +201,10 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-## TEST
-if (TEST) {
-    years_to_do <- 2004
-}
+# ## TEST
+# if (TEST) {
+#     years_to_do <- 2004
+# }
 
 
 ## Decide what to do
@@ -361,21 +361,34 @@ for (yyyy in years_to_do) {
     ## init flags columns
     rawdata[, QFlag_1 := as.factor(NA)]
 
-
     ####    Mark signal physical limits    #####################################
     rawdata[ CM21value <  sig_lowlim, QFlag_1 := "sgLIM_hit" ]
     rawdata[ CM21value >  sig_upplim, QFlag_1 := "sgLIM_hit" ]
-    NR_signal_limit    <-   rawdata[  QFlag_1 == "sgLIM_hit", .N ]
     ############################################################################
 
 
     ####    Mark night signal possible limits    ###############################
-    getnight  <- rawdata$Elevat < DARK_ELEV
+    ## Using an acceptable dark based on expected global value
+
     ## mark too negative signal values
     rawdata[ CM21value * cm21factor(Date) < MINLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark" ]
     ## drop too positive signal values
     rawdata[ CM21value * cm21factor(Date) > MAXLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark" ]
-    NR_signal_night_limit <- rawdata[QFlag_1 %in% c("ToolowDark","ToohigDark"), .N ]
+
+    ## special case for 2004 of set problem
+    if (yyyy == 2004) {
+        ## reset dark flags
+        rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV, QFlag_1 := NA ]
+        ## set low flag
+        rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV &
+                    CM21value < signal_lower_limit(Date),
+                QFlag_1 := "ToolowDark"]
+        ## set high flag
+        ## use the lower part of posible physical signal as a threshold
+        rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV &
+                    CM21value > (signal_lower_limit(Date) + (signal_upper_limit(Date) - signal_lower_limit(Date)) * 0.4),
+                QFlag_1 := "ToohigDark"]
+    }
     ############################################################################
 
 
@@ -383,14 +396,11 @@ for (yyyy in years_to_do) {
                "** non NA data points loaded\n\n"))
     cat(paste0("**", NR_bad_ranges,
                "** points marked as bad data ranges set to NA\n\n"))
-    cat(paste0("**", NR_signal_limit,
+    cat(paste0("**", rawdata[!is.na(CM21value) & QFlag_1 == "sgLIM_hit", .N ],
                "** possible signal error\n\n"))
-    # cat(paste0( "**",
-    #             NR_signal_night_limit, "** possible extreme night values\n\n" ))
-    # #     cat(paste0( "\"Negative daytime\" removed *",
-    # #             NR_negative_daytime, "* data points\n\n" ))
-    cat(paste0( "**",
-                rawdata[ !is.na(CM21value), .N ], "** non NA data points loaded remaining\n\n"))
+    cat(paste0("**", rawdata[!is.na(CM21value) & QFlag_1 %in% c("ToolowDark","ToohigDark"), .N ],
+               "** possible extreme night values\n\n" ))
+
 
     if (!all(is.na(rawdata$QFlag_1))) {
         cat('\\scriptsize\n')
