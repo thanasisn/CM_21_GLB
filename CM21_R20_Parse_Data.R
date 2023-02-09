@@ -64,7 +64,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
@@ -103,13 +103,13 @@ OutliersPlot <- 5
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-# TEST      <- TRUE
+TEST      <- TRUE
 # ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (!TEST | any(args == "NOTEST")) { TEST <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
@@ -121,6 +121,7 @@ if (!exists("params")) {
 cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
 cat(paste("\n**TEST     :", TEST,      "**\n"))
 
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
 #'
@@ -200,10 +201,10 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# ## TEST
-# if (TEST) {
-#     years_to_do <- 2004
-# }
+## TEST
+if (TEST) {
+    years_to_do <- 2004
+}
 
 
 ## Decide what to do
@@ -228,27 +229,20 @@ cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 #'
 #' #### Filter of possible signal values.
 #'
-#'
 #' Allowed signal of ranges that are possible to be recorded normally.
-#'
 #'
 #+ include=T, echo=F
 pander(signal_physical_limits)
 #'
-#'
-#'
 #' #### Mark of possible night signal.
 #'
-#'
-#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow a radiation range of `r paste0("[",MINLIMnight,", " ,MAXLIMnight,"]")` to remove various inconsistencies.
-#'
+#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow
+#' a radiation range of `r paste0("[",MINLIMnight,", " ,MAXLIMnight,"]")`
+#' to remove various inconsistencies.
 #'
 #' #### Filter negative signal when sun is up.
 #'
-#'
-#'
 #' Allowed years to do: `r input_years`
-#'
 #'
 #' Years to do: `r years_to_do`
 #'
@@ -293,8 +287,8 @@ for (yyyy in years_to_do) {
                                          "/LAP_CM21_H_SIG_", yyyy, "_bad_ranges"),
                          clean  = TRUE)
     ## remove bad ranges
-    rawdata[ Bad_ranges != "", CM21value := NA ]
-    rawdata[ Bad_ranges != "", CM21sd    := NA ]
+    rawdata[Bad_ranges != "", CM21value := NA ]
+    rawdata[Bad_ranges != "", CM21sd    := NA ]
     rawdata[ , Bad_ranges := NULL ]
     ############################################################################
 
@@ -307,7 +301,8 @@ for (yyyy in years_to_do) {
     for (an in grep("CM21", names(rawdata), value = T)) {
         suppressWarnings({
             daily <- rawdata[ , .(dmin = min(get(an), na.rm = TRUE),
-                                  dmax = max(get(an), na.rm = TRUE)), by = as.Date(Date)]
+                                  dmax = max(get(an), na.rm = TRUE)),
+                              by = as.Date(Date)]
             low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
             upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
         })
@@ -363,10 +358,8 @@ for (yyyy in years_to_do) {
     title(main = paste("CM21sd by month", yyyy))
     cat('\n\n')
 
-
-    ## start flags columns
+    ## init flags columns
     rawdata[, QFlag_1 := as.factor(NA)]
-
 
 
     ####    Mark signal physical limits    #####################################
@@ -374,7 +367,6 @@ for (yyyy in years_to_do) {
     rawdata[ CM21value >  sig_upplim, QFlag_1 := "sgLIM_hit" ]
     NR_signal_limit    <-   rawdata[  QFlag_1 == "sgLIM_hit", .N ]
     ############################################################################
-
 
 
     ####    Mark night signal possible limits    ###############################
@@ -490,9 +482,9 @@ for (yyyy in years_to_do) {
     cat('\n\n')
 
     par(mar = c(2,4,2,1))
-    month_vec <- strftime(  rawdata$Date, format = "%m")
-    dd        <- aggregate( rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
-                            list(month_vec), FUN = summary, digits = 6 )
+    month_vec <- strftime( rawdata$Date, format = "%m")
+    dd        <- aggregate(rawdata[, c("CM21value", "CM21sd", "Elevat", "Azimuth")],
+                           list(month_vec), FUN = summary, digits = 6 )
     boxplot(rawdata$CM21value ~ month_vec )
     title(main = paste("CM21value by month", yyyy))
 

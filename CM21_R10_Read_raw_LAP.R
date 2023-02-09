@@ -225,7 +225,9 @@ if (!params$ALL_YEARS) {
         stop("NO new data! NO need to parse!")
     }
 }
+#+ include=TRUE, echo=FALSE
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
 
 #'
 #' Years to do: `r years_to_do`
@@ -386,6 +388,7 @@ for (YYYY in years_to_do) {
 
 
     ## Plots for exceptions ------
+    ## use to investigate problems
 
     if (YYYY == 1995) {
         part <- year_data[ Date > as.POSIXct("1995-10-8") &

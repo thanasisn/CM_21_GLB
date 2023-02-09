@@ -24,24 +24,28 @@ OUTPUT_FORMAT = NULL
 system("./get_data_from_sirena.sh")
 
 
+## redner all in list
+source_list <- c(
+    # "./CM21_R10_Read_raw_LAP.R",
+    # "./CM21_R20_Parse_Data.R",
+    "./CM21_R30_Compute_dark.R",
+    NULL
+)
 
-render("./CM21_R10_Read_raw_LAP.R",
-       params = list( ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+for (as in source_list) {
+    cat("\n\n==================================================\n")
+    cat(format(Sys.time()),"\n")
+    cat("START:", as, "\n")
+
+    render(as,
+           params = list( ALL_YEARS = TRUE ),
+           clean                = T  ,
+           output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
+
+}
 
 
-render("./CM21_R20_Parse_Data.R",
-       params = list( ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_R30_Compute_dark.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
+stop()
 
 render("./CM21_R40_Missing_dark_construct.R",
        params = list(  ALL_YEARS = TRUE ),
