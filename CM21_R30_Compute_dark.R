@@ -63,7 +63,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
@@ -82,7 +82,7 @@ if (!interactive()) {
 
 
 ## FIXME this is for pdf output
-if (!interactive()) { options(warn=-1) }
+if (!interactive()) { options(warn = -1) }
 
 #+ echo=F, include=F
 ####  External code  ####
@@ -107,7 +107,7 @@ TEST      <- FALSE
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (!TEST | any(args == "NOTEST")) { TEST <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
@@ -150,7 +150,7 @@ output_files <- list.files( path    = SIGNAL_DIR,
                             full.names = T )
 
 
-
+## . Resolve years to do -----
 if (!params$ALL_YEARS) {
     years_to_do <- c()
     for (ay in input_years) {
@@ -215,7 +215,7 @@ if (file.exists(DARKCONST)) {
 #+ include=TRUE, echo=F, results="asis"
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
-for ( yyyy in years_to_do) {
+for (yyyy in years_to_do) {
 
     #### Get raw data ####
     afile <- grep(yyyy, input_files,  value = T)
@@ -224,7 +224,6 @@ for ( yyyy in years_to_do) {
     unlink(tmpfolder, recursive = TRUE)
     dir.create(tmpfolder)
     pbcount <- 0
-
 
     #### Get raw data ####
     rawdata        <- readRDS(afile)
