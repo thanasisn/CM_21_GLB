@@ -41,16 +41,16 @@
 #'
 #' **S0 -> S1**
 #'
-#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+#' **Source code: [`github.com/thanasisn/CM_21_GLB`](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display/2-cm21_global/`](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #' Read **Signal 0** and compute dark level correction **Signal 1** data
 #'
 #' - Compute dark when it is feasible
 #' - Apply dark correction
-#' - Plot daily signal and dark correction on external pdf
-#' - Keep dark statistics for use next
+#' - Plot daily signal and dark correction on a pdf
+#' - Keep dark statistics for use at next stages
 #'
 #+ echo=F, include=T
 
@@ -313,7 +313,6 @@ for (yyyy in years_to_do) {
                 }
             }
         } else {
-
             ####    Dark Correction function   #################################
             dark_generator <- dark_function(dark_day    = dark_day,
                                             DCOUNTLIM   = DCOUNTLIM,
@@ -323,7 +322,6 @@ for (yyyy in years_to_do) {
                                             missfiles   = missfiles,
                                             missingdark = missingdark )
 
-
             ####    Create dark signal for correction    #######################
             todays_dark_correction <- dark_generator(daydata$Date)
             dark_flag              <- "COMPUTED"
@@ -331,8 +329,6 @@ for (yyyy in years_to_do) {
 
         ####    Apply dark correction    #######################################
         daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
-
-
 
 
         ## plot to external pdf
@@ -401,24 +397,26 @@ for (yyyy in years_to_do) {
     globaldata$day        <- NULL
     globaldata$sig_lowlim <- NULL
     globaldata$sig_upplim <- NULL
-    write_RDS(object = globaldata,
-              file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
+    if (!TEST) {
+        write_RDS(object = globaldata,
+                  file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_S1_",yyyy,".Rds") )
+    }
 
     ## partial write most recent stats
-    darkDT <- darkDT[ , .SD[which.max(CalcDate)], by = Date ]
-    write_RDS(object = darkDT, file = DARKSTORE)
-
+    if (!TEST) {
+        darkDT <- darkDT[ , .SD[which.max(CalcDate)], by = Date ]
+        write_RDS(object = darkDT, file = DARKSTORE)
+    }
     ## create pdf with all daily plots
     system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
                   paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")),
            ignore.stderr = T )
 
 
-
-    cat(paste0( "**",
-                NR_loaded, "** non NA data points loaded\n\n" ))
-    cat(paste0( "**",
-                NR_extreme_SD, "** points excluded from dark calculation due to extreme SD\n\n" ))
+    cat(paste0("**",
+               NR_loaded, "** non NA data points loaded\n\n" ))
+    cat(paste0("**",
+               NR_extreme_SD, "** points excluded from dark calculation due to extreme SD\n\n" ))
 
 
     cat('\\scriptsize\n\n')
@@ -463,14 +461,14 @@ for (yyyy in years_to_do) {
     hist(statist$Emed,    main = paste("Evening Median Dark" , yyyy), breaks = 50)
     hist(statist$Ecnt,    main = paste("Evening count Dark"  , yyyy), breaks = 50)
 
-    plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = paste("Sun measurements"    , yyyy) , xlab = "" )
-    plot(statist$Date, statist$SunUP,   "p", pch = 16, cex = .5, main = paste("Sun up measurements" , yyyy) , xlab = "" )
-    plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = paste("Morning Average Dark", yyyy) , xlab = "" )
-    plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = paste("Morning Median Dark" , yyyy) , xlab = "" )
-    plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = paste("Morning count Dark"  , yyyy) , xlab = "" )
-    plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = paste("Evening Average Dark", yyyy) , xlab = "" )
-    plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = paste("Evening Median Dark" , yyyy) , xlab = "" )
-    plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = paste("Evening count Dark"  , yyyy) , xlab = "" )
+    plot(statist$Date, statist$sunMeas, "p", pch = 16, cex = .5, main = paste("Sun measurements"    , yyyy), xlab = "" )
+    plot(statist$Date, statist$SunUP,   "p", pch = 16, cex = .5, main = paste("Sun up measurements" , yyyy), xlab = "" )
+    plot(statist$Date, statist$Mavg,    "p", pch = 16, cex = .5, main = paste("Morning Average Dark", yyyy), xlab = "" )
+    plot(statist$Date, statist$Mmed,    "p", pch = 16, cex = .5, main = paste("Morning Median Dark" , yyyy), xlab = "" )
+    plot(statist$Date, statist$Mcnt,    "p", pch = 16, cex = .5, main = paste("Morning count Dark"  , yyyy), xlab = "" )
+    plot(statist$Date, statist$Eavg,    "p", pch = 16, cex = .5, main = paste("Evening Average Dark", yyyy), xlab = "" )
+    plot(statist$Date, statist$Emed,    "p", pch = 16, cex = .5, main = paste("Evening Median Dark" , yyyy), xlab = "" )
+    plot(statist$Date, statist$Ecnt,    "p", pch = 16, cex = .5, main = paste("Evening count Dark"  , yyyy), xlab = "" )
 
     cat(paste("#### Days with Evening dark data points count < 100\n"))
     cat('\n\n')
