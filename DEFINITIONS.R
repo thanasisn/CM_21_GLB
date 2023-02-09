@@ -90,6 +90,9 @@ DARK_ELEV   <- -10         ## Sun elevation limit to get dark signal (R20, R30)
 MINLIMnight <- -15         ## Lower radiation limit  when dark       (R20) -> ToolowDark
 MAXLIMnight <- +15         ## Higher radiation limit when dark       (R20) -> ToohigDark
 
+LOWrangeNight <- 0.3       ## Limit the signal for dark calculation inside the lower % part of physical possible limit
+
+
 ####    Negative radiation when sun is up   ####################################
 SUN_ELEV    <- +0         ## When sun is above that           (R50)
 MINglbSUNup <- -0.3       ## Exclude signal values below that (R50) above that will set to zero

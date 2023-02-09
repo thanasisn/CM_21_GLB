@@ -24,16 +24,25 @@ OUTPUT_FORMAT = NULL
 system("./get_data_from_sirena.sh")
 
 
-## redner all in list
+## render all in list
 source_list <- c(
     # "./CM21_R10_Read_raw_LAP.R",
-    # "./CM21_R20_Parse_Data.R",
+    "./CM21_R20_Parse_Data.R",
     "./CM21_R30_Compute_dark.R",
+    "./CM21_R40_Missing_dark_construct.R",
+    "./CM21_R50_Signal_to_GHI.R",
+    "./CM21_R60_GHI_output.R",
+    # "./CM21_T70_GHI_Export_WRDC.R",
+    "./CM21_T71_GHI_Export_TOT.R",
     NULL
 )
 
+cat("\n\nWill do:\n")
+cat(source_list,sep = "\n")
+
+
 for (as in source_list) {
-    cat("\n\n==================================================\n")
+    cat("\n\n===============================================================\n")
     cat(format(Sys.time()),"\n")
     cat("START:", as, "\n")
 
@@ -47,34 +56,6 @@ for (as in source_list) {
 
 stop()
 
-render("./CM21_R40_Missing_dark_construct.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_R50_Signal_to_GHI.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_R60_GHI_output.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_T70_GHI_Export_WRDC.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_T71_GHI_Export_TOT.R",
-       params = list(  ALL_YEARS = TRUE ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
 
 
 render("./CM21_T80_check_sirena_export.R",
