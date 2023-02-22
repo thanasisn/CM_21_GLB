@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-#' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
+#' Copyright (C) 2018 Athanasios Natsis <natsisphysicist@gmail.com>
 #'
 
 ## ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4

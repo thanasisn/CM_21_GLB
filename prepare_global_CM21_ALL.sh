@@ -13,7 +13,6 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
 
-
 info "Try to get new files"
 "$(dirname "$0")/get_data_from_sirena.sh"
 
@@ -36,13 +35,12 @@ info "Clean output L0 to L1 GHI"
 Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"             "ALL"
 
 
-## extra output
+## extra output to run occational and inspect output
 # info "Export for WRDC"
 # Rscript "$(dirname "$0")/CM21_T70_GHI_Export_WRDC.R"
 
 # info "Export for Sirena"
 # Rscript "$(dirname "$0")/CM21_T71_GHI_Export_TOT.R"
-
 
 
 

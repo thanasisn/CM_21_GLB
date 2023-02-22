@@ -1,4 +1,4 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "CM21 signal filtering. **SIG -> S0** "
 #' author:        "Natsis Athanasios"
@@ -329,7 +329,7 @@ for (yyyy in years_to_do) {
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", yyyy ),
+         main = paste("CM21 signal ", yyyy),
          xlab = "Elevation",
          ylab = "CM21 signal" )
     abline( h = yearlims[ an == "CM21value", low], col = "red")
@@ -337,7 +337,7 @@ for (yyyy in years_to_do) {
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
-         main = paste("CM21 signal SD", yyyy ),
+         main = paste("CM21 signal SD", yyyy),
          xlab = "Elevation",
          ylab = "CM21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
@@ -348,9 +348,9 @@ for (yyyy in years_to_do) {
     par(mar = c(2,4,2,1))
     month_vec <- strftime( rawdata$Date, format = "%m")
     dd        <- aggregate(rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
-                           list(month_vec), FUN = summary, digits = 6 )
+                           list(month_vec), FUN = summary, digits = 6)
 
-    boxplot(rawdata$CM21value ~ month_vec )
+    boxplot(rawdata$CM21value ~ month_vec)
     title(main = paste("CM21value by month", yyyy))
     cat('\n\n')
 
@@ -362,8 +362,8 @@ for (yyyy in years_to_do) {
     rawdata[, QFlag_1 := as.factor(NA)]
 
     ####    Mark signal physical limits    #####################################
-    rawdata[ CM21value <  sig_lowlim, QFlag_1 := "sgLIM_hit" ]
-    rawdata[ CM21value >  sig_upplim, QFlag_1 := "sgLIM_hit" ]
+    rawdata[CM21value <  sig_lowlim, QFlag_1 := "sgLIM_hit"]
+    rawdata[CM21value >  sig_upplim, QFlag_1 := "sgLIM_hit"]
     ############################################################################
 
 
@@ -371,14 +371,24 @@ for (yyyy in years_to_do) {
     ## Using an acceptable dark based on expected global value
 
     ## mark too negative signal values
-    rawdata[ CM21value * cm21factor(Date) < MINLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark" ]
+    rawdata[CM21value * cm21factor(Date) < MINLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark"]
     ## drop too positive signal values
-    rawdata[ CM21value * cm21factor(Date) > MAXLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark" ]
+    rawdata[CM21value * cm21factor(Date) > MAXLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark"]
 
     ## special case for 2004 of set problem
     if (yyyy == 2004) {
+        cat("\n### BEWARE!\n\n")
+        cat("There is an un expected +2.5V offset in the recording singal for
+            2004-07-03 00:00 until 2004-07-22 00:00.
+            We changed the allowed physical signal limits to copensate.
+            And apply different flagging scheme on this region, based on the
+            actual allowed physical limits.
+            This approch could be generilized, but we have to test the robustness
+            of the setted physical limits and the derived allowed dark range.\n")
+
         ## reset dark flags
-        rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV, QFlag_1 := NA ]
+        rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV,
+                QFlag_1 := NA]
         ## set low flag
         rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV &
                     CM21value < signal_lower_limit(Date),

@@ -1,24 +1,20 @@
 
 # CM_21_GLB
 
-## May use QCrad for pre processing
+## Should use QCrad for pre processing
 
-We already do some filtering of bad data in CM-21
+- Latest QCrad can help to clean data form erroneous records.
+- Also use `inspect_days_Lap_sirena.R`.
+- Some data exclusions have been implemented on the TOT files without other 
+indications.
 
-## Calibration/amplification dates error [ ]
+## Manual review of the output
 
-Period 2004-07-03 to 2004-07-22 seems the conversion factor is wrong.
+Use `inspect_days_Lap_sirena.R` to check the output especially before committing data to sirena.
 
-- check original calibration factor [ ]
-- test with different amplification/date [ ]
-- ask Bais [ ]
-
-
-    
 ## Do a comparison with inclined CM-21 
 
 For the period CM-21 was missing for calibration
-
 
 ## Implement a data history columns 
 

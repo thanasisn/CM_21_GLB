@@ -1,4 +1,4 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Check total radiation export for sirena"
 #' author:        "Natsis Athanasios"
@@ -267,7 +267,7 @@ points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
 
 # myRtools::writeDATA(data,
 #                     datfile,
-#                     contact = "natsisthanasis@gmail.com",
+#                     contact = "natsisphysicist@gmail.com",
 #                     type = "dat")
 
 

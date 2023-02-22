@@ -1,4 +1,4 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Read raw CM21 data. **LAP -> SIG** "
 #' author:        "Natsis Athanasios"
