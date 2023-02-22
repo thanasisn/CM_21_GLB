@@ -1,4 +1,4 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2020-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #### Functions including the calibration factors of the instruments and the acquisition system.
 
@@ -12,8 +12,7 @@ cm21_calibration_data <- matrix(
        c( "1991-01-01", 11.98E-6, 0.5E-2,
           "1995-10-21", 11.98E-6,   2E-2,
           "1995-11-02", 11.98E-6,   1E-2,  ## <- this is correct!!!
-          "2004-07-01", 11.98E-6,   4E-2,  ## <- date is not correct needs a shift
-          "2004-07-22", 11.98E-6,   4E-2,  ## <- date is not correct needs a shift
+          "2004-07-01", 11.98E-6,   4E-2,  ## <- this is correct!!!
           "2005-12-05", 11.99E-6,   4E-2,
           "2011-12-30", 11.96E-6,   4E-2,
           "2012-01-31", 11.96E-6,   4E-2,
@@ -60,12 +59,16 @@ cm21factor <- function(date) {
 
 
 ####  Set possible signal range on acquisition  ####
+##
+## Be careful !! those values are used to define an envelope for the accepted
+## range ot the dark signal.
+##
 signal_physical_limits <- matrix(
     c( "1991-01-01",       -1.0, 5.0,
        "1995-10-21",       -0.4, 1.2,
        "1995-11-02",       -0.6, 2.5,
        "2004-07-01",       -0.2, 0.6,
-       "2004-07-03 00:00", -0.2 + 2.5, 0.6 + 2.5, ## there is a signal offset
+       "2004-07-03 00:00", -0.2 + 2.5, 0.6 + 2.5, ## there is a +2.5V overall signal offset
        "2004-07-22 00:00", -0.2, 0.6,
        "2005-12-05",       -0.2, 0.6,
        "2011-12-30",       -0.2, 0.6,
@@ -98,12 +101,8 @@ signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 rule   = 1:2  )
 
 
-dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
+# dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
 # plot(dd, cm21factor(dd))
 # plot(dd, signal_upper_limit(dd))
-
 # (signal_lower_limit(dd) + (signal_upper_limit(dd) - signal_lower_limit(dd)) * 0.3)
 # signal_lower_limit(dd) * cm21factor(dd)
-
-
-

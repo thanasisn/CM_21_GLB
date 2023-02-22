@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# /* Copyright (C) 2019 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2019 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
@@ -26,14 +26,16 @@ system("./get_data_from_sirena.sh")
 
 ## render all in list
 source_list <- c(
-    # "./CM21_R10_Read_raw_LAP.R",
+    "./CM21_R10_Read_raw_LAP.R",
     "./CM21_R20_Parse_Data.R",
     "./CM21_R30_Compute_dark.R",
     "./CM21_R40_Missing_dark_construct.R",
     "./CM21_R50_Signal_to_GHI.R",
     "./CM21_R60_GHI_output.R",
-    # "./CM21_T70_GHI_Export_WRDC.R",
+    "./CM21_T70_GHI_Export_WRDC.R",
     "./CM21_T71_GHI_Export_TOT.R",
+    "./CM21_T80_check_sirena_export.R",
+    "./CM21_T81_check_wrdc_output.R",
     NULL
 )
 
@@ -54,37 +56,13 @@ for (as in source_list) {
 }
 
 
-stop()
-
-
-
-render("./CM21_T80_check_sirena_export.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-render("./CM21_T81_check_wrdc_output.R",
-       params = list( CACHE = F ),
-       clean                = T  ,
-       output_dir           = "~/CM_21_GLB/REPORTS/REPORTS/")
-
-
-
-
-
-cat("Run to create the graphs:\n")
+cat("Run manually to create the graphs:\n")
 cat("./CM21_P98_Plot_all_years_LAP.R\n")
 cat("./CM21_P99_Plot_all_daily_LAP.R\n")
 
-
-#
-# ## some more nice plots
-#
+# ## some more nice plots for sirena display
 # source("./CM21_P98_Plot_all_years_LAP.R")
-#
 # source("./CM21_P99_Plot_all_daily_LAP.R")
-
 
 
 cat(paste("\n\n IS YOU SEE THIS: \n", Script.Name," GOT TO THE END!! \n"))

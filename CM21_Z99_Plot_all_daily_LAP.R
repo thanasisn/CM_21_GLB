@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-#' Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com>
+#' Copyright (C) 2018 Athanasios Natsis <natsisphysicist@gmail.com>
 #'
 #' Read text files with CM_21 signal data
 #'
