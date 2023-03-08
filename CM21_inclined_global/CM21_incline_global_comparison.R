@@ -190,8 +190,27 @@ plot(DATA$Date,
      main = "Inclined CM21 signal")
 
 
+#' ## Common measurements
+
 plot(DT$wattGLB, DT$INC_value,
-     pch  = ".")
+     pch  = ".",
+     xlab = "",
+     main = "Common values")
+
+
+plot(DT$Date,
+     DT$wattGLB,
+     col  = col_hor,
+     pch  = ".",
+     xlab = "",
+     main = "Global radiation")
+
+plot(DT$Date,
+     DT$INC_value,
+     col  = col_inc,
+     pch  = ".",
+     xlab = "",
+     main = "Inclined CM21 signal")
 
 
 
