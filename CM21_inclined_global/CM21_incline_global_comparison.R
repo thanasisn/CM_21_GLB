@@ -1,11 +1,9 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "CM21 signal filtering. **SIG -> S0** "
+#' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Read signal data and write level 0 data.
-#'                 Marks or remove problematic data."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -44,12 +42,12 @@
 #+ echo=F, include=T
 
 
-####_  Document options _####
+##__  Document Options  --------------------------------------------------------
 
 #+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""      )
-# knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(dev        = "pdf"   )
+# knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(fig.pos    = '!h'     )
@@ -57,7 +55,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 #+ include=F, echo=F
-####  Set environment  ####
+##__  Run Environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
@@ -71,196 +69,129 @@ if (!interactive()) {
 
 
 #+ echo=F, include=F
-####  External code  ####
+##  External code  -------------------------------------------------------------
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 
 
-####  Variables  ####
-source("~/CM_21_GLB/DEFINITIONS.R")
-panderOptions('table.alignment.default', 'right')
-panderOptions('table.split.table',        120   )
-
-
+##  Variables  -----------------------------------------------------------------
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-## bais doy 53:178
+## Bais doy 53:178
 START_DAY <- "2022-02-22"
 END_DAY   <- "2022-06-27"
 
-
-
-as.POSIXct(START_DAY)
-
+## color values
 col_hor <- "green"
-col_ing <- "magenta"
+col_inc <- "magenta"
 
 
-## get HOR_CM21
+
+##  Load HOR_CM21  -------------------------------------------------------------
 HORIZ <- readRDS("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L1_2022.Rds")
 
 
-plot(HORIZ$Date,
-     HORIZ$wattGLB,
-     xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)) )
 
 
+##  Load INC_CM  ---------------------------------------------------------------
+INCLI <- data.table()
 
-## get INC_CM
-incfiles <- list.files(path        = "~/DATA_RAW/Raddata/1",
+incfiles <- list.files(path        = "~/DATA_RAW/Bband/CM21_LAP.INC",
                        pattern     = "[0-9]{6}01.LAP",
                        full.names  = TRUE,
                        ignore.case = TRUE,
                        recursive   = TRUE)
 
 
-dayswecare <- seq.Date(as.Date(START_DAY), as.Date(END_DAY), by = "day")
-
+dayswecare <- seq.Date(as.Date(START_DAY),
+                       as.Date(END_DAY), by = "day")
+missing_files <- c()
 for (aday in dayswecare) {
     aday  <- as.Date(aday, origin = "1970-01-01")
-
     found <- grep(paste0(format(aday, "%d%m%y01")), incfiles, ignore.case = T )
 
-}
-
-
-
-
-
-
-stop()
-for (aday in days_of_year) {
-
-
-    found <- grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
     ## check file names
     if (length(found) > 1) {
         stop("Found more file than we should") }
     if (length(found) == 0) {
-        missing_files <- c(missing_files, paste0(YYYY,"/", format(aday, "%d%m%y06")))
-        cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n",
-            file = MISSING_INP, append = T )
+        missing_files <- c(missing_files, paste0( format(aday, "%d%m%y01")))
+        cat("Missing inclined for", format(aday), paste0( format(aday, "%d%m%y01")),"\n")
         next()
     }
 
-    ## recreate time stamp for all minutes of day
-    suppressWarnings(rm(D_minutes))
-    D_minutes <- seq(from       = as.POSIXct(paste(aday,"00:00:30 UTC")),
+    ##  Recreate time stamp for all minutes of day
+    D_minutes <- seq(from       = as.POSIXct(paste(aday, "00:00:30 UTC")),
                      length.out = 1440,
                      by         = "min" )
 
-    ####    Read LAP file    ####
-    lap <- fread( sirena_files[found], na.strings = "-9" )
+    ##  Read LAP file
+    lap <- fread( incfiles[found], na.strings = "-9" )
     lap[ V1 < -8, V1 := NA ]
     lap[ V2 < -8, V2 := NA ]
     stopifnot( dim(lap)[1] == 1440 )
 
+    ##  Day table to save
+    day_data <- data.table( Date        = D_minutes, # Date of the data point
+                            INC_value   = lap$V1,    # Raw value for CM21
+                            INC_sd      = lap$V2)    # Raw SD value for CM21
 
-
-
-
-
-stop("wait")
-
-
-#'
-#' Check time ranges span in hours
-#'
-#+ include=T, echo=F
-hist(ranges$HourSpan)
-cat('\n\n')
-temp <- ranges[ ranges$HourSpan > 12 , ]
-row.names(temp) <- NULL
-pander( temp )
-cat('\n\n')
-pander(data.table(table(ranges$Comment)))
-cat('\n\n')
-
-
-
-
-####  Get data input files  ####
-input_files <- list.files(path       = SIGNAL_DIR,
-                          pattern    = "LAP_CM21_H_SIG_[0-9]{4}.Rds",
-                          full.names = TRUE )
-input_years <- as.numeric(
-    sub(".rds", "",
-        sub(".*_SIG_", "", basename(input_files)),
-        ignore.case = T))
-
-
-## Get storage files
-output_files <- list.files(path       = SIGNAL_DIR,
-                           pattern    = "LAP_CM21_H_S0_[0-9]{4}.Rds",
-                           full.names = TRUE )
-
-
-if (!params$ALL_YEARS) {
-    years_to_do <- c()
-    for (ay in input_years) {
-        inp <- grep(ay, input_files,  value = T)
-        out <- grep(ay, output_files, value = T)
-        if ( length(out) == 0 ) {
-            ## do if not there
-            years_to_do <- c(years_to_do,ay)
-        } else {
-            ## do if newer data
-            if (file.mtime(inp) > file.mtime(out))
-                years_to_do <- c(years_to_do,ay)
-        }
-        years_to_do <- sort(unique(years_to_do))
-    }
-} else {
-    years_to_do <- sort(unique(input_years))
+    ##  Gather data
+    INCLI <- rbind(INCLI, day_data)
 }
 
+##  Complete data set
+DATA <- merge(HORIZ, INCLI, all = TRUE)
+# DATA[, HOR_value := wattGLB / cm21factor(Date) ]
+
+##  USE common data for analysis
+DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
-## Decide what to do
-if (length(years_to_do) == 0 ) {
-    stop("NO new data! NO need to parse!")
-}
-cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
+## TODO
+## - plot by date with free scale
+## - define period of data to use
+## - dark calculation????
+##   - before analysis!
+## - correlate
+
+
 
 
 #'
-#' ## Process CM21 data
+#' ## Process data
 #'
-#' Apply filtering from measurements log files and
-#' signal limitations.
+#' Investigate data of horizontal and inclined CM-21.
 #'
-#' #### Drop any data with NA signal.
+#' Start day: `r START_DAY`
 #'
-#' #### Bad day ranges.
-#'
-#' Exclude date ranges from file '`r basename(BAD_RANGES)`'.
-#' These were determined with manual inspection and logging.
-#'
-#' #### Filter of possible signal values.
-#'
-#' Allowed signal of ranges that are possible to be recorded normally.
-#'
-#+ include=T, echo=F
-pander(signal_physical_limits)
-#'
-#' #### Mark of possible night signal.
-#'
-#' During night (sun elevation `r paste("<",DARK_ELEV)`) we allow
-#' a radiation range of `r paste0("[",MINLIMnight,", " ,MAXLIMnight,"]")`
-#' to remove various inconsistencies.
-#'
-#' #### Filter negative signal when sun is up.
-#'
-#' Allowed years to do: `r input_years`
-#'
-#' Years to do: `r years_to_do`
+#' End day:   `r END_DAY`
 #'
 #+ include=T, echo=F
 
 
+plot(DATA$Date,
+     DATA$wattGLB,
+     xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)),
+     col  = col_hor,
+     pch  = ".",
+     xlab = "",
+     main = "Global radiation")
+
+plot(DATA$Date,
+     DATA$INC_value,
+     xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)),
+     col  = col_inc,
+     pch  = ".",
+     xlab = "",
+     main = "Inclined CM21 signal")
+
+
+plot(DT$wattGLB, DT$INC_value,
+     pch  = ".")
 
 
 
