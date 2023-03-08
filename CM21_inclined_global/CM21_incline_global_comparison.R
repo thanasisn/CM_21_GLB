@@ -108,23 +108,55 @@ plot(HORIZ$Date,
      xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)) )
 
 
+
 ## get INC_CM
-files <- list.files(path    = "~/DATA_RAW/Raddata/1",
-                    pattern = "[0-9]{6}01.LAP",
-                    full.names = TRUE,
-                    ignore.case = TRUE,
-                    recursive = TRUE)
-
-## get dates
-basename(files)
+incfiles <- list.files(path        = "~/DATA_RAW/Raddata/1",
+                       pattern     = "[0-9]{6}01.LAP",
+                       full.names  = TRUE,
+                       ignore.case = TRUE,
+                       recursive   = TRUE)
 
 
+dayswecare <- seq.Date(as.Date(START_DAY), as.Date(END_DAY), by = "day")
+
+for (aday in dayswecare) {
+    aday  <- as.Date(aday, origin = "1970-01-01")
+
+    found <- grep(paste0(format(aday, "%d%m%y01")), incfiles, ignore.case = T )
+
+}
 
 
 
 
 
 
+stop()
+for (aday in days_of_year) {
+
+
+    found <- grep( paste0( "/",YYYY,"/", format(aday, "%d%m%y06") ), sirena_files, ignore.case = T )
+    ## check file names
+    if (length(found) > 1) {
+        stop("Found more file than we should") }
+    if (length(found) == 0) {
+        missing_files <- c(missing_files, paste0(YYYY,"/", format(aday, "%d%m%y06")))
+        cat(paste0(YYYY,"/", format(aday, "%d%m%y06")), sep = "\n",
+            file = MISSING_INP, append = T )
+        next()
+    }
+
+    ## recreate time stamp for all minutes of day
+    suppressWarnings(rm(D_minutes))
+    D_minutes <- seq(from       = as.POSIXct(paste(aday,"00:00:30 UTC")),
+                     length.out = 1440,
+                     by         = "min" )
+
+    ####    Read LAP file    ####
+    lap <- fread( sirena_files[found], na.strings = "-9" )
+    lap[ V1 < -8, V1 := NA ]
+    lap[ V2 < -8, V2 := NA ]
+    stopifnot( dim(lap)[1] == 1440 )
 
 
 
