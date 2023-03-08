@@ -83,59 +83,55 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
-OutliersPlot <- 5
-
-
-
-####  Execution control  ####
-## Default
-ALL_YEARS <- FALSE
-TEST      <- FALSE
-# TEST      <- TRUE
-# ALL_YEARS <- TRUE
-
-## When running
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) > 0) {
-    if (!TEST | any(args == "NOTEST")) { TEST <- FALSE }
-    if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
-    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
-    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
-}
-## When knitting
-if (!exists("params")) {
-    params <- list( ALL_YEARS = ALL_YEARS)
-}
-cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
-cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-#'
-#' ## Check bad ranges input
-#'
-#+ include=T, echo=F
+## bais doy 53:178
+START_DAY <- "2022-02-22"
+END_DAY   <- "2022-06-27"
 
-####  Load exclusion list  ####
 
-ranges        <- read.table(BAD_RANGES,
-                            sep          = ";",
-                            colClasses   = "character",
-                            strip.white  = TRUE,
-                            header       = TRUE,
-                            comment.char = "#" )
-ranges$From     <- strptime(ranges$From,  format = "%F %H:%M", tz = "UTC")
-ranges$Until    <- strptime(ranges$Until, format = "%F %H:%M", tz = "UTC")
-ranges$HourSpan <- as.numeric(ranges$Until - ranges$From) / 3600
-ranges$Comment[ranges$Comment == ""] <- "NO DESCRIPTION"
 
-#'
-#' Check inverted time ranges
-#'
-#+ include=T, echo=F
-pander(ranges[ !ranges$From < ranges$Until, ])
-stopifnot(!all(!ranges$From < ranges$Until))
+as.POSIXct(START_DAY)
+
+col_hor <- "green"
+col_ing <- "magenta"
+
+
+## get HOR_CM21
+HORIZ <- readRDS("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L1_2022.Rds")
+
+
+plot(HORIZ$Date,
+     HORIZ$wattGLB,
+     xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)) )
+
+
+## get INC_CM
+files <- list.files(path    = "~/DATA_RAW/Raddata/1",
+                    pattern = "[0-9]{6}01.LAP",
+                    full.names = TRUE,
+                    ignore.case = TRUE,
+                    recursive = TRUE)
+
+## get dates
+basename(files)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+stop("wait")
 
 
 #'
@@ -189,10 +185,6 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# ## TEST
-# if (TEST) {
-#     years_to_do <- 2004
-# }
 
 
 ## Decide what to do
