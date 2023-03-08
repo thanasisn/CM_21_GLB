@@ -171,6 +171,10 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #' Investigate data of horizontal and inclined CM-21.
 #'
+#' Inclined data are read from "sirena" directly.
+#'
+#' Global data are produced by me.
+#'
 #' Data view is extended to:
 #'
 #' Start day: `r START_DAY`
@@ -270,7 +274,7 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          log  = "y",
          cex  = 0.6)
-    abline(h = 1, lty = 1 , col = "black")
+    # abline(h = 1, lty = 1 , col = "black")
 
 
     par(mar=c(0, 0, 0, 0))
