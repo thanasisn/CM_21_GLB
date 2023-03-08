@@ -84,6 +84,11 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 START_DAY <- "2022-02-22"
 END_DAY   <- "2022-06-27"
 
+## extend
+START_DAY <- "2022-02-20"
+END_DAY   <- "2022-07-01"
+
+
 ## color values
 col_hor <- "green"
 col_inc <- "magenta"
@@ -162,16 +167,17 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 #'
-#' ## Process data
+#' # Data Overview
 #'
 #' Investigate data of horizontal and inclined CM-21.
+#'
+#' Data view is extended to:
 #'
 #' Start day: `r START_DAY`
 #'
 #' End day:   `r END_DAY`
 #'
 #+ include=T, echo=F
-
 
 plot(DATA$Date,
      DATA$wattGLB,
@@ -190,7 +196,12 @@ plot(DATA$Date,
      main = "Inclined CM21 signal")
 
 
+#'
 #' ## Common measurements
+#'
+#' Only simultaneous measurements.
+#'
+#+ include=T, echo=F
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
@@ -211,6 +222,77 @@ plot(DT$Date,
      pch  = ".",
      xlab = "",
      main = "Inclined CM21 signal")
+
+
+
+#'
+#' ## Daily plot
+#'
+#+ include=T, echo=F
+for (ad in unique(as.Date(DT$Date))) {
+    pp <- DT[ as.Date(Date) == ad ]
+    ad <- as.Date(ad, origin = "1970-01-01")
+
+    par(mar = c(2,2,2,1))
+
+    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
+
+    plot.new()
+
+    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+    par(new = T)
+    plot(pp$Date,
+         pp$wattGLB,
+         col  = col_hor,
+         xlab = "",  ylab = "",
+         yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.4)
+
+    par(new = T)
+    plot(pp$Date,
+         pp$INC_value,
+         col  = col_inc,
+         xlab = "",  ylab = "",
+         yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.3)
+
+
+    par(new = T)
+    plot(pp$Date,
+         pp$INC_value / pp$wattGLB ,
+         col  = "blue",
+         xlab = "",  ylab = "",
+         xaxs = "i",
+         pch  = 19,
+         log  = "y",
+         cex  = 0.6)
+    abline(h = 1, lty = 1 , col = "black")
+
+
+    par(mar=c(0, 0, 0, 0))
+    # c(bottom, left, top, right)
+    plot.new()
+    legend("center",
+           legend = c("Global Horizontal [W/m^2]",
+                      "Inclined Signal [V]",
+                      "log(Inclined / Horizontal)"),
+           col  = c(col_hor, col_inc,'blue'),
+           pch  = 19,
+           ncol = 3,
+           bty = "n")
+
+}
+
+
+#'
+#' # Process
+#'
+#+ include=T, echo=F
+
 
 
 
