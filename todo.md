@@ -26,5 +26,7 @@ S------------
 S1-----------
 S12-1-Q--C---
 ```
+## Add calibration events
 
+Mark calibration events on the plots
 
