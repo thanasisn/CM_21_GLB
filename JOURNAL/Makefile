@@ -10,7 +10,7 @@ markdowns := $(shell find -name "*.md" | sort -V)
 ## pre pandoc run
 preprocess: .markdowncontent
 .markdowncontent: $(markdowns)
-	./pre_process.sh $(markdowns)
+	./.pre_process.sh $(markdowns)
 
 
 ## create pdf file
@@ -25,6 +25,7 @@ $(TARGET): Makefile .markdowncontent
 	  --metadata-file   .index.yaml   \
 	  --from            markdown      \
 	  --to              pdf           \
+	  --lua-filter      .columns.lua  \
 	  --pdf-engine      xelatex       \
 	  --pdf-engine-opt  -shell-escape \
 	  --out             '$@'          \
@@ -54,6 +55,7 @@ $(TARGET): Makefile .markdowncontent
 	  --toc                           \
 	  --metadata-file   .index.yaml   \
 	  --mathjax                       \
+	  --lua-filter      .columns.lua  \
 	  --template        .easy-pandoc-templates-master/html/uikit.html \
 	  --from            markdown      \
 	  --to              html          \
