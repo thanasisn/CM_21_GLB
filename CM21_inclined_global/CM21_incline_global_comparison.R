@@ -74,7 +74,7 @@ library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
-
+source("~/CM_21_GLB/Functions_dark_calculation.R")
 
 ##  Variables  -----------------------------------------------------------------
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
@@ -157,7 +157,6 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 ## TODO
-## - plot by date with free scale
 ## - define period of data to use
 ## - dark calculation????
 ##   - before analysis!
@@ -252,7 +251,7 @@ for (ad in unique(as.Date(DT$Date))) {
          yaxt = "n",
          xaxs = "i",
          pch  = 19,
-         cex  = 0.4)
+         cex  = 0.3)
 
     par(new = T)
     plot(pp$Date,
@@ -262,19 +261,46 @@ for (ad in unique(as.Date(DT$Date))) {
          yaxt = "n",
          xaxs = "i",
          pch  = 19,
-         cex  = 0.3)
+         cex  = 0.2)
+
+
+    vec <- pp$INC_value / pp$wattGLB
+    vec[!is.finite(vec)] <- NA
+
+    range <- diff(range(vec, na.rm = T))
+    range <- range * 0.03
+    mean  <- mean(vec, na.rm = T)
+    ylim  <- c(mean - range, mean + range)
+
+
+    vec[vec > ylim[2]] <- NA
+    vec[vec < ylim[1]] <- NA
 
 
     par(new = T)
     plot(pp$Date,
-         pp$INC_value / pp$wattGLB ,
+         vec ,
          col  = "blue",
          xlab = "",  ylab = "",
          xaxs = "i",
          pch  = 19,
          log  = "y",
-         cex  = 0.6)
+         cex  = 0.4)
     # abline(h = 1, lty = 1 , col = "black")
+
+
+
+    par(new = T)
+    plot(pp$Date,
+         vec ,
+         ylim = ylim,
+         col  = "cyan",
+         xlab = "",  ylab = "",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.4)
+
+
 
 
     par(mar=c(0, 0, 0, 0))
@@ -288,6 +314,8 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = 19,
            ncol = 3,
            bty = "n")
+
+
 
 }
 
