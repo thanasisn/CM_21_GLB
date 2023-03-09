@@ -26,6 +26,8 @@ for ay in "${years[@]}"; do
     echo
     echo "# $ay"
     echo
+    echo ":::columns"
+    echo
     ) >> "$targetfile"
     
     ## loop all files of year
@@ -36,8 +38,15 @@ for ay in "${years[@]}"; do
             echo " - $infile"
             cat "$infile" >> "$targetfile" 
             echo ""       >> "$targetfile" 
+            echo "------" >> "$targetfile" 
+            echo ""       >> "$targetfile" 
         fi
     done
+    (
+    echo
+    echo ":::"
+    echo
+    ) >> "$targetfile"
 done 
 
 ## add tail
