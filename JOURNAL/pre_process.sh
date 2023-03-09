@@ -3,14 +3,20 @@
 
 #### Create a master md file with h1 header from folders names
 
-## this sould be sorted
+## this should be already sorted
+## list of files from Makefile
 args=( "$@" )
 
+## init document
 targetfile=".markdowncontent"
 echo "" > "$targetfile"
 
+## add preamble
+cat "./About.md" >> "$targetfile"
+
+
 ## get all the years from files
-years=($(for af in "${args[@]}"; do echo "$(basename "$(dirname "$af")")"; done | sort -u))
+years=($(for af in "${args[@]}"; do echo "$(basename "$(dirname "$af")")"; done | sort -u | grep "[0-9]*" ))
 
 ## loop years
 for ay in "${years[@]}"; do
@@ -33,5 +39,8 @@ for ay in "${years[@]}"; do
         fi
     done
 done 
+
+## add tail
+cat "./README.md" >> "$targetfile"
 
 exit 0 
