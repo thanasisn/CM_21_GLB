@@ -328,6 +328,106 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ## get all day
+# wholeday    <- rawdata[ day == as.Date(theday) ]
+# ## use only valid data for dark
+# daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
+#
+#
+# ## fill all minutes for nicer graphs
+# daydata     <- merge(daydata, daymimutes, all = T)
+# daydata$day <- as.Date(daydata$Date)
+#
+#
+# ####  Filter Standard deviation extremes  ##############################
+# ## SD can not be greater than the signal
+# pre_count     <- daydata[ !is.na(CM21value), .N ]
+# ## apply rule if there are enough data
+# if (pre_count > STD_ret_ap_for) {
+#     daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
+#     NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
+#     if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
+#         cat('\n')
+#         cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n\n")
+#         next()
+#     }
+# }
+# ########################################################################
+#
+#
+#
+#
+# ####    Calculate Dark signal   ########################################
+# dark_day <- dark_calculations( dates      = daydata$Date,
+#                                values     = daydata$CM21value,
+#                                elevatio   = daydata$Eleva,
+#                                nightlimit = DARK_ELEV,
+#                                dstretch   = DSTRETCH)
+#
+#
+#
+# # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+# if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+#         (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+#     # cat("Can not apply dark\n")
+#     todays_dark_correction <- NA
+#     dark_flag              <- "MISSING"
+#     missingdark            <- NA
+#
+#     ## get dark from pre-computed file
+#     if (exists("construct")) {
+#         ## can not find date
+#         if (! theday %in% construct$Date) {
+#             todays_dark_correction <- NA
+#             dark_flag              <- "MISSING"
+#             missingdark            <- NA
+#         } else {
+#             ## get data from recomputed dark database
+#             todays_dark_correction <- construct[ Date == theday, DARK]
+#             dark_flag              <- "CONSTRUCTED"
+#         }
+#     }
+# } else {
+#     ####    Dark Correction function   #################################
+#     dark_generator <- dark_function(dark_day    = dark_day,
+#                                     DCOUNTLIM   = DCOUNTLIM,
+#                                     type        = "median",
+#                                     adate       = theday ,
+#                                     test        = test,
+#                                     missfiles   = missfiles,
+#                                     missingdark = missingdark )
+#
+#     ####    Create dark signal for correction    #######################
+#     todays_dark_correction <- dark_generator(daydata$Date)
+#     dark_flag              <- "COMPUTED"
+# }
+#
+# ####    Apply dark correction    #######################################
+# daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
+
+
+
+
+
+
+
+
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
