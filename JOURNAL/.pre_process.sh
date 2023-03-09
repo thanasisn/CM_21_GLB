@@ -24,6 +24,8 @@ for ay in "${years[@]}"; do
     echo "** $ay **"
     ( 
     echo
+    echo "\newpage"
+    echo
     echo "# $ay"
     echo
     echo ":::columns"
@@ -50,6 +52,11 @@ for ay in "${years[@]}"; do
 done 
 
 ## add tail
-cat "./README.md" >> "$targetfile"
+(
+echo
+echo "\newpage"
+echo
+cat "./Readme.md" 
+) >> "$targetfile"
 
 exit 0 
