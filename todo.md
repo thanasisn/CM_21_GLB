@@ -8,13 +8,6 @@
 - Some data exclusions have been implemented on the TOT files without other 
 indications.
 
-## Manual review of the output
-
-Use `inspect_days_Lap_sirena.R` to check the output especially before committing data to sirena.
-
-## Do a comparison with inclined CM-21 
-
-For the period CM-21 was missing for calibration
 
 ## Implement a data history columns 
 
@@ -26,6 +19,7 @@ S------------
 S1-----------
 S12-1-Q--C---
 ```
+
 ## Add calibration events
 
 Mark calibration events on the plots
