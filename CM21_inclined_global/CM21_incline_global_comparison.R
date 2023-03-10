@@ -76,6 +76,13 @@ source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 
+##  Use the same definitions as horizontal CM-21 -------------------------------
+
+## Standard deviation filter (apply after other filters)
+STD_ret_ap_for = 10   ## apply rule when there are enough data points
+STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily value)
+
+
 ##  Variables  -----------------------------------------------------------------
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -138,6 +145,17 @@ for (aday in dayswecare) {
     lap[ V2 < -8, V2 := NA ]
     stopifnot( dim(lap)[1] == 1440 )
 
+    sunfl <- paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
+    #### . . Read SUN file  ####
+    if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_construction_cron.py\n")))
+    sun_temp <- read.table( sunfl,
+                            sep         = ";",
+                            header      = TRUE,
+                            na.strings  = "None",
+                            strip.white = TRUE,
+                            as.is       = TRUE)
+
+
     ##  Day table to save
     day_data <- data.table( Date        = D_minutes, # Date of the data point
                             INC_value   = lap$V1,    # Raw value for CM21
@@ -165,6 +183,7 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 
+
 #'
 #' # Data Overview
 #'
@@ -182,6 +201,8 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #+ include=T, echo=F
 
+if (!interactive()) {  # workaround plot setup
+
 plot(DATA$Date,
      DATA$wattGLB,
      xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)),
@@ -198,6 +219,8 @@ plot(DATA$Date,
      xlab = "",
      main = "Inclined CM21 signal")
 
+} # workaround plot setup
+
 
 #'
 #' ## Common measurements
@@ -205,6 +228,8 @@ plot(DATA$Date,
 #' Only simultaneous measurements.
 #'
 #+ include=T, echo=F
+
+if (!interactive()) {  # workaround plot setup
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
@@ -226,12 +251,16 @@ plot(DT$Date,
      xlab = "",
      main = "Inclined CM21 signal")
 
+} # workaround plot setup
+
 
 
 #'
 #' ## Daily plot
 #'
 #+ include=T, echo=F
+if (!interactive()) {  # workaround plot setup
+
 for (ad in unique(as.Date(DT$Date))) {
     pp <- DT[ as.Date(Date) == ad ]
     ad <- as.Date(ad, origin = "1970-01-01")
@@ -268,7 +297,7 @@ for (ad in unique(as.Date(DT$Date))) {
     vec[!is.finite(vec)] <- NA
 
     range <- diff(range(vec, na.rm = T))
-    range <- range * 0.03
+    range <- range * 0.01
     mean  <- mean(vec, na.rm = T)
     ylim  <- c(mean - range, mean + range)
 
@@ -288,8 +317,6 @@ for (ad in unique(as.Date(DT$Date))) {
          cex  = 0.4)
     # abline(h = 1, lty = 1 , col = "black")
 
-
-
     par(new = T)
     plot(pp$Date,
          vec ,
@@ -301,24 +328,22 @@ for (ad in unique(as.Date(DT$Date))) {
          cex  = 0.4)
 
 
-
-
     par(mar=c(0, 0, 0, 0))
     # c(bottom, left, top, right)
     plot.new()
     legend("center",
            legend = c("Global Horizontal [W/m^2]",
                       "Inclined Signal [V]",
-                      "log(Inclined / Horizontal)"),
-           col  = c(col_hor, col_inc,'blue'),
+                      "log(Inclined / Horizontal)",
+                      "Inclined / Horizontal"),
+           col  = c(col_hor, col_inc,'blue', "cyan"),
            pch  = 19,
-           ncol = 3,
+           ncol = 2,
            bty = "n")
-
-
 
 }
 
+} # workaround plot setup
 
 #'
 #' # Process
@@ -327,6 +352,113 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
+##  Init yearly calculations
+globaldata    <- data.table()
+NR_extreme_SD <- 0
+
+daystodo      <- unique(as.Date(DATA[!is.na(INC_value), Date]))
+pbcount       <- 0
+
+for (ddd in daystodo) {
+
+    theday      <- as.POSIXct( as.Date(ddd, origin = "1970-01-01"))
+    test        <- format( theday, format = "%d%m%y06" )
+    pbcount     <- pbcount + 1
+
+    daymimutes  <- data.frame(
+        Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
+                    as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
+    )
+
+
+    ## get all day
+    wholeday    <- DATA[as.Date(Date) == as.Date(theday), ]
+    ## use only valid data for dark
+    daydata     <- DATA[as.Date(Date) == as.Date(theday) & !is.na(INC_value), ]
+
+    ## fill all minutes for nicer graphs
+    daydata     <- merge(daydata, daymimutes, all = T)
+    daydata$day <- as.Date(daydata$Date)
+
+
+
+    ####  Filter Standard deviation extremes  ##############################
+    ## SD can not be greater than the signal
+    pre_count     <- daydata[ !is.na(INC_value), .N ]
+    ## apply rule if there are enough data
+    if (pre_count > STD_ret_ap_for) {
+        ## filter sd relative to the signal
+        vec <- daydata[, INC_sd < STD_relMAX * max(INC_value, na.rm = T) ]
+        if (sum(!vec, na.rm = T) > 0) {
+            cat("Extreme sd values detected N:",sum(!vec, na.rm = T) ,"\n" )
+            cat("Will be ignored from dark calculation\n" )
+        }
+        daydata        <- daydata[ vec ]
+
+        NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(INC_value), .N ]
+        if (nrow(daydata[!is.na(INC_value)]) < 1) {
+            cat('\n')
+            cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n\n")
+            next()
+        }
+    }
+    ########################################################################
+
+
+
+
+
+
+
+
+    daydata[is.na(Elevat) ]
+
+        dates      <- daydata$Date
+        values     <- daydata$INC_value
+        elevatio   <- daydata$Elevat
+        nightlimit <- DARK_ELEV
+        dstretch   <- DSTRETCH
+
+        require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
+
+        ### suppress warnings zoo::index
+        suppressWarnings({
+            ## find local noun
+            nounindex    <- match( max(elevatio), elevatio )
+            ## split day in half
+            selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
+            selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
+            ## all morning and evening dates
+            morning      <- dates[selectmorn]
+            evening      <- dates[selecteven]
+
+            ## morning selection with time limit
+            mornigend    <- morning[max(index(morning))]
+            mornigstart  <- mornigend - dstretch
+            ## selection for morning dark
+            morningdark  <- selectmorn & dates <= mornigend & mornigstart < dates
+
+            ## evening selection with time limit
+            eveningstart <- evening[min(index(evening))]
+            eveningend   <- eveningstart + dstretch
+            ## selection for evening dark
+            eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
+        })
+
+        return(
+            data.frame(
+                Mavg = mean(      values[morningdark],  na.rm = TRUE ),
+                Mmed = median(    values[morningdark],  na.rm = TRUE ),
+                Msta = max(       dates[ morningdark],  na.rm = TRUE ),
+                Mend = min(       dates[ morningdark],  na.rm = TRUE ),
+                Mcnt = sum(!is.na(values[morningdark])),
+                Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
+                Emed = median(    values[eveningdark],  na.rm = TRUE ),
+                Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
+                Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
+                Ecnt = sum(!is.na(values[eveningdark]))
+            )
+        )
 
 
 
@@ -344,44 +476,29 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-# ## get all day
-# wholeday    <- rawdata[ day == as.Date(theday) ]
-# ## use only valid data for dark
-# daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
-#
-#
-# ## fill all minutes for nicer graphs
-# daydata     <- merge(daydata, daymimutes, all = T)
-# daydata$day <- as.Date(daydata$Date)
-#
-#
-# ####  Filter Standard deviation extremes  ##############################
-# ## SD can not be greater than the signal
-# pre_count     <- daydata[ !is.na(CM21value), .N ]
-# ## apply rule if there are enough data
-# if (pre_count > STD_ret_ap_for) {
-#     daydata       <- daydata[ CM21sd < STD_relMAX * max(CM21value, na.rm = T) ]
-#     NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(CM21value), .N ]
-#     if (nrow(daydata[ !is.na(CM21value) ]) < 1) {
-#         cat('\n')
-#         cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n\n")
-#         next()
-#     }
-# }
-# ########################################################################
-#
-#
-#
-#
-# ####    Calculate Dark signal   ########################################
-# dark_day <- dark_calculations( dates      = daydata$Date,
-#                                values     = daydata$CM21value,
-#                                elevatio   = daydata$Eleva,
-#                                nightlimit = DARK_ELEV,
-#                                dstretch   = DSTRETCH)
-#
-#
-#
+    ####    Calculate Dark signal   ########################################
+    dark_day <- dark_calculations( dates      = daydata$Date,
+                                   values     = daydata$INC_value,
+                                   elevatio   = daydata$Elevat,
+                                   nightlimit = DARK_ELEV,
+                                   dstretch   = DSTRETCH)
+
+
+
+
+
+
+
+    cat(paste(dark_day),"\n")
+
+
+
+}
+
+
+
+
+
 # # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
 # if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
 #         (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
