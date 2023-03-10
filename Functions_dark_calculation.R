@@ -25,7 +25,18 @@ dark_calculations <- function(elevatio,
 
     require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
 
-    ### suppress warnings zoo::index
+    ## Check input requirements
+    if (!all(!is.na(elevatio))) {
+        cat("\n\nSTOP: NAs in elevation vector!!\n\n")
+        stop("NAs in elevation vector!!")
+    }
+    if (!all(!is.na(dates))) {
+        cat("\n\nSTOP: NAs in dates vector!!\n\n")
+        stop("NAs in dates vector!!")
+    }
+
+
+    ## suppress warnings zoo::index
     suppressWarnings({
         ## find local noun
         nounindex    <- match( max(elevatio), elevatio )
