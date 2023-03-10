@@ -2,6 +2,7 @@
 #' ---
 #' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
 #' author:        "Natsis Athanasios"
+#' abstruct:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
 #' documentclass: article
@@ -36,8 +37,9 @@
 #'    ALL_YEARS: TRUE
 #' ---
 
+
 #'
-#' Compare Inclined CM21 with Global CM21 to produce a calibration factor
+#'
 #'
 #+ echo=F, include=T
 
@@ -77,6 +79,13 @@ source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 
 ##  Use the same definitions as horizontal CM-21 -------------------------------
+
+## from "~/CM_21_GLB/DEFINITIONS.R"
+SUN_FOLDER <- "~/DATA_RAW/SUN/PySolar_LAP/"
+DARK_ELEV  <- -10         ## Sun elevation limit to get dark signal (R20, R30)
+DSTRETCH   <-  20 * 3600  ## Extend of dark signal for morning and evening of the same day (R30)
+DCOUNTLIM  <-  10         ## Number of valid measurements to compute dark (R30)
+
 
 ## Standard deviation filter (apply after other filters)
 STD_ret_ap_for = 10   ## apply rule when there are enough data points
@@ -156,14 +165,20 @@ for (aday in dayswecare) {
                             as.is       = TRUE)
 
 
+    # Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
+    # Elevat      = sun_temp$ELEV
+
     ##  Day table to save
     day_data <- data.table( Date        = D_minutes, # Date of the data point
                             INC_value   = lap$V1,    # Raw value for CM21
-                            INC_sd      = lap$V2)    # Raw SD value for CM21
+                            INC_sd      = lap$V2,    # Raw SD value for CM21
+                            # Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
+                            Elevat      = sun_temp$ELEV)
 
     ##  Gather data
     INCLI <- rbind(INCLI, day_data)
 }
+
 
 ##  Complete data set
 DATA <- merge(HORIZ, INCLI, all = TRUE)
@@ -346,7 +361,18 @@ for (ad in unique(as.Date(DT$Date))) {
 } # workaround plot setup
 
 #'
+#' \newpage
+#'
 #' # Process
+#'
+#' ## Compute dark signal correction for inclined CM-21.
+#'
+#' We calculate zero offset as the **median** value of signal with:
+#'
+#' - Sun elevation angle bellow $`r DARK_ELEV`^\circ$
+#' - Data span of `r DSTRETCH / 3600` minutes
+#'
+#' We interpolate between the "morning" and "evening" offset for each day.
 #'
 #+ include=T, echo=F
 
@@ -377,7 +403,7 @@ for (ddd in daystodo) {
     daydata     <- DATA[as.Date(Date) == as.Date(theday) & !is.na(INC_value), ]
 
     ## fill all minutes for nicer graphs
-    daydata     <- merge(daydata, daymimutes, all = T)
+    daydata     <- merge(daydata, daymimutes, by = "Date", all = T)
     daydata$day <- as.Date(daydata$Date)
 
 
@@ -404,139 +430,177 @@ for (ddd in daystodo) {
     }
     ########################################################################
 
-
-
-
-
-
-
-
-    daydata[is.na(Elevat) ]
-
-        dates      <- daydata$Date
-        values     <- daydata$INC_value
-        elevatio   <- daydata$Elevat
-        nightlimit <- DARK_ELEV
-        dstretch   <- DSTRETCH
-
-        require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
-
-        ### suppress warnings zoo::index
-        suppressWarnings({
-            ## find local noun
-            nounindex    <- match( max(elevatio), elevatio )
-            ## split day in half
-            selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
-            selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
-            ## all morning and evening dates
-            morning      <- dates[selectmorn]
-            evening      <- dates[selecteven]
-
-            ## morning selection with time limit
-            mornigend    <- morning[max(index(morning))]
-            mornigstart  <- mornigend - dstretch
-            ## selection for morning dark
-            morningdark  <- selectmorn & dates <= mornigend & mornigstart < dates
-
-            ## evening selection with time limit
-            eveningstart <- evening[min(index(evening))]
-            eveningend   <- eveningstart + dstretch
-            ## selection for evening dark
-            eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
-        })
-
-        return(
-            data.frame(
-                Mavg = mean(      values[morningdark],  na.rm = TRUE ),
-                Mmed = median(    values[morningdark],  na.rm = TRUE ),
-                Msta = max(       dates[ morningdark],  na.rm = TRUE ),
-                Mend = min(       dates[ morningdark],  na.rm = TRUE ),
-                Mcnt = sum(!is.na(values[morningdark])),
-                Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
-                Emed = median(    values[eveningdark],  na.rm = TRUE ),
-                Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
-                Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
-                Ecnt = sum(!is.na(values[eveningdark]))
-            )
-        )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ####    Calculate Dark signal   ########################################
+    suppressWarnings({
     dark_day <- dark_calculations( dates      = daydata$Date,
                                    values     = daydata$INC_value,
                                    elevatio   = daydata$Elevat,
                                    nightlimit = DARK_ELEV,
                                    dstretch   = DSTRETCH)
+    })
+
+    if (!((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+          (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+        cat("Can not apply dark\n")
+        todays_dark_correction <- NA
+        dark_flag              <- "MISSING"
+        missingdark            <- NA
+
+        # ## get dark from pre-computed file
+        # if (exists("construct")) {
+        #     ## can not find date
+        #     if (! theday %in% construct$Date) {
+        #         todays_dark_correction <- NA
+        #         dark_flag              <- "MISSING"
+        #         missingdark            <- NA
+        #     } else {
+        #         ## get data from recomputed dark database
+        #         todays_dark_correction <- construct[ Date == theday, DARK]
+        #         dark_flag              <- "CONSTRUCTED"
+        #     }
+        # }
+
+        } else {
+        ####    Dark Correction function   #################################
+        dark_generator <- dark_function(dark_day    = dark_day,
+                                        DCOUNTLIM   = DCOUNTLIM,
+                                        type        = "median",
+                                        adate       = theday ,
+                                        test        = test,
+                                        missfiles   = missfiles,
+                                        missingdark = missingdark )
+
+        ####    Create dark signal for correction    #######################
+        todays_dark_correction <- dark_generator(daydata$Date)
+        dark_flag              <- "COMPUTED"
+    }
+
+    # ####    Apply dark correction    #######################################
+    daydata[, INC_valueWdark := INC_value - todays_dark_correction ]
 
 
+    ####    Get processed and unprocessed data    ##########################
+    daydata    <- merge( daydata, wholeday,
+                         by = intersect(names(daydata),names(wholeday)), all = T)
 
-
-
-
-
-    cat(paste(dark_day),"\n")
-
-
+    globaldata <- rbind( globaldata, daydata, fill = TRUE )
 
 }
 
 
 
+plot(globaldata$Date,
+     globaldata[, INC_valueWdark - INC_value],
+     pch = 19,
+     cex = 0.3,
+     ylab = "Zero offset [V]",
+     xlab = "",
+     main = "Dark Signal Correction for Inclined CM-21")
 
 
-# # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
-# if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
-#         (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
-#     # cat("Can not apply dark\n")
-#     todays_dark_correction <- NA
-#     dark_flag              <- "MISSING"
-#     missingdark            <- NA
-#
-#     ## get dark from pre-computed file
-#     if (exists("construct")) {
-#         ## can not find date
-#         if (! theday %in% construct$Date) {
-#             todays_dark_correction <- NA
-#             dark_flag              <- "MISSING"
-#             missingdark            <- NA
-#         } else {
-#             ## get data from recomputed dark database
-#             todays_dark_correction <- construct[ Date == theday, DARK]
-#             dark_flag              <- "CONSTRUCTED"
-#         }
-#     }
-# } else {
-#     ####    Dark Correction function   #################################
-#     dark_generator <- dark_function(dark_day    = dark_day,
-#                                     DCOUNTLIM   = DCOUNTLIM,
-#                                     type        = "median",
-#                                     adate       = theday ,
-#                                     test        = test,
-#                                     missfiles   = missfiles,
-#                                     missingdark = missingdark )
-#
-#     ####    Create dark signal for correction    #######################
-#     todays_dark_correction <- dark_generator(daydata$Date)
-#     dark_flag              <- "COMPUTED"
-# }
-#
-# ####    Apply dark correction    #######################################
-# daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
+
+globaldata[, INC_value := INC_valueWdark ]
+globaldata[, INC_valueWdark := NULL ]
+
+
+
+
+##  USE common data for analysis
+DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
+
+
+#'
+#' ## Daily plot with dark correction
+#'
+#+ include=T, echo=F
+if (!interactive()) {  # workaround plot setup
+
+    for (ad in unique(as.Date(DT$Date))) {
+        pp <- DT[ as.Date(Date) == ad ]
+        ad <- as.Date(ad, origin = "1970-01-01")
+
+        par(mar = c(2,2,2,1))
+
+        layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
+
+        plot.new()
+
+        title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+        par(new = T)
+        plot(pp$Date,
+             pp$wattGLB,
+             col  = col_hor,
+             xlab = "",  ylab = "",
+             yaxt = "n",
+             xaxs = "i",
+             pch  = 19,
+             cex  = 0.3)
+
+        par(new = T)
+        plot(pp$Date,
+             pp$INC_value,
+             col  = col_inc,
+             xlab = "",  ylab = "",
+             yaxt = "n",
+             xaxs = "i",
+             pch  = 19,
+             cex  = 0.2)
+
+
+        vec <- pp$INC_value / pp$wattGLB
+        vec[!is.finite(vec)] <- NA
+
+        range <- diff(range(vec, na.rm = T))
+        range <- range * 0.01
+        mean  <- mean(vec, na.rm = T)
+        ylim  <- c(mean - range, mean + range)
+
+
+        vec[vec > ylim[2]] <- NA
+        vec[vec < ylim[1]] <- NA
+
+
+        par(new = T)
+        plot(pp$Date,
+             vec ,
+             col  = "blue",
+             xlab = "",  ylab = "",
+             xaxs = "i",
+             pch  = 19,
+             log  = "y",
+             cex  = 0.4)
+        # abline(h = 1, lty = 1 , col = "black")
+
+        par(new = T)
+        plot(pp$Date,
+             vec ,
+             ylim = ylim,
+             col  = "cyan",
+             xlab = "",  ylab = "",
+             xaxs = "i",
+             pch  = 19,
+             cex  = 0.4)
+
+
+        par(mar=c(0, 0, 0, 0))
+        # c(bottom, left, top, right)
+        plot.new()
+        legend("center",
+               legend = c("Global Horizontal [W/m^2]",
+                          "Inclined Signal [V]",
+                          "log(Inclined / Horizontal)",
+                          "Inclined / Horizontal"),
+               col  = c(col_hor, col_inc,'blue', "cyan"),
+               pch  = 19,
+               ncol = 2,
+               bty = "n")
+
+    }
+
+} # workaround plot setup
+
+
+
 
 
 
