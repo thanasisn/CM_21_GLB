@@ -3,11 +3,11 @@
 
 ##  To build journal:
 
-- "make"      for defaults
-- "make all"  the defaults (pdf and html)
-- "make pdf"  ... 
-- "make html" ...
-- "make odt"  ...
+- "`make`"      for defaults
+- "`make all`"  the defaults (pdf and html)
+- "`make pdf`"  ... 
+- "`make html`" ...
+- "`make odt`"  ...
 
 
 ## Format
@@ -20,7 +20,6 @@ Filenames should be numerical sorted:
 
 File template:
 
------
 
 ```
 ## 2022-02-21 00:00 [USERNAME]
@@ -30,4 +29,3 @@ File template:
 Text for this entry
 
 ```
------

@@ -12,7 +12,12 @@ targetfile=".markdowncontent"
 echo "" > "$targetfile"
 
 ## add preamble
-cat "./About.md" >> "$targetfile"
+(
+cat "./About.md"
+echo 
+echo "-----"
+echo
+)>> "$targetfile"
 
 
 ## get all the years from files
@@ -28,7 +33,10 @@ for ay in "${years[@]}"; do
     echo
     echo "# $ay"
     echo
-    echo ":::columns"
+    # .justified
+    # .ragged 
+    echo '::: {.columns columngap=4em column-rule="1px solid black"}'
+    # echo ":::columns"
     echo
     ) >> "$targetfile"
     
@@ -38,10 +46,12 @@ for ay in "${years[@]}"; do
         ## append the appropriate files only
         if [[ -n "$infile" ]]; then
             echo " - $infile"
-            cat "$infile" >> "$targetfile" 
-            echo ""       >> "$targetfile" 
-            echo "------" >> "$targetfile" 
-            echo ""       >> "$targetfile" 
+            (
+            cat "$infile" 
+            echo ""       
+            # echo "------" 
+            echo ""        
+            ) >> "$targetfile"
         fi
     done
     (
@@ -54,7 +64,8 @@ done
 ## add tail
 (
 echo
-echo "\newpage"
+# echo "\newpage"
+echo "-------"
 echo
 cat "./Readme.md" 
 ) >> "$targetfile"
