@@ -2,7 +2,7 @@
 #' ---
 #' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
 #' author:        "Natsis Athanasios"
-#' abstruct:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
+#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
 #' documentclass: article
@@ -248,7 +248,6 @@ if (!interactive()) {  # workaround plot setup
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
-     xlab = "",
      main = "Common values")
 
 
@@ -497,8 +496,6 @@ plot(globaldata$Date,
      xlab = "",
      main = "Dark Signal Correction for Inclined CM-21")
 
-
-
 globaldata[, INC_value := INC_valueWdark ]
 globaldata[, INC_valueWdark := NULL ]
 
@@ -507,6 +504,12 @@ globaldata[, INC_valueWdark := NULL ]
 
 ##  USE common data for analysis
 DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
+
+
+plot(DT$wattGLB, DT$INC_value,
+     pch  = ".",
+     main = "Common values")
+
 
 
 #'
