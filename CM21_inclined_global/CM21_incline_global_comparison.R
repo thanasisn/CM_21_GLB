@@ -101,8 +101,8 @@ START_DAY <- "2022-02-22"
 END_DAY   <- "2022-06-27"
 
 ## extend
-START_DAY <- "2022-02-20"
-END_DAY   <- "2022-07-01"
+START_DAY <- "2022-02-21"
+END_DAY   <- "2022-06-28"
 
 
 ## color values
@@ -603,9 +603,9 @@ if (!interactive()) {  # workaround plot setup
 } # workaround plot setup
 
 
+plot()
 
-
-
+ln(DT)
 
 
 
