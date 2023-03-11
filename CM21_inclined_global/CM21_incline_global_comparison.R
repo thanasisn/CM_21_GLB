@@ -104,8 +104,8 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 START_DAY <- "2022-02-21"
 END_DAY   <- "2022-06-27"
 
-START_DAY_exact <- as.POSIXct("2022-02-21 11:00")
-END_DAY_exact   <- as.POSIXct("2022-06-27 12:00")
+START_DAY_exact <- as.POSIXct("2022-02-21 11:30")
+END_DAY_exact   <- as.POSIXct("2022-06-27 11:30")
 
 
 
@@ -551,7 +551,7 @@ DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 ## Use only exact dates --------------------------------------------------------
 DT <- DT[Date > START_DAY_exact]
-
+DT <- DT[Date < END_DAY_exact  ]
 
 par(def.par)
 layout(1)
