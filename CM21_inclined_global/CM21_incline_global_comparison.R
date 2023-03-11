@@ -102,7 +102,7 @@ END_DAY   <- "2022-06-27"
 
 ## extend
 START_DAY <- "2022-02-21"
-END_DAY   <- "2022-06-28"
+END_DAY   <- "2022-06-27"
 
 
 ## color values
@@ -216,6 +216,8 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #+ include=T, echo=F
 
+
+#+ include=F, echo=F
 if (!interactive()) {  # workaround plot setup
 
 plot(DATA$Date,
@@ -232,7 +234,7 @@ plot(DATA$Date,
      col  = col_inc,
      pch  = ".",
      xlab = "",
-     main = "Inclined CM21 signal")
+     main = "Inclined CM-21 signal")
 
 } # workaround plot setup
 
@@ -244,11 +246,12 @@ plot(DATA$Date,
 #'
 #+ include=T, echo=F
 
+
 if (!interactive()) {  # workaround plot setup
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
-     main = "Common values")
+     main = "Common measurements")
 
 
 plot(DT$Date,
@@ -263,7 +266,7 @@ plot(DT$Date,
      col  = col_inc,
      pch  = ".",
      xlab = "",
-     main = "Inclined CM21 signal")
+     main = "Inclined CM-21 signal")
 
 } # workaround plot setup
 
@@ -273,6 +276,9 @@ plot(DT$Date,
 #' ## Daily plot
 #'
 #+ include=T, echo=F
+
+
+#+ include=F, echo=F
 if (!interactive()) {  # workaround plot setup
 
 for (ad in unique(as.Date(DT$Date))) {
@@ -340,6 +346,16 @@ for (ad in unique(as.Date(DT$Date))) {
          xaxs = "i",
          pch  = 19,
          cex  = 0.4)
+
+
+    par(new = T)
+    plot(pp$INC_value,
+         pp$wattGLB ,
+         col  = "red",
+         xlab = "",  ylab = "",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.2)
 
 
     par(mar=c(0, 0, 0, 0))
@@ -412,10 +428,10 @@ for (ddd in daystodo) {
     pre_count     <- daydata[ !is.na(INC_value), .N ]
     ## apply rule if there are enough data
     if (pre_count > STD_ret_ap_for) {
-        ## filter sd relative to the signal
+        ## filter SD relative to the signal
         vec <- daydata[, INC_sd < STD_relMAX * max(INC_value, na.rm = T) ]
         if (sum(!vec, na.rm = T) > 0) {
-            cat("Extreme sd values detected N:",sum(!vec, na.rm = T) ,"\n" )
+            cat("Extreme SD values detected N:",sum(!vec, na.rm = T) ,"\n" )
             cat("Will be ignored from dark calculation\n" )
         }
         daydata        <- daydata[ vec ]
@@ -445,8 +461,8 @@ for (ddd in daystodo) {
         dark_flag              <- "MISSING"
         missingdark            <- NA
 
-        # ## get dark from pre-computed file
-        # if (exists("construct")) {
+        ## get dark from pre-computed file
+        if (exists("construct")) {
         #     ## can not find date
         #     if (! theday %in% construct$Date) {
         #         todays_dark_correction <- NA
@@ -457,7 +473,8 @@ for (ddd in daystodo) {
         #         todays_dark_correction <- construct[ Date == theday, DARK]
         #         dark_flag              <- "CONSTRUCTED"
         #     }
-        # }
+        }
+
 
         } else {
         ####    Dark Correction function   #################################
@@ -584,6 +601,16 @@ if (!interactive()) {  # workaround plot setup
              pch  = 19,
              cex  = 0.4)
 
+        par(new = T)
+        plot(pp$INC_value,
+             pp$wattGLB ,
+             col  = "red",
+             xlab = "",  ylab = "",
+             xaxs = "i",
+             pch  = 19,
+             cex  = 0.2)
+
+
 
         par(mar=c(0, 0, 0, 0))
         # c(bottom, left, top, right)
@@ -603,9 +630,17 @@ if (!interactive()) {  # workaround plot setup
 } # workaround plot setup
 
 
-plot()
 
-ln(DT)
+
+
+plot(DT$wattGLB, DT$INC_value,
+     pch  = ".",
+     main = "Common measurements")
+
+
+fit <- lm(DT$INC_value ~ DT$wattGLB)
+abline(fit, col = "red")
+
 
 
 
