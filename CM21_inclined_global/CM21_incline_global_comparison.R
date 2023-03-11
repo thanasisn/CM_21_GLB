@@ -100,14 +100,13 @@ residuals_distance <- 0.2
 ##  Variables  -----------------------------------------------------------------
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
-
-## Bais doy 53:178
-START_DAY <- "2022-02-22"
-END_DAY   <- "2022-06-27"
-
-## extend
+## data extend
 START_DAY <- "2022-02-21"
 END_DAY   <- "2022-06-27"
+
+START_DAY_exact <- as.POSIXct("2022-02-21 10:00")
+END_DAY_exact   <- as.POSIXct("2022-06-28 10:00")
+
 
 
 ## color values
@@ -223,6 +222,12 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #' End day:   `r END_DAY`
 #'
+#'
+#'
+#' Correletion period:
+#'
+#' Start day exact: `r START_DAY_exact`
+#' #'
 #+ include=T, echo=F
 
 
@@ -539,6 +544,10 @@ globaldata[, INC_valueWdark := NULL ]
 
 ##  Use common data for correlation analysis -----------------------------------
 DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
+
+
+## Use only exact dates --------------------------------------------------------
+DT <- DT[Date > START_DAY_exact]
 
 
 par(def.par)
