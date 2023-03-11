@@ -62,7 +62,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_R20_") })
+                            return("CM21_incline_global_comparison_") })
 if (!interactive()) {
     pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
@@ -281,11 +281,10 @@ plot(DT$Date,
 
 
 
-#'
-#' ## Daily plot
-#'
-#+ include=T, echo=F
-
+# #'
+# #' ## Daily plot
+# #'
+# #+ include=T, echo=F
 
 #+ include=F, echo=F
 if (!interactive()) {  # workaround plot setup
@@ -393,10 +392,9 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' We calculate zero offset as the **median** value of signal with:
 #'
-#' - Sun elevation angle bellow $`r DARK_ELEV`^\circ$
-#' - Data span of `r DSTRETCH / 3600` minutes
-#'
-#' We interpolate between the "morning" and "evening" offset for each day.
+#' - Sun elevation angle bellow $`r DARK_ELEV`^\circ$.
+#' - Data span for dark `r DSTRETCH / 3600` minutes for each "morning" and "evening".
+#' - We interpolate between the "morning" and "evening" offset for each day for the dark correction.
 #'
 #+ include=T, echo=F
 
@@ -470,6 +468,7 @@ for (ddd in daystodo) {
         dark_flag              <- "MISSING"
         missingdark            <- NA
 
+        stop()
         ## get dark from pre-computed file
         if (exists("construct")) {
         #     ## can not find date
@@ -528,10 +527,23 @@ globaldata[, INC_valueWdark := NULL ]
 
 
 
+#'
+#' \newpage
+#'
+#' ## Correlation
+#'
+#' Get offending points by residuals distance.
+#'
+#+ include=T, echo=F
 
-##  USE common data for analysis
+
+##  Use common data for correlation analysis -----------------------------------
 DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
 
+
+par(def.par)
+layout(1)
+plot.new()
 
 
 fit <- lm(DT$INC_value ~ DT$wattGLB)
@@ -540,17 +552,32 @@ vec <- abs(fit$residuals) > residuals_distance
 DT$Offending <- vec
 
 plot(DT$wattGLB, DT$INC_value,
-     pch  = ".",
+     pch  = 1,
+     cex  = 0.5,
+     xlab = "Global [W]",
+     ylab = "Inclined [V]",
      main = "Common measurements")
 
 points(DT$wattGLB[vec], DT$INC_value[vec],
        pch = "+", col = "magenta")
 
-abline(fit, col = "red")
+abline(fit, col = "red", lwd = 2)
+
+
+legend("bottom", lty = 1, bty = "n", lwd = 2, cex = 1,
+       paste("y= ",
+             signif(abs(fit[[1]][1]), 3),
+             if (fit[[1]][2] > 0) '+' else '-',
+             signif(abs(fit[[1]][2]), 3),
+             " * x")
+)
+
+
+pander(fit)
 
 
 ## all points
-# DT$Date[vec]
+OffendingPoints <- DT[vec, ]
 
 pander(
     data.frame(table(DT$day[vec])),
@@ -561,8 +588,11 @@ pander(
 
 
 
+
+## Daily plot with dark correction ---------------------------------------------
+
 #'
-#' ## Daily plot with dark correction
+#' ## floating scale daily plot after dark correction
 #'
 #+ include=T, echo=F
 # if (!interactive()) {  # workaround plot setup
@@ -669,7 +699,7 @@ pander(
                           "Inclined / Horizontal",
                           "Offending points"),
                col  = c(col_hor, col_inc,'darkblue', "cyan", "red"),
-               pch  = 19,
+               pch  = c(19     ,       19,       19,     19,     1),
                ncol = 2,
                bty = "n")
 
@@ -682,6 +712,28 @@ pander(
 # } # workaround plot setup
 
 
+#'
+#' ## Table of offending points
+#'
+#+ include=T, echo=F
+
+OffendingPoints[, Azimuth   := NULL ]
+OffendingPoints[, preNoon   := NULL ]
+OffendingPoints[, Offending := NULL ]
+OffendingPoints[, day       := NULL ]
+
+setorder(OffendingPoints, Date)
+
+
+
+#+ echo=F, include=T
+#' \scriptsize
+#+ echo=F, include=T
+pander(OffendingPoints,
+       cap = "Offending Points")
+#'
+#' \normalsize
+#+ echo=F, include=T
 
 
 
