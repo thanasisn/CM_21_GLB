@@ -74,6 +74,7 @@ if (!interactive()) {
 ##  External code  -------------------------------------------------------------
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
+library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
@@ -105,7 +106,7 @@ START_DAY <- "2022-02-21"
 END_DAY   <- "2022-06-27"
 
 START_DAY_exact <- as.POSIXct("2022-02-21 11:50")
-END_DAY_exact   <- as.POSIXct("2022-06-27 09:01")
+END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
 
 
 
@@ -259,11 +260,11 @@ plot(DATA$Date,
 #'
 #' ## Common measurements
 #'
-#' Only simultaneous measurements.
+#' Only simultaneous measurements for correlation.
 #'
 #+ include=T, echo=F
 
-
+#+ include=F, echo=F
 if (!interactive()) {  # workaround plot setup
 
 plot(DT$wattGLB, DT$INC_value,
@@ -358,7 +359,9 @@ for (ad in unique(as.Date(DT$Date))) {
          vec ,
          ylim = ylim,
          col  = "cyan",
-         xlab = "",  ylab = "",
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
          xaxs = "i",
          pch  = 19,
          cex  = 0.4)
@@ -368,7 +371,8 @@ for (ad in unique(as.Date(DT$Date))) {
     plot(pp$INC_value,
          pp$wattGLB ,
          col  = "red",
-         xlab = "",  ylab = "",
+         xlab = "",
+         ylab = "",
          xaxs = "i",
          pch  = 19,
          cex  = 0.2)
@@ -625,7 +629,7 @@ pander(
              pp$wattGLB,
              col  = col_hor,
              xlab = "",  ylab = "",
-             yaxt = "n",
+             # yaxt = "n",
              xaxs = "i",
              pch  = 19,
              cex  = 0.3)
@@ -643,7 +647,8 @@ pander(
         plot(pp$Date,
              pp$INC_value,
              col  = col_inc,
-             xlab = "",  ylab = "",
+             xlab = "",
+             ylab = "",
              yaxt = "n",
              xaxs = "i",
              pch  = 19,
@@ -653,6 +658,8 @@ pander(
         points(pp$Date[pp$Offending],
                pp$INC_value[pp$Offending],
                col  = "red",
+               yaxt = "n",
+               xaxt = "n",
                pch  = 1,
                cex  = 1)
 
@@ -668,7 +675,12 @@ pander(
         vec[vec > ylim[2]] <- NA
         vec[vec < ylim[1]] <- NA
 
-#
+
+
+
+
+
+
 #         par(new = T)
 #         plot(pp$Date,
 #              vec ,
@@ -685,16 +697,34 @@ pander(
              vec ,
              ylim = ylim,
              col  = "cyan",
-             xlab = "",  ylab = "",
+             xlab = "",
+             ylab = "",
+             yaxt = "n",
+             xaxt = "n",
              xaxs = "i",
              pch  = 19,
              cex  = 0.4)
+
+
+        ## LOESS curve
+        LOESS_CRITERIO <-  c("aicc", "gcv")[2]
+        vec2 <- !is.na(vec)
+        FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
+                             degree = 1,
+                             criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+        FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
+        lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
+
+
 
         par(new = T)
         plot(pp$INC_value,
              pp$wattGLB ,
              col  = "darkblue",
-             xlab = "",  ylab = "",
+             xlab = "",
+             ylab = "",
+             yaxt = "n",
+             xaxt = "n",
              xaxs = "i",
              pch  = 19,
              cex  = 0.2)
@@ -709,9 +739,11 @@ pander(
                           "Inclined Signal [V]",
                           "Correlation Inclined ~ Horizontal",
                           "Inclined / Horizontal",
-                          "Offending points"),
-               col  = c(col_hor, col_inc,'darkblue', "cyan", "red"),
-               pch  = c(19     ,       19,       19,     19,     1),
+                          "Offending points",
+                          "LOESS"),
+               col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
+               pch  = c(     19,       19,       19,     19,     1,       NA),
+               lty  = c(     NA,       NA,       NA,     NA,    NA,        1),
                ncol = 2,
                bty = "n")
 
