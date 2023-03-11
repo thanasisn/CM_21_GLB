@@ -104,8 +104,8 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 START_DAY <- "2022-02-21"
 END_DAY   <- "2022-06-27"
 
-START_DAY_exact <- as.POSIXct("2022-02-21 10:00")
-END_DAY_exact   <- as.POSIXct("2022-06-28 10:00")
+START_DAY_exact <- as.POSIXct("2022-02-21 11:00")
+END_DAY_exact   <- as.POSIXct("2022-06-27 12:00")
 
 
 
@@ -227,7 +227,10 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #' Correletion period:
 #'
 #' Start day exact: `r START_DAY_exact`
-#' #'
+#'
+#' End day exact: `r END_DAY_exact`
+#'
+#'
 #+ include=T, echo=F
 
 
