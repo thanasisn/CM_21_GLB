@@ -78,6 +78,8 @@ source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 
+def.par <- par(no.readonly = TRUE)
+
 ##  Use the same definitions as horizontal CM-21 -------------------------------
 
 ## from "~/CM_21_GLB/DEFINITIONS.R"
@@ -90,6 +92,9 @@ DCOUNTLIM  <-  10         ## Number of valid measurements to compute dark (R30)
 ## Standard deviation filter (apply after other filters)
 STD_ret_ap_for = 10   ## apply rule when there are enough data points
 STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily value)
+
+
+residuals_distance <- 0.2
 
 
 ##  Variables  -----------------------------------------------------------------
@@ -124,8 +129,10 @@ incfiles <- list.files(path        = "~/DATA_RAW/Bband/CM21_LAP.INC",
                        pattern     = "[0-9]{6}01.LAP",
                        full.names  = TRUE,
                        ignore.case = TRUE,
-                       recursive   = TRUE)
+                       recursive   = TRUE,
+                       no..        = TRUE)
 
+stopifnot(length(incfiles) > 0)
 
 dayswecare <- seq.Date(as.Date(START_DAY),
                        as.Date(END_DAY), by = "day")
@@ -178,6 +185,8 @@ for (aday in dayswecare) {
     ##  Gather data
     INCLI <- rbind(INCLI, day_data)
 }
+
+
 
 
 ##  Complete data set
@@ -504,6 +513,7 @@ for (ddd in daystodo) {
 }
 
 
+par(def.par)
 
 plot(globaldata$Date,
      globaldata[, INC_valueWdark - INC_value],
@@ -523,9 +533,31 @@ globaldata[, INC_valueWdark := NULL ]
 DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
+
+fit <- lm(DT$INC_value ~ DT$wattGLB)
+vec <- abs(fit$residuals) > residuals_distance
+
+DT$Offending <- vec
+
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
-     main = "Common values")
+     main = "Common measurements")
+
+points(DT$wattGLB[vec], DT$INC_value[vec],
+       pch = "+", col = "magenta")
+
+abline(fit, col = "red")
+
+
+## all points
+# DT$Date[vec]
+
+pander(
+    data.frame(table(DT$day[vec])),
+    caption = "Offending points"
+)
+
+
 
 
 
@@ -533,7 +565,7 @@ plot(DT$wattGLB, DT$INC_value,
 #' ## Daily plot with dark correction
 #'
 #+ include=T, echo=F
-if (!interactive()) {  # workaround plot setup
+# if (!interactive()) {  # workaround plot setup
 
     for (ad in unique(as.Date(DT$Date))) {
         pp <- DT[ as.Date(Date) == ad ]
@@ -556,6 +588,15 @@ if (!interactive()) {  # workaround plot setup
              pch  = 19,
              cex  = 0.3)
 
+
+        points(pp$Date[pp$Offending],
+               pp$wattGLB[pp$Offending],
+               col  = "red",
+               pch  = 1,
+               cex  = 1)
+
+
+
         par(new = T)
         plot(pp$Date,
              pp$INC_value,
@@ -566,6 +607,12 @@ if (!interactive()) {  # workaround plot setup
              pch  = 19,
              cex  = 0.2)
 
+
+        points(pp$Date[pp$Offending],
+               pp$INC_value[pp$Offending],
+               col  = "red",
+               pch  = 1,
+               cex  = 1)
 
         vec <- pp$INC_value / pp$wattGLB
         vec[!is.finite(vec)] <- NA
@@ -579,16 +626,16 @@ if (!interactive()) {  # workaround plot setup
         vec[vec > ylim[2]] <- NA
         vec[vec < ylim[1]] <- NA
 
-
-        par(new = T)
-        plot(pp$Date,
-             vec ,
-             col  = "blue",
-             xlab = "",  ylab = "",
-             xaxs = "i",
-             pch  = 19,
-             log  = "y",
-             cex  = 0.4)
+#
+#         par(new = T)
+#         plot(pp$Date,
+#              vec ,
+#              col  = "blue",
+#              xlab = "",  ylab = "",
+#              xaxs = "i",
+#              pch  = 19,
+#              log  = "y",
+#              cex  = 0.4)
         # abline(h = 1, lty = 1 , col = "black")
 
         par(new = T)
@@ -604,7 +651,7 @@ if (!interactive()) {  # workaround plot setup
         par(new = T)
         plot(pp$INC_value,
              pp$wattGLB ,
-             col  = "red",
+             col  = "darkblue",
              xlab = "",  ylab = "",
              xaxs = "i",
              pch  = 19,
@@ -618,30 +665,21 @@ if (!interactive()) {  # workaround plot setup
         legend("center",
                legend = c("Global Horizontal [W/m^2]",
                           "Inclined Signal [V]",
-                          "log(Inclined / Horizontal)",
-                          "Inclined / Horizontal"),
-               col  = c(col_hor, col_inc,'blue', "cyan"),
+                          "Correlation Inclined ~ Horizontal",
+                          "Inclined / Horizontal",
+                          "Offending points"),
+               col  = c(col_hor, col_inc,'darkblue', "cyan", "red"),
                pch  = 19,
                ncol = 2,
                bty = "n")
 
+        layout(rbind(1,2), heights=c(7,1))
+
+
+        par(def.par)
     }
 
-} # workaround plot setup
-
-
-
-
-
-plot(DT$wattGLB, DT$INC_value,
-     pch  = ".",
-     main = "Common measurements")
-
-
-fit <- lm(DT$INC_value ~ DT$wattGLB)
-abline(fit, col = "red")
-
-
+# } # workaround plot setup
 
 
 
