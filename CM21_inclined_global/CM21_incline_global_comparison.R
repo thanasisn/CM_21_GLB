@@ -199,14 +199,6 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 
-## TODO
-## - define period of data to use
-## - dark calculation????
-##   - before analysis!
-## - correlate
-
-
-
 
 
 #'
@@ -226,7 +218,7 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #'
 #'
-#' Correletion period:
+#' Correlation period:
 #'
 #' Start day exact: `r START_DAY_exact`
 #'
@@ -397,7 +389,6 @@ for (ad in unique(as.Date(DT$Date))) {
 } # workaround plot setup
 
 #'
-#' \newpage
 #'
 #' # Process
 #'
@@ -562,19 +553,16 @@ DT <- DT[Date < END_DAY_exact  ]
 #'
 #+ include=T, echo=F
 
-par(def.par)
-layout(1)
-plot.new()
-
 ## linear fit
-fit           <- lm(DT$INC_value ~ DT$wattGLB)
+Pfit          <- lm(DT$wattGLB   ~ DT$INC_value)
+fit           <- lm(DT$INC_value ~ DT$wattGLB  )
 res_threshold <- 2
 vec <- abs(fit$residuals) > sd(fit$residuals) * res_threshold
 DT$Offending <- vec
 
 ## robust linear fit
-rfit <- rlm(DT$INC_value ~ DT$wattGLB)
-
+ rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
+Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
 
 
 #'
@@ -584,8 +572,9 @@ rfit <- rlm(DT$INC_value ~ DT$wattGLB)
 #'
 #+ include=T, echo=F
 
-
-
+par(def.par)
+layout(1)
+plot.new()
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = 1,
@@ -601,24 +590,27 @@ abline(fit, col = "red", lwd = 2)
 abline(rfit, col = "blue", lwd = 2)
 
 legend("bottom",
-       bty = "n", lwd = 2, cex = 1,
+       bty = "n", lwd = 2, cex = 0.8,
        lty = 1,
        col = c("red", "blue"),
        legend = c(paste("lm: y= ",
                         signif(abs(fit[[1]][1]), 3),
                         if (fit[[1]][2] > 0) '+' else '-',
-                        signif(abs(fit[[1]][2]), 3),
+                        signif(abs(fit[[1]][2]), 4),
                         " * x"),
                   paste("robust lm: y= ",
                         signif(abs(rfit[[1]][1]), 3),
                         if (rfit[[1]][2] > 0) '+' else '-',
-                        signif(abs(rfit[[1]][2]), 3),
+                        signif(abs(rfit[[1]][2]), 4),
                         " * x")
        )
 )
 
+
+
+
 pander(summary(fit),
-       caption = "Linear regrasion **RED**")
+       caption = "Linear regression **RED**")
 
 ## all points
 OffendingPoints <- DT[vec, ]
@@ -630,7 +622,7 @@ pander(
 
 
 pander(summary(fit),
-       caption = "Robust Linear regrasion **BLUE**")
+       caption = "Robust Linear regression **BLUE**")
 
 
 
@@ -643,7 +635,9 @@ pander(summary(fit),
 #' ## Distribution of ratios
 #'
 #'
+#'
 #+ include=T, echo=F
+
 
 ratiolim <- 0.02
 vec <- DT$INC_value/DT$wattGLB
@@ -651,7 +645,36 @@ vec <- vec[abs(vec) < ratiolim]
 
 hist(vec,
      breaks = 100,
-     xlim = c(-0.005,0.015))
+     xlim = c(-0.005,0.015),
+     main = "All values INC_value / wattGLB")
+
+abline(v = mean(vec,   na.rem = T), col = "blue" )
+abline(v = median(vec, na.rem = T), col = "green" )
+
+legend("topright", lty = 1,
+       legend = c(paste("Mean:",  signif(mean(vec,   na.rem = T), 5)),
+                  paste("Median:", signif(median(vec, na.rem = T), 5))),
+       col    = c("blue", "green")
+)
+
+## removed offending
+
+vec <- DT$INC_value[!DT$Offending] / DT$wattGLB[!DT$Offending]
+vec <- vec[abs(vec) < ratiolim]
+
+hist(vec,
+     breaks = 100,
+     xlim = c(-0.005,0.015),
+     main = "Without offending INC_value / wattGLB")
+
+abline(v = mean(vec,   na.rem = T), col = "blue" )
+abline(v = median(vec, na.rem = T), col = "green" )
+
+legend("topright", lty = 1,
+       legend = c(paste("Mean:",  signif(mean(vec,   na.rem = T), 5)),
+                  paste("Median:", signif(median(vec, na.rem = T), 5))),
+       col    = c("blue", "green")
+)
 
 
 
@@ -668,150 +691,141 @@ hist(vec,
 #' ## Floating scale daily plot after dark correction
 #'
 #+ include=T, echo=F
-# if (!interactive()) {  # workaround plot setup
-
-    for (ad in unique(as.Date(DT$Date))) {
-        pp <- DT[ as.Date(Date) == ad ]
-        ad <- as.Date(ad, origin = "1970-01-01")
-
-        par(mar = c(2,2,2,1))
-
-        layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
-
-        plot.new()
-
-        title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-        par(new = T)
-        plot(pp$Date,
-             pp$wattGLB,
-             col  = col_hor,
-             xlab = "",  ylab = "",
-             # yaxt = "n",
-             xaxs = "i",
-             pch  = 19,
-             cex  = 0.3)
 
 
-        points(pp$Date[pp$Offending],
-               pp$wattGLB[pp$Offending],
-               col  = "red",
-               pch  = 1,
-               cex  = 1)
+for (ad in unique(as.Date(DT$Date))) {
+    pp <- DT[ as.Date(Date) == ad ]
+    ad <- as.Date(ad, origin = "1970-01-01")
+
+    par(mar = c(2,2,2,1))
+
+    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
+
+    plot.new()
+
+    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+    par(new = T)
+    plot(pp$Date,
+         pp$wattGLB,
+         col  = col_hor,
+         xlab = "",  ylab = "",
+         # yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.3)
 
 
-
-        par(new = T)
-        plot(pp$Date,
-             pp$INC_value,
-             col  = col_inc,
-             xlab = "",
-             ylab = "",
-             yaxt = "n",
-             xaxs = "i",
-             pch  = 19,
-             cex  = 0.2)
-
-
-        points(pp$Date[pp$Offending],
-               pp$INC_value[pp$Offending],
-               col  = "red",
-               yaxt = "n",
-               xaxt = "n",
-               pch  = 1,
-               cex  = 1)
-
-        vec <- pp$INC_value / pp$wattGLB
-        vec[!is.finite(vec)] <- NA
-
-        range <- diff(range(vec, na.rm = T))
-        range <- range * 0.01
-        mean  <- mean(vec, na.rm = T)
-        ylim  <- c(mean - range, mean + range)
-
-
-        vec[vec > ylim[2]] <- NA
-        vec[vec < ylim[1]] <- NA
+    points(pp$Date[pp$Offending],
+           pp$wattGLB[pp$Offending],
+           col  = "red",
+           pch  = 1,
+           cex  = 1)
 
 
 
+    par(new = T)
+    plot(pp$Date,
+         pp$INC_value,
+         col  = col_inc,
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.2)
+
+
+    points(pp$Date[pp$Offending],
+           pp$INC_value[pp$Offending],
+           col  = "red",
+           yaxt = "n",
+           xaxt = "n",
+           pch  = 1,
+           cex  = 1)
+
+    vec <- pp$INC_value / pp$wattGLB
+    vec[!is.finite(vec)] <- NA
+
+    range <- diff(range(vec, na.rm = T))
+    range <- range * 0.01
+    mean  <- mean(vec, na.rm = T)
+    ylim  <- c(mean - range, mean + range)
+
+
+    vec[vec > ylim[2]] <- NA
+    vec[vec < ylim[1]] <- NA
+
+    #         par(new = T)
+    #         plot(pp$Date,
+    #              vec ,
+    #              col  = "blue",
+    #              xlab = "",  ylab = "",
+    #              xaxs = "i",
+    #              pch  = 19,
+    #              log  = "y",
+    #              cex  = 0.4)
+    # abline(h = 1, lty = 1 , col = "black")
+
+    par(new = T)
+    plot(pp$Date,
+         vec ,
+         ylim = ylim,
+         col  = "cyan",
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.4)
+
+
+    ## LOESS curve
+    LOESS_CRITERIO <-  c("aicc", "gcv")[2]
+    vec2 <- !is.na(vec)
+    FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
+                         degree = 1,
+                         criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+    FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
+    lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
 
 
 
-
-#         par(new = T)
-#         plot(pp$Date,
-#              vec ,
-#              col  = "blue",
-#              xlab = "",  ylab = "",
-#              xaxs = "i",
-#              pch  = 19,
-#              log  = "y",
-#              cex  = 0.4)
-        # abline(h = 1, lty = 1 , col = "black")
-
-        par(new = T)
-        plot(pp$Date,
-             vec ,
-             ylim = ylim,
-             col  = "cyan",
-             xlab = "",
-             ylab = "",
-             yaxt = "n",
-             xaxt = "n",
-             xaxs = "i",
-             pch  = 19,
-             cex  = 0.4)
-
-
-        ## LOESS curve
-        LOESS_CRITERIO <-  c("aicc", "gcv")[2]
-        vec2 <- !is.na(vec)
-        FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
-                             degree = 1,
-                             criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-        FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
-        lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
+    par(new = T)
+    plot(pp$INC_value,
+         pp$wattGLB ,
+         col  = "darkblue",
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.2)
 
 
 
-        par(new = T)
-        plot(pp$INC_value,
-             pp$wattGLB ,
-             col  = "darkblue",
-             xlab = "",
-             ylab = "",
-             yaxt = "n",
-             xaxt = "n",
-             xaxs = "i",
-             pch  = 19,
-             cex  = 0.2)
+    par(mar=c(0, 0, 0, 0))
+    # c(bottom, left, top, right)
+    plot.new()
+    legend("center",
+           legend = c("Global Horizontal [W/m^2]",
+                      "Inclined Signal [V]",
+                      "Correlation Inclined ~ Horizontal",
+                      "Inclined / Horizontal",
+                      "Offending points",
+                      "LOESS"),
+           col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
+           pch  = c(     19,       19,       19,     19,     1,       NA),
+           lty  = c(     NA,       NA,       NA,     NA,    NA,        1),
+           ncol = 2,
+           bty = "n")
+
+    layout(rbind(1,2), heights=c(7,1))
 
 
-
-        par(mar=c(0, 0, 0, 0))
-        # c(bottom, left, top, right)
-        plot.new()
-        legend("center",
-               legend = c("Global Horizontal [W/m^2]",
-                          "Inclined Signal [V]",
-                          "Correlation Inclined ~ Horizontal",
-                          "Inclined / Horizontal",
-                          "Offending points",
-                          "LOESS"),
-               col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
-               pch  = c(     19,       19,       19,     19,     1,       NA),
-               lty  = c(     NA,       NA,       NA,     NA,    NA,        1),
-               ncol = 2,
-               bty = "n")
-
-        layout(rbind(1,2), heights=c(7,1))
-
-
-        par(def.par)
-    }
-
-# } # workaround plot setup
-
+    par(def.par)
+}
 
 # #'
 # #' ## Table of offending points
@@ -833,6 +847,170 @@ hist(vec,
 # #'
 # #' \normalsize
 # #+ echo=F, include=T
+
+
+
+
+
+
+## Calibrated daily data -------------------------------------------------------
+#'
+#' \newpage
+#'
+#' ## Calibrated daily data
+#'
+#+ include=T, echo=F
+
+
+
+
+
+
+predict(fit, DT$INC_value)
+
+
+stop()
+for (ad in unique(as.Date(DT$Date))) {
+    pp <- DT[ as.Date(Date) == ad ]
+    ad <- as.Date(ad, origin = "1970-01-01")
+
+    par(mar = c(2,2,2,1))
+
+    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
+
+    plot.new()
+
+    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+    par(new = T)
+    plot(pp$Date,
+         pp$wattGLB,
+         col  = col_hor,
+         xlab = "",  ylab = "",
+         # yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.3)
+
+
+    points(pp$Date[pp$Offending],
+           pp$wattGLB[pp$Offending],
+           col  = "red",
+           pch  = 1,
+           cex  = 1)
+
+
+
+    par(new = T)
+    plot(pp$Date,
+         pp$INC_value,
+         col  = col_inc,
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.2)
+
+
+    points(pp$Date[pp$Offending],
+           pp$INC_value[pp$Offending],
+           col  = "red",
+           yaxt = "n",
+           xaxt = "n",
+           pch  = 1,
+           cex  = 1)
+
+    vec <- pp$INC_value / pp$wattGLB
+    vec[!is.finite(vec)] <- NA
+
+    range <- diff(range(vec, na.rm = T))
+    range <- range * 0.01
+    mean  <- mean(vec, na.rm = T)
+    ylim  <- c(mean - range, mean + range)
+
+
+    vec[vec > ylim[2]] <- NA
+    vec[vec < ylim[1]] <- NA
+
+    #         par(new = T)
+    #         plot(pp$Date,
+    #              vec ,
+    #              col  = "blue",
+    #              xlab = "",  ylab = "",
+    #              xaxs = "i",
+    #              pch  = 19,
+    #              log  = "y",
+    #              cex  = 0.4)
+    # abline(h = 1, lty = 1 , col = "black")
+
+    par(new = T)
+    plot(pp$Date,
+         vec ,
+         ylim = ylim,
+         col  = "cyan",
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.4)
+
+
+    ## LOESS curve
+    LOESS_CRITERIO <-  c("aicc", "gcv")[2]
+    vec2 <- !is.na(vec)
+    FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
+                         degree = 1,
+                         criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+    FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
+    lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
+
+
+
+    par(new = T)
+    plot(pp$INC_value,
+         pp$wattGLB ,
+         col  = "darkblue",
+         xlab = "",
+         ylab = "",
+         yaxt = "n",
+         xaxt = "n",
+         xaxs = "i",
+         pch  = 19,
+         cex  = 0.2)
+
+
+
+    par(mar=c(0, 0, 0, 0))
+    # c(bottom, left, top, right)
+    plot.new()
+    legend("center",
+           legend = c("Global Horizontal [W/m^2]",
+                      "Inclined Signal [V]",
+                      "Correlation Inclined ~ Horizontal",
+                      "Inclined / Horizontal",
+                      "Offending points",
+                      "LOESS"),
+           col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
+           pch  = c(     19,       19,       19,     19,     1,       NA),
+           lty  = c(     NA,       NA,       NA,     NA,    NA,        1),
+           ncol = 2,
+           bty = "n")
+
+    layout(rbind(1,2), heights=c(7,1))
+
+
+    par(def.par)
+}
+
+
+
+
+
+
+
+
 
 
 
