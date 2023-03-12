@@ -38,6 +38,29 @@
 #' ---
 
 
+
+#'
+#' # Description
+#'
+#' Got measurements from inclined CM-21:
+#' : $V_{IN}$
+#'
+#' Use linear regression to get radiation:
+#' : $E_{IN} = β + α * V_{IN}$
+#'
+#' or
+#'
+#' Use median of the ratio:
+#' : $E_{IN} = a * E_{GL}$
+#'
+#' Assume:
+#' : $E_{IN} = E_{GL}$
+#'
+#'
+#' Produce Global "measurements":
+#' : $V_{GL} = E_{IN} / S_{new}$
+#'
+#' Select an arbitrary $S_{new}$ value.
 #'
 #'
 #'
@@ -1057,32 +1080,6 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-#'
-#' # Description
-#'
-#' Got measurements from inclined CM-21:
-#' : $V_{IN}$
-#'
-#' Use linear regression to get radiation:
-#' : $E_{IN} = β + α * V_{IN}$
-#'
-#' or
-#'
-#' Use median of the ratio:
-#' : $E_{IN} = a * E_{GL}$
-#'
-#' Assume:
-#' : $E_{IN} = E_{GL}$
-#'
-#'
-#' Produce Global "measurements":
-#' : $V_{GL} = E_{IN} / S_{new}$
-#'
-#' Select an arbitrary $S_{new}$ value.
-#'
-#+ include=T, echo=F
-
-
 
 
 
@@ -1094,11 +1091,14 @@ gapdata$INC_value
 
 
 ## Use last linear model
-Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_value
 
-predict(Pfit, gapdata)
+gapdata$INC_watt    <- Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_value
+gapdata$INC_watt_sd <- Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_sd
 
-predict(Pfit, gapdata, terms = "INC_value")
+
+# predict(Pfit, gapdata)
+
+# predict(Pfit, gapdata, terms = "INC_value")
 
 
 
