@@ -554,9 +554,11 @@ DT <- DT[Date < END_DAY_exact  ]
 #+ include=T, echo=F
 
 ## linear fit
-Pfit          <- lm(DT$wattGLB   ~ DT$INC_value)
-fit           <- lm(DT$INC_value ~ DT$wattGLB  )
+fit   <- lm(DT$INC_value ~ DT$wattGLB  )
+Pfit  <- lm(DT$wattGLB   ~ DT$INC_value)
+
 res_threshold <- 2
+
 vec <- abs(fit$residuals) > sd(fit$residuals) * res_threshold
 DT$Offending <- vec
 
@@ -689,6 +691,8 @@ legend("topright", lty = 1,
 #' \newpage
 #'
 #' ## Floating scale daily plot after dark correction
+#'
+#' Ratios are filtered for plotting
 #'
 #+ include=T, echo=F
 
@@ -857,19 +861,84 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' \newpage
 #'
+#' # Results
+#'
 #' ## Calibrated daily data
+#'
+#' Using the linear fit model
+#'
+#' With removed offending data points
+#'
+#' **Radiometric values are on the same scale now**
+#'
 #'
 #+ include=T, echo=F
 
 
+## remove offending
+DT <- DT[ Offending == FALSE , ]
+## recalculate fits
+
+## linear regression
+fit   <- lm(DT$INC_value ~ DT$wattGLB  )
+Pfit  <- lm(DT$wattGLB   ~ DT$INC_value)
+
+## robust linear fit
+ rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
+Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
 
 
 
 
-predict(fit, DT$INC_value)
 
 
-stop()
+par(def.par)
+layout(1)
+plot.new()
+
+plot(DT$wattGLB, DT$INC_value,
+     pch  = 1,
+     cex  = 0.3,
+     xlab = "Global [W]",
+     ylab = "Inclined [V]",
+     main = "Common measurements witout offending")
+
+abline(fit, col = "red", lwd = 2)
+abline(rfit, col = "blue", lwd = 2)
+
+legend("bottom",
+       bty = "n", lwd = 2, cex = 0.8,
+       lty = 1,
+       col = c("red", "blue"),
+       legend = c(paste("lm: y= ",
+                        signif(abs(fit[[1]][1]), 3),
+                        if (fit[[1]][2] > 0) '+' else '-',
+                        signif(abs(fit[[1]][2]), 4),
+                        " * x"),
+                  paste("robust lm: y= ",
+                        signif(abs(rfit[[1]][1]), 3),
+                        if (rfit[[1]][2] > 0) '+' else '-',
+                        signif(abs(rfit[[1]][2]), 4),
+                        " * x")
+       )
+)
+
+
+pander(summary(fit),
+       caption = "Linear regression **RED**")
+
+
+pander(summary(fit),
+       caption = "Robust Linear regression **BLUE**")
+
+
+
+
+## Use last linear model
+DT$INC_watt <- predict(Pfit, DT)
+
+
+
 for (ad in unique(as.Date(DT$Date))) {
     pp <- DT[ as.Date(Date) == ad ]
     ad <- as.Date(ad, origin = "1970-01-01")
@@ -898,50 +967,33 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = 1,
            cex  = 1)
 
-
-
-    par(new = T)
-    plot(pp$Date,
-         pp$INC_value,
-         col  = col_inc,
-         xlab = "",
-         ylab = "",
-         yaxt = "n",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.2)
-
-
     points(pp$Date[pp$Offending],
-           pp$INC_value[pp$Offending],
+           pp$INC_watt[pp$Offending],
            col  = "red",
            yaxt = "n",
            xaxt = "n",
            pch  = 1,
            cex  = 1)
 
-    vec <- pp$INC_value / pp$wattGLB
+
+    points(pp$Date,
+           pp$INC_watt,
+           col  = col_inc,
+           pch  = 19,
+           cex  = 0.2)
+
+
+    vec <- pp$INC_watt / pp$wattGLB
     vec[!is.finite(vec)] <- NA
+    ylim <- range(vec, na.rm = T)
 
-    range <- diff(range(vec, na.rm = T))
-    range <- range * 0.01
-    mean  <- mean(vec, na.rm = T)
-    ylim  <- c(mean - range, mean + range)
-
-
-    vec[vec > ylim[2]] <- NA
-    vec[vec < ylim[1]] <- NA
-
-    #         par(new = T)
-    #         plot(pp$Date,
-    #              vec ,
-    #              col  = "blue",
-    #              xlab = "",  ylab = "",
-    #              xaxs = "i",
-    #              pch  = 19,
-    #              log  = "y",
-    #              cex  = 0.4)
-    # abline(h = 1, lty = 1 , col = "black")
+    # range <- diff(range(vec, na.rm = T))
+    # range <- range * 0.02
+    # mean  <- mean(vec, na.rm = T)
+    # ylim  <- c(mean - range, mean + range)
+    #
+    # vec[vec > ylim[2]] <- NA
+    # vec[vec < ylim[1]] <- NA
 
     par(new = T)
     plot(pp$Date,
@@ -968,17 +1020,17 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-    par(new = T)
-    plot(pp$INC_value,
-         pp$wattGLB ,
-         col  = "darkblue",
-         xlab = "",
-         ylab = "",
-         yaxt = "n",
-         xaxt = "n",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.2)
+    # par(new = T)
+    # plot(pp$INC_watt,
+    #      pp$wattGLB ,
+    #      col  = "darkblue",
+    #      xlab = "",
+    #      ylab = "",
+    #      yaxt = "n",
+    #      xaxt = "n",
+    #      xaxs = "i",
+    #      pch  = 19,
+    #      cex  = 0.2)
 
 
 
@@ -987,7 +1039,7 @@ for (ad in unique(as.Date(DT$Date))) {
     plot.new()
     legend("center",
            legend = c("Global Horizontal [W/m^2]",
-                      "Inclined Signal [V]",
+                      "Inclined Signal [W/m^2]",
                       "Correlation Inclined ~ Horizontal",
                       "Inclined / Horizontal",
                       "Offending points",
@@ -1008,7 +1060,15 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-
+#+
+#+
+#+ # Description
+#+
+#+ Got measurements from inclined CM-21 $V_{IN}$.
+#+
+#+ Use a linear regrassion to get watt
+#+
+#+
 
 
 
