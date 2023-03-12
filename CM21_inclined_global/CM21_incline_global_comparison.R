@@ -863,7 +863,7 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' # Results
 #'
-#' ## Calibrated daily data
+#' ## Generate Global data from Inclined.
 #'
 #' Using the linear fit model
 #'
@@ -886,7 +886,6 @@ Pfit  <- lm(DT$wattGLB   ~ DT$INC_value)
 ## robust linear fit
  rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
 Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
-
 
 
 
@@ -1019,7 +1018,6 @@ for (ad in unique(as.Date(DT$Date))) {
     lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
 
 
-
     # par(new = T)
     # plot(pp$INC_watt,
     #      pp$wattGLB ,
@@ -1031,7 +1029,6 @@ for (ad in unique(as.Date(DT$Date))) {
     #      xaxs = "i",
     #      pch  = 19,
     #      cex  = 0.2)
-
 
 
     par(mar=c(0, 0, 0, 0))
@@ -1050,8 +1047,7 @@ for (ad in unique(as.Date(DT$Date))) {
            ncol = 2,
            bty = "n")
 
-    layout(rbind(1,2), heights=c(7,1))
-
+    layout(rbind(1,2), heights = c(7,1))
 
     par(def.par)
 }
@@ -1060,15 +1056,49 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-#+
-#+
-#+ # Description
-#+
-#+ Got measurements from inclined CM-21 $V_{IN}$.
-#+
-#+ Use a linear regrassion to get watt
-#+
-#+
+
+#'
+#' # Description
+#'
+#' Got measurements from inclined CM-21:
+#' : $V_{IN}$
+#'
+#' Use linear regression to get radiation:
+#' : $E_{IN} = β + α * V_{IN}$
+#'
+#' or
+#'
+#' Use median of the ratio:
+#' : $E_{IN} = a * E_{GL}$
+#'
+#' Assume:
+#' : $E_{IN} = E_{GL}$
+#'
+#'
+#' Produce Global "measurements":
+#' : $V_{GL} = E_{IN} / S_{new}$
+#'
+#' Select an arbitrary $S_{new}$ value.
+#'
+#+ include=T, echo=F
+
+
+
+
+
+gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
+
+gapdata$INC_value
+
+
+
+
+## Use last linear model
+Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_value
+
+predict(Pfit, gapdata)
+
+predict(Pfit, gapdata, terms = "INC_value")
 
 
 
