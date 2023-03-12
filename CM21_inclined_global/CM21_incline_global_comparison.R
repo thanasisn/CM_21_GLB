@@ -132,6 +132,11 @@ END_DAY   <- "2022-06-27"
 START_DAY_exact <- as.POSIXct("2022-02-21 11:50")
 END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
 
+## missing data
+START_DAY_miss <- as.POSIXct("2022-02-28 00:00")
+END_DAY_miss   <- as.POSIXct("2022-06-04 00:00")
+
+
 ## color values
 col_hor <- "green"
 col_inc <- "magenta"
@@ -610,9 +615,6 @@ legend("bottom",
        )
 )
 
-
-
-
 pander(summary(fit),
        caption = "Linear regression **RED**")
 
@@ -624,15 +626,12 @@ pander(
     caption = "Offending points"
 )
 
-
 pander(summary(fit),
        caption = "Robust Linear regression **BLUE**")
 
 
 
-
-
-
+##  Distribution of ratios  ----------------------------------------------------
 #'
 #' \newpage
 #'
@@ -641,7 +640,6 @@ pander(summary(fit),
 #'
 #'
 #+ include=T, echo=F
-
 
 ratiolim <- 0.02
 vec <- DT$INC_value/DT$wattGLB
@@ -679,9 +677,6 @@ legend("topright", lty = 1,
                   paste("Median:", signif(median(vec, na.rem = T), 5))),
        col    = c("blue", "green")
 )
-
-
-
 
 
 
@@ -727,8 +722,6 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = 1,
            cex  = 1)
 
-
-
     par(new = T)
     plot(pp$Date,
          pp$INC_value,
@@ -739,7 +732,6 @@ for (ad in unique(as.Date(DT$Date))) {
          xaxs = "i",
          pch  = 19,
          cex  = 0.2)
-
 
     points(pp$Date[pp$Offending],
            pp$INC_value[pp$Offending],
@@ -756,7 +748,6 @@ for (ad in unique(as.Date(DT$Date))) {
     range <- range * 0.01
     mean  <- mean(vec, na.rm = T)
     ylim  <- c(mean - range, mean + range)
-
 
     vec[vec > ylim[2]] <- NA
     vec[vec < ylim[1]] <- NA
@@ -785,7 +776,6 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.4)
 
-
     ## LOESS curve
     LOESS_CRITERIO <-  c("aicc", "gcv")[2]
     vec2 <- !is.na(vec)
@@ -794,7 +784,6 @@ for (ad in unique(as.Date(DT$Date))) {
                          criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
     FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
     lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
-
 
 
     par(new = T)
@@ -810,8 +799,7 @@ for (ad in unique(as.Date(DT$Date))) {
          cex  = 0.2)
 
 
-
-    par(mar=c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0))
     # c(bottom, left, top, right)
     plot.new()
     legend("center",
@@ -828,7 +816,6 @@ for (ad in unique(as.Date(DT$Date))) {
            bty = "n")
 
     layout(rbind(1,2), heights=c(7,1))
-
 
     par(def.par)
 }
@@ -934,10 +921,25 @@ pander(summary(fit),
 
 
 
+##  Predict new values  --------------------------------------------------------
 
-## Use last linear model
-DT$INC_watt <- predict(Pfit, DT)
 
+## Select model
+
+# ## rubust linear model
+# LMS <- Prfit
+
+## simple linear model
+LMS <- Pfit
+
+## Make predictions
+
+# DT$INC_watt <- predict(LMS, DT)
+DT$INC_watt            <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_value)
+DT$INC_watt_sd         <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_sd)
+
+globaldata$INC_watt    <- (LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_value)
+globaldata$INC_watt_sd <- (LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_sd)
 
 
 for (ad in unique(as.Date(DT$Date))) {
@@ -961,7 +963,6 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.3)
 
-
     points(pp$Date[pp$Offending],
            pp$wattGLB[pp$Offending],
            col  = "red",
@@ -976,13 +977,11 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = 1,
            cex  = 1)
 
-
     points(pp$Date,
            pp$INC_watt,
            col  = col_inc,
            pch  = 19,
            cex  = 0.2)
-
 
     vec <- pp$INC_watt / pp$wattGLB
     vec[!is.finite(vec)] <- NA
@@ -1009,7 +1008,6 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.4)
 
-
     ## LOESS curve
     LOESS_CRITERIO <-  c("aicc", "gcv")[2]
     vec2 <- !is.na(vec)
@@ -1018,7 +1016,6 @@ for (ad in unique(as.Date(DT$Date))) {
                          criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
     FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
     lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
-
 
     # par(new = T)
     # plot(pp$INC_watt,
@@ -1031,7 +1028,6 @@ for (ad in unique(as.Date(DT$Date))) {
     #      xaxs = "i",
     #      pch  = 19,
     #      cex  = 0.2)
-
 
     par(mar=c(0, 0, 0, 0))
     # c(bottom, left, top, right)
@@ -1056,28 +1052,44 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-
-
-
-
+## Gap data --------------------------------------------------------------------
+#'
+#' ## Gap data inspection
+#'
+#'
 
 
 gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
 
-gapdata$INC_value
+## focus on missing data
+gapdata <- gapdata[ Date > START_DAY_miss]
+gapdata <- gapdata[ Date <   END_DAY_miss]
+
+gapdata <- merge(gapdata,
+                 data.frame(Date = seq(from = min(gapdata$Date),
+                                       to   = max(gapdata$Date),
+                                       by   = "min")),
+                 all = T)
+
+names(gapdata)
 
 
+for (ad in unique(gapdata$day)) {
+    tmp <- gapdata[ day == ad, ]
+    ad  <- as.Date(ad, origin = "1970-01-01")
+
+    par(mar = c(2,2,2,1))
+
+    if (all(is.na(tmp$INC_watt))) next()
+
+    plot(tmp$Date,
+         tmp$INC_watt, "l")
+
+    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+
+}
 
 
-## Use last linear model
-
-gapdata$INC_watt    <- Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_value
-gapdata$INC_watt_sd <- Pfit[[1]][1] + Pfit[[1]][2] * gapdata$INC_sd
-
-
-# predict(Pfit, gapdata)
-
-# predict(Pfit, gapdata, terms = "INC_value")
 
 
 
