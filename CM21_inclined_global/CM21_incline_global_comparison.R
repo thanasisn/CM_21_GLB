@@ -98,14 +98,14 @@ if (!interactive()) {
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
-library(MASS)
+library(MASS,       quietly = TRUE, warn.conflicts = FALSE)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 
 def.par <- par(no.readonly = TRUE)
 
-##  Use the same definitions as horizontal CM-21 -------------------------------
+##  Use the same dark definitions as horizontal CM-21 --------------------------
 
 ## from "~/CM_21_GLB/DEFINITIONS.R"
 SUN_FOLDER <- "~/DATA_RAW/SUN/PySolar_LAP/"
@@ -119,7 +119,6 @@ STD_ret_ap_for = 10   ## apply rule when there are enough data points
 STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily value)
 
 
-residuals_distance <- 0.2
 
 
 ##  Variables  -----------------------------------------------------------------
@@ -129,10 +128,9 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 START_DAY <- "2022-02-21"
 END_DAY   <- "2022-06-27"
 
+## exact extend
 START_DAY_exact <- as.POSIXct("2022-02-21 11:50")
 END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
-
-
 
 ## color values
 col_hor <- "green"
@@ -179,7 +177,7 @@ for (aday in dayswecare) {
                      length.out = 1440,
                      by         = "min" )
 
-    ##  Read LAP file
+    ## . .  Read LAP file  ####
     lap <- fread( incfiles[found], na.strings = "-9" )
     lap[ V1 < -8, V1 := NA ]
     lap[ V2 < -8, V2 := NA ]
@@ -194,10 +192,6 @@ for (aday in dayswecare) {
                             na.strings  = "None",
                             strip.white = TRUE,
                             as.is       = TRUE)
-
-
-    # Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
-    # Elevat      = sun_temp$ELEV
 
     ##  Day table to save
     day_data <- data.table( Date        = D_minutes, # Date of the data point
@@ -222,8 +216,6 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 
-
-
 #'
 #' # Data Overview
 #'
@@ -239,14 +231,11 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #' End day:   `r END_DAY`
 #'
-#'
-#'
 #' Correlation period:
 #'
 #' Start day exact: `r START_DAY_exact`
 #'
 #' End day exact: `r END_DAY_exact`
-#'
 #'
 #+ include=T, echo=F
 
@@ -286,7 +275,6 @@ if (!interactive()) {  # workaround plot setup
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
      main = "Common measurements")
-
 
 plot(DT$Date,
      DT$wattGLB,
@@ -345,7 +333,6 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.2)
 
-
     vec <- pp$INC_value / pp$wattGLB
     vec[!is.finite(vec)] <- NA
 
@@ -354,10 +341,8 @@ for (ad in unique(as.Date(DT$Date))) {
     mean  <- mean(vec, na.rm = T)
     ylim  <- c(mean - range, mean + range)
 
-
     vec[vec > ylim[2]] <- NA
     vec[vec < ylim[1]] <- NA
-
 
     par(new = T)
     plot(pp$Date,
@@ -382,7 +367,6 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.4)
 
-
     par(new = T)
     plot(pp$INC_value,
          pp$wattGLB ,
@@ -393,8 +377,7 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.2)
 
-
-    par(mar=c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0))
     # c(bottom, left, top, right)
     plot.new()
     legend("center",
@@ -402,10 +385,10 @@ for (ad in unique(as.Date(DT$Date))) {
                       "Inclined Signal [V]",
                       "log(Inclined / Horizontal)",
                       "Inclined / Horizontal"),
-           col  = c(col_hor, col_inc,'blue', "cyan"),
+           col  = c(col_hor, col_inc, 'blue', "cyan"),
            pch  = 19,
            ncol = 2,
-           bty = "n")
+           bty  = "n")
 
 }
 
@@ -426,7 +409,6 @@ for (ad in unique(as.Date(DT$Date))) {
 #+ include=T, echo=F
 
 
-
 ##  Init yearly calculations
 globaldata    <- data.table()
 NR_extreme_SD <- 0
@@ -441,12 +423,11 @@ for (ddd in daystodo) {
     pbcount     <- pbcount + 1
 
     daymimutes  <- data.frame(
-        Date = seq( as.POSIXct(paste(as.Date(theday), "00:00:30")),
-                    as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
+        Date = seq(as.POSIXct(paste(as.Date(theday), "00:00:30")),
+                   as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min")
     )
 
-
-    ## get all day
+    ## get all day from all data
     wholeday    <- DATA[as.Date(Date) == as.Date(theday), ]
     ## use only valid data for dark
     daydata     <- DATA[as.Date(Date) == as.Date(theday) & !is.na(INC_value), ]
@@ -454,7 +435,6 @@ for (ddd in daystodo) {
     ## fill all minutes for nicer graphs
     daydata     <- merge(daydata, daymimutes, by = "Date", all = T)
     daydata$day <- as.Date(daydata$Date)
-
 
 
     ####  Filter Standard deviation extremes  ##############################
@@ -468,7 +448,7 @@ for (ddd in daystodo) {
             cat("Extreme SD values detected N:",sum(!vec, na.rm = T) ,"\n" )
             cat("Will be ignored from dark calculation\n" )
         }
-        daydata        <- daydata[ vec ]
+        daydata <- daydata[vec]
 
         NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(INC_value), .N ]
         if (nrow(daydata[!is.na(INC_value)]) < 1) {
@@ -495,9 +475,9 @@ for (ddd in daystodo) {
         dark_flag              <- "MISSING"
         missingdark            <- NA
 
-        stop()
+        stop("DARK WARNING")
         ## get dark from pre-computed file
-        if (exists("construct")) {
+        # if (exists("construct")) {
         #     ## can not find date
         #     if (! theday %in% construct$Date) {
         #         todays_dark_correction <- NA
@@ -508,8 +488,7 @@ for (ddd in daystodo) {
         #         todays_dark_correction <- construct[ Date == theday, DARK]
         #         dark_flag              <- "CONSTRUCTED"
         #     }
-        }
-
+        # }
 
         } else {
         ####    Dark Correction function   #################################
