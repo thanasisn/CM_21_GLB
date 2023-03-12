@@ -75,6 +75,7 @@ if (!interactive()) {
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
+library(MASS)
 source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
@@ -511,7 +512,7 @@ for (ddd in daystodo) {
         dark_flag              <- "COMPUTED"
     }
 
-    # ####    Apply dark correction    #######################################
+    ####    Apply dark correction    #######################################
     daydata[, INC_valueWdark := INC_value - todays_dark_correction ]
 
 
@@ -520,21 +521,23 @@ for (ddd in daystodo) {
                          by = intersect(names(daydata),names(wholeday)), all = T)
 
     globaldata <- rbind( globaldata, daydata, fill = TRUE )
-
 }
 
 
-par(def.par)
+# par(def.par)
+#
+# plot(globaldata$Date,
+#      globaldata[, INC_valueWdark - INC_value],
+#      pch = 19,
+#      cex = 0.3,
+#      ylab = "Zero offset [V]",
+#      xlab = "",
+#      main = "Dark Signal Correction for Inclined CM-21")
 
-plot(globaldata$Date,
-     globaldata[, INC_valueWdark - INC_value],
-     pch = 19,
-     cex = 0.3,
-     ylab = "Zero offset [V]",
-     xlab = "",
-     main = "Dark Signal Correction for Inclined CM-21")
+
 
 ## keep only dark correction data
+## data for output
 globaldata[, INC_value := INC_valueWdark ]
 globaldata[, INC_valueWdark := NULL ]
 
@@ -551,14 +554,11 @@ DT <- DT[Date > START_DAY_exact]
 DT <- DT[Date < END_DAY_exact  ]
 
 
-
+## Correlation Inclined ~ Horizontal CM-21. ------------------------------------
 #'
 #' \newpage
 #'
-#' ## Correlation
-#'
-#' Get offending points by residuals distance greater than
-#' $`r residuals_distance` [V]$.
+#' ## Correlation Inclined ~ Horizontal CM-21.
 #'
 #+ include=T, echo=F
 
@@ -566,9 +566,26 @@ par(def.par)
 layout(1)
 plot.new()
 
-fit <- lm(DT$INC_value ~ DT$wattGLB)
-vec <- abs(fit$residuals) > residuals_distance
+## linear fit
+fit           <- lm(DT$INC_value ~ DT$wattGLB)
+res_threshold <- 2
+vec <- abs(fit$residuals) > sd(fit$residuals) * res_threshold
 DT$Offending <- vec
+
+## robust linear fit
+rfit <- rlm(DT$INC_value ~ DT$wattGLB)
+
+
+
+#'
+#' ### Linear regression
+#'
+#' Outliers selection by $`r res_threshold`σ$ distance
+#'
+#+ include=T, echo=F
+
+
+
 
 plot(DT$wattGLB, DT$INC_value,
      pch  = 1,
@@ -581,17 +598,27 @@ points(DT$wattGLB[vec], DT$INC_value[vec],
        pch = "+", col = "magenta")
 
 abline(fit, col = "red", lwd = 2)
+abline(rfit, col = "blue", lwd = 2)
 
-legend("bottom", lty = 1, bty = "n", lwd = 2, cex = 1,
-       paste("y= ",
-             signif(abs(fit[[1]][1]), 3),
-             if (fit[[1]][2] > 0) '+' else '-',
-             signif(abs(fit[[1]][2]), 3),
-             " * x")
+legend("bottom",
+       bty = "n", lwd = 2, cex = 1,
+       lty = 1,
+       col = c("red", "blue"),
+       legend = c(paste("lm: y= ",
+                        signif(abs(fit[[1]][1]), 3),
+                        if (fit[[1]][2] > 0) '+' else '-',
+                        signif(abs(fit[[1]][2]), 3),
+                        " * x"),
+                  paste("robust lm: y= ",
+                        signif(abs(rfit[[1]][1]), 3),
+                        if (rfit[[1]][2] > 0) '+' else '-',
+                        signif(abs(rfit[[1]][2]), 3),
+                        " * x")
+       )
 )
 
-pander(fit)
-
+pander(summary(fit),
+       caption = "Linear regrasion **RED**")
 
 ## all points
 OffendingPoints <- DT[vec, ]
@@ -600,6 +627,13 @@ pander(
     data.frame(table(DT$day[vec])),
     caption = "Offending points"
 )
+
+
+pander(summary(fit),
+       caption = "Robust Linear regrasion **BLUE**")
+
+
+
 
 
 
@@ -779,28 +813,26 @@ hist(vec,
 # } # workaround plot setup
 
 
-#'
-#' ## Table of offending points
-#'
-#+ include=T, echo=F
-
-OffendingPoints[, Azimuth   := NULL ]
-OffendingPoints[, preNoon   := NULL ]
-OffendingPoints[, Offending := NULL ]
-OffendingPoints[, day       := NULL ]
-
-setorder(OffendingPoints, Date)
-
-
-
-#+ echo=F, include=T
-#' \scriptsize
-#+ echo=F, include=T
-pander(OffendingPoints,
-       cap = "Offending Points")
-#'
-#' \normalsize
-#+ echo=F, include=T
+# #'
+# #' ## Table of offending points
+# #'
+# #+ include=T, echo=F
+#
+# OffendingPoints[, Azimuth   := NULL ]
+# OffendingPoints[, preNoon   := NULL ]
+# OffendingPoints[, Offending := NULL ]
+# OffendingPoints[, day       := NULL ]
+#
+# setorder(OffendingPoints, Date)
+#
+# #+ echo=F, include=T
+# #' \scriptsize
+# #+ echo=F, include=T
+# pander(OffendingPoints,
+#        cap = "Offending Points")
+# #'
+# #' \normalsize
+# #+ echo=F, include=T
 
 
 
