@@ -615,10 +615,9 @@ ratiolim <- 0.02
 vec <- DT$INC_value/DT$wattGLB
 vec <- vec[abs(vec) < ratiolim]
 
-
 hist(vec,
      breaks = 100,
-     xlim = c(-0.01,0.02))
+     xlim = c(-0.005,0.015))
 
 
 
