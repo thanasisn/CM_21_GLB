@@ -1066,8 +1066,6 @@ for (ad in unique(as.Date(DT$Date))) {
 #+
 #+ Got measurements from inclined CM-21 $V_{IN}$.
 #+
-#+ Use a linear regrassion to get watt
-#+
 #+
 
 

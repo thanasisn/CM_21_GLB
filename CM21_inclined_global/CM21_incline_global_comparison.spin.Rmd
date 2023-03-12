@@ -1,52 +1,51 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
-#' author:        "Natsis Athanasios"
-#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
-#' institute:     "AUTH"
-#' affiliation:   "Laboratory of Atmospheric Physics"
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#' params:
-#'    ALL_YEARS: TRUE
-#' ---
+---
+title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
+author:        "Natsis Athanasios"
+abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
+institute:     "AUTH"
+affiliation:   "Laboratory of Atmospheric Physics"
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc:        true
+    fig_width:  7.5
+    fig_height: 5
+
+date: "`r format(Sys.time(), '%F')`"
+params:
+   ALL_YEARS: TRUE
+---
 
 
-#'
-#'
-#'
-#+ echo=F, include=T
+
+
+```{r echo=F, include=T}
 
 
 ##__  Document Options  --------------------------------------------------------
 
-#+ echo=F, include=F
+```
+```{r echo=F, include=F}
 knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "pdf"   )
 # knitr::opts_chunk$set(dev        = "png"    )
@@ -56,7 +55,8 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 ##__  Run Environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -70,7 +70,8 @@ if (!interactive()) {
 }
 
 
-#+ echo=F, include=F
+```
+```{r echo=F, include=F}
 ##  External code  -------------------------------------------------------------
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
@@ -196,39 +197,38 @@ DATA <- merge(HORIZ, INCLI, all = TRUE)
 
 ##  USE common data for analysis
 DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
+```
+
+
+# Data Overview
+
+Investigate data of horizontal and inclined CM-21.
+
+Inclined data are read from "sirena" directly.
+
+Global data are produced by me.
+
+Data view is extended to:
+
+Start day: `r START_DAY`
+
+End day:   `r END_DAY`
 
 
 
+Correlation period:
+
+Start day exact: `r START_DAY_exact`
+
+End day exact: `r END_DAY_exact`
 
 
-#'
-#' # Data Overview
-#'
-#' Investigate data of horizontal and inclined CM-21.
-#'
-#' Inclined data are read from "sirena" directly.
-#'
-#' Global data are produced by me.
-#'
-#' Data view is extended to:
-#'
-#' Start day: `r START_DAY`
-#'
-#' End day:   `r END_DAY`
-#'
-#'
-#'
-#' Correlation period:
-#'
-#' Start day exact: `r START_DAY_exact`
-#'
-#' End day exact: `r END_DAY_exact`
-#'
-#'
-#+ include=T, echo=F
+
+```{r include=T, echo=F}
 
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 if (!interactive()) {  # workaround plot setup
 
 plot(DATA$Date,
@@ -248,16 +248,18 @@ plot(DATA$Date,
      main = "Inclined CM-21 signal")
 
 } # workaround plot setup
+```
 
 
-#'
-#' ## Common measurements
-#'
-#' Only simultaneous measurements for correlation.
-#'
-#+ include=T, echo=F
+## Common measurements
 
-#+ include=F, echo=F
+Only simultaneous measurements for correlation.
+
+
+```{r include=T, echo=F}
+
+```
+```{r include=F, echo=F}
 if (!interactive()) {  # workaround plot setup
 
 plot(DT$wattGLB, DT$INC_value,
@@ -288,7 +290,8 @@ plot(DT$Date,
 # #'
 # #+ include=T, echo=F
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 if (!interactive()) {  # workaround plot setup
 
 for (ad in unique(as.Date(DT$Date))) {
@@ -387,20 +390,22 @@ for (ad in unique(as.Date(DT$Date))) {
 }
 
 } # workaround plot setup
+```
 
-#'
-#'
-#' # Process
-#'
-#' ## Compute dark signal correction for inclined CM-21.
-#'
-#' We calculate zero offset as the **median** value of signal with:
-#'
-#' - Sun elevation angle bellow $`r DARK_ELEV`^\circ$.
-#' - Data span for dark `r DSTRETCH / 3600` minutes for each "morning" and "evening".
-#' - We interpolate between the "morning" and "evening" offset for each day for the dark correction.
-#'
-#+ include=T, echo=F
+
+
+# Process
+
+## Compute dark signal correction for inclined CM-21.
+
+We calculate zero offset as the **median** value of signal with:
+
+- Sun elevation angle bellow $`r DARK_ELEV`^\circ$.
+- Data span for dark `r DSTRETCH / 3600` minutes for each "morning" and "evening".
+- We interpolate between the "morning" and "evening" offset for each day for the dark correction.
+
+
+```{r include=T, echo=F}
 
 
 
@@ -546,12 +551,15 @@ DT <- DT[Date < END_DAY_exact  ]
 
 
 ## Correlation Inclined ~ Horizontal CM-21. ------------------------------------
-#'
-#' \newpage
-#'
-#' ## Correlation Inclined ~ Horizontal CM-21.
-#'
-#+ include=T, echo=F
+```
+
+
+\newpage
+
+## Correlation Inclined ~ Horizontal CM-21.
+
+
+```{r include=T, echo=F}
 
 ## linear fit
 fit   <- lm(DT$INC_value ~ DT$wattGLB  )
@@ -565,14 +573,15 @@ DT$Offending <- vec
 ## robust linear fit
  rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
 Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
+```
 
 
-#'
-#' ### Linear regression
-#'
-#' Outliers selection by $`r res_threshold`σ$ distance
-#'
-#+ include=T, echo=F
+### Linear regression
+
+Outliers selection by $`r res_threshold`σ$ distance
+
+
+```{r include=T, echo=F}
 
 par(def.par)
 layout(1)
@@ -625,20 +634,17 @@ pander(
 
 pander(summary(fit),
        caption = "Robust Linear regression **BLUE**")
+```
+
+
+\newpage
+
+## Distribution of ratios
 
 
 
 
-
-
-#'
-#' \newpage
-#'
-#' ## Distribution of ratios
-#'
-#'
-#'
-#+ include=T, echo=F
+```{r include=T, echo=F}
 
 
 ratiolim <- 0.02
@@ -687,14 +693,17 @@ legend("topright", lty = 1,
 
 
 ## Daily plot with dark correction ---------------------------------------------
-#'
-#' \newpage
-#'
-#' ## Floating scale daily plot after dark correction
-#'
-#' Ratios are filtered for plotting
-#'
-#+ include=T, echo=F
+```
+
+
+\newpage
+
+## Floating scale daily plot after dark correction
+
+Ratios are filtered for plotting
+
+
+```{r include=T, echo=F}
 
 
 for (ad in unique(as.Date(DT$Date))) {
@@ -858,21 +867,24 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 ## Calibrated daily data -------------------------------------------------------
-#'
-#' \newpage
-#'
-#' # Results
-#'
-#' ## Calibrated daily data
-#'
-#' Using the linear fit model
-#'
-#' With removed offending data points
-#'
-#' **Radiometric values are on the same scale now**
-#'
-#'
-#+ include=T, echo=F
+```
+
+
+\newpage
+
+# Results
+
+## Calibrated daily data
+
+Using the linear fit model
+
+With removed offending data points
+
+**Radiometric values are on the same scale now**
+
+
+
+```{r include=T, echo=F}
 
 
 ## remove offending
@@ -1060,21 +1072,26 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-#+
-#+
-#+ # Description
-#+
-#+ Got measurements from inclined CM-21 $V_{IN}$.
-#+
-#+ Use a linear regrassion to get watt
-#+
-#+
+```
+```{r }
+```
+```{r }
+```
+```{r # Description}
+```
+```{r }
+```
+```{r Got measurements from inclined CM-21 $V_{IN}$.}
+```
+```{r }
+```
+```{r }
+```
 
+**END**
 
-
-
-
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
