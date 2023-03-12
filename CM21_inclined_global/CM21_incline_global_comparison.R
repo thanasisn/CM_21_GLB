@@ -60,7 +60,7 @@
 #' Produce Global "measurements":
 #' : $V_{GL} = E_{IN} / S_{new}$
 #'
-#' Select an arbitrary $S_{new}$ value.
+#' Select an arbitrary $S_{new}$ value for archive usage.
 #'
 #'
 #'
@@ -133,8 +133,8 @@ START_DAY_exact <- as.POSIXct("2022-02-21 11:50")
 END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
 
 ## missing data
-START_DAY_miss <- as.POSIXct("2022-02-28 00:00")
-END_DAY_miss   <- as.POSIXct("2022-06-04 00:00")
+START_DAY_miss <- as.POSIXct("2022-02-28 06:00")
+END_DAY_miss   <- as.POSIXct("2022-06-03 12:00")
 
 
 ## color values
