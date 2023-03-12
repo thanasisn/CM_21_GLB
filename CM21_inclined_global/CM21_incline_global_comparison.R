@@ -534,8 +534,21 @@ plot(globaldata$Date,
      xlab = "",
      main = "Dark Signal Correction for Inclined CM-21")
 
+## keep only dark correction data
 globaldata[, INC_value := INC_valueWdark ]
 globaldata[, INC_valueWdark := NULL ]
+
+
+
+
+
+
+##  Use only common data for correlation analysis ------------------------------
+DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
+
+##  Use only exact date range --------------------------------------------------
+DT <- DT[Date > START_DAY_exact]
+DT <- DT[Date < END_DAY_exact  ]
 
 
 
@@ -544,27 +557,17 @@ globaldata[, INC_valueWdark := NULL ]
 #'
 #' ## Correlation
 #'
-#' Get offending points by residuals distance.
+#' Get offending points by residuals distance greater than
+#' $`r residuals_distance` [V]$.
 #'
 #+ include=T, echo=F
-
-
-##  Use common data for correlation analysis -----------------------------------
-DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
-
-
-## Use only exact dates --------------------------------------------------------
-DT <- DT[Date > START_DAY_exact]
-DT <- DT[Date < END_DAY_exact  ]
 
 par(def.par)
 layout(1)
 plot.new()
 
-
 fit <- lm(DT$INC_value ~ DT$wattGLB)
 vec <- abs(fit$residuals) > residuals_distance
-
 DT$Offending <- vec
 
 plot(DT$wattGLB, DT$INC_value,
@@ -579,7 +582,6 @@ points(DT$wattGLB[vec], DT$INC_value[vec],
 
 abline(fit, col = "red", lwd = 2)
 
-
 legend("bottom", lty = 1, bty = "n", lwd = 2, cex = 1,
        paste("y= ",
              signif(abs(fit[[1]][1]), 3),
@@ -587,7 +589,6 @@ legend("bottom", lty = 1, bty = "n", lwd = 2, cex = 1,
              signif(abs(fit[[1]][2]), 3),
              " * x")
 )
-
 
 pander(fit)
 
@@ -602,11 +603,34 @@ pander(
 
 
 
+#'
+#' \newpage
+#'
+#' ## Distribution of ratios
+#'
+#'
+#+ include=T, echo=F
+
+ratiolim <- 0.02
+vec <- DT$INC_value/DT$wattGLB
+vec <- vec[abs(vec) < ratiolim]
+
+
+hist(vec,
+     breaks = 100,
+     xlim = c(-0.01,0.02))
+
+
+
+
+
+
 
 
 
 ## Daily plot with dark correction ---------------------------------------------
-
+#'
+#' \newpage
 #'
 #' ## Floating scale daily plot after dark correction
 #'
