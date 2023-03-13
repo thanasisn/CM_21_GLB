@@ -135,6 +135,9 @@ END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
 START_DAY_miss <- as.POSIXct("2022-02-28 06:00")
 END_DAY_miss   <- as.POSIXct("2022-06-03 12:00")
 
+## Sun elevation limit
+elevation_lim  <- 8
+
 ## color values
 col_hor <- "green"
 col_inc <- "magenta"
@@ -230,9 +233,11 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #' Correlation period:
 #'
-#' Start day exact: `r START_DAY_exact`
+#' Start day exact: **`r START_DAY_exact`**
 #'
-#' End day exact: `r END_DAY_exact`
+#' End day exact: **`r END_DAY_exact`**
+#'
+#' Correlate data with sun elevation **$>`r elevation_lim`^\circ$**
 #'
 #+ include=T, echo=F
 
@@ -379,8 +384,8 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
+## Compute dark signal correction for inclined CM-21 ---------------------------
 
-#'
 #'
 #' # Process
 #'
@@ -388,9 +393,9 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' We calculate zero offset as the **median** value of signal with:
 #'
-#' - Sun elevation angle bellow $`r DARK_ELEV`^\circ$.
-#' - Data span for dark `r DSTRETCH / 3600` minutes for each "morning" and "evening".
-#' - We interpolate between the "morning" and "evening" offset for each day for the dark correction.
+#' - Data with Sun elevation angle **bellow $`r DARK_ELEV`^\circ$**.
+#' - Data **span for dark signal `r DSTRETCH / 3600`** minutes for each "morning" and "evening".
+#' - We **interpolate dark signal** between the "morning" and "evening" offset for each day for the dark correction.
 #'
 #+ include=T, echo=F
 
@@ -527,6 +532,9 @@ DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
 DT <- DT[Date > START_DAY_exact]
 DT <- DT[Date < END_DAY_exact  ]
 
+##  Limit sun elevation  -------------------------------------------------------
+DT <- DT[ Elevat >= elevation_lim]
+
 
 
 ## Correlation Inclined ~ Horizontal CM-21. ------------------------------------
@@ -621,38 +629,40 @@ pander(summary(fit),
 
 ratiolim <- 0.02
 vec <- DT$INC_value/DT$wattGLB
-vec <- vec[abs(vec) < ratiolim]
+vec <- vec[!is.infinite(vec)]
+# vec <- vec[abs(vec) < ratiolim]
 
 hist(vec,
-     breaks = 100,
-     xlim = c(-0.005,0.015),
+     breaks = 2000,
+     xlim = c(-0.01,0.03),
      main = "All values INC_value / wattGLB")
 
 abline(v =   mean(vec, na.rem = TRUE), col = "blue" )
 abline(v = median(vec, na.rem = TRUE), col = "green")
 
 legend("topright", lty = 1,
-       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 5)),
-                  paste("Median:", signif(median(vec, na.rem = TRUE), 5))),
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 6)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 6))),
        col    = c("blue", "green")
 )
 
 
 ##  Removed offending for histogram
 vec <- DT$INC_value[!DT$Offending] / DT$wattGLB[!DT$Offending]
-vec <- vec[abs(vec) < ratiolim]
+vec <- vec[!is.infinite(vec)]
+# vec <- vec[abs(vec) < ratiolim]
 
 hist(vec,
-     breaks = 100,
-     xlim = c(-0.005,0.015),
+     breaks = 2000,
+     xlim = c(-0.01,0.03),
      main = "Without offending INC_value / wattGLB")
 
 abline(v = mean(vec,   na.rem = T), col = "blue" )
 abline(v = median(vec, na.rem = T), col = "green" )
 
 legend("topright", lty = 1,
-       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 5)),
-                  paste("Median:", signif(median(vec, na.rem = TRUE), 5))),
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 6)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 6))),
        col    = c("blue", "green")
 )
 
@@ -852,7 +862,7 @@ plot(DT$wattGLB, DT$INC_value,
      cex  = 0.3,
      xlab = "Global [W]",
      ylab = "Inclined [V]",
-     main = "Common measurements witout offending")
+     main = "Common measurements without offending")
 
 abline( fit, col = "red",  lwd = 2)
 abline(rfit, col = "blue", lwd = 2)
@@ -882,15 +892,92 @@ pander(summary(fit),
 
 
 
+
+
+##  Distribution of ratios  ----------------------------------------------------
+#'
+#' \newpage
+#'
+#' ## Distribution of ratios
+#'
+#+ include=T, echo=F
+
+ratiolim <- 0.02
+vec <- DT$INC_value/DT$wattGLB
+vec <- vec[!is.infinite(vec)]
+
+#vec <- vec[abs(vec) < ratiolim]
+
+hist(vec,
+     breaks = 2000,
+     xlim = c(-0.01,0.03),
+     main = "All values INC_value / wattGLB")
+
+abline(v =   mean(vec, na.rem = TRUE), col = "blue" )
+abline(v = median(vec, na.rem = TRUE), col = "green")
+
+legend("topright", lty = 1,
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 6)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 6))),
+       col    = c("blue", "green")
+)
+
+
+##  Removed offending for histogram
+vec <- DT$INC_value[!DT$Offending] / DT$wattGLB[!DT$Offending]
+vec <- vec[!is.infinite(vec)]
+
+#vec <- vec[abs(vec) < ratiolim]
+
+hist(vec,
+     breaks = 2000,
+     xlim = c(-0.01,0.03),
+     main = "Without offending INC_value / wattGLB")
+
+abline(v = mean(vec,   na.rem = T), col = "blue" )
+abline(v = median(vec, na.rem = T), col = "green")
+
+legend("topright", lty = 1,
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 6)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 6))),
+       col    = c("blue", "green")
+)
+
+
+
+
+
+
+
 ##  Predict new values  --------------------------------------------------------
 
 ## Select model
 
-# ## rubust linear model
+# ## robust linear model
 # LMS <- Prfit
 
 ## simple linear model
 LMS <- Pfit
+
+vec <- DT$INC_value[!DT$Offending] / DT$wattGLB[!DT$Offending]
+vec <- vec[(!is.infinite(vec))]
+
+
+pp <- data.frame(Median    = median(vec, na.rm = TRUE),
+                 Mean      = mean(vec, na.rm = TRUE),
+                 Robust_lm = rfit[[1]][2],
+                 Simple_lm = fit[[1]][2])
+pp <- data.frame(Parameter = names(pp),
+                 CF        = unlist(pp[1,]))
+row.names(pp) <- NULL
+setorder(pp , CF)
+
+panderOptions("table.alignment.default", "left")
+pander(as.data.frame(pp),
+       caption = "Calibration factors",
+       digits  = 7,
+       table.alignment.default = "left")
+
 
 
 ## Create new data  ------------------------------------------------------------
@@ -967,15 +1054,17 @@ for (ad in unique(as.Date(DT$Date))) {
          cex  = 0.4)
 
     ## LOESS curve
-    LOESS_CRITERIO <-  c("aicc", "gcv")[2]
-    vec2 <- !is.na(vec)
-    FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
-                         degree    = 1,
-                         criterion = LOESS_CRITERIO,
-                         user.span = NULL,
-                         plot      = FALSE)
-    FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
-    lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
+    suppressWarnings({
+        LOESS_CRITERIO <-  c("aicc", "gcv")[2]
+        vec2 <- !is.na(vec)
+        FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
+                             degree    = 1,
+                             criterion = LOESS_CRITERIO,
+                             user.span = NULL,
+                             plot      = FALSE)
+        FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
+        lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
+    })
 
     # par(new = T)
     # plot(pp$INC_watt,
@@ -1049,59 +1138,61 @@ for (ad in unique(gapdata$day)) {
 
 
 
-## Export new data -------------------------------------------------------------
-outdir <- "~/CM_21_GLB/CM21_inclined_global/export"
-dir.create(outdir, showWarnings = FALSE)
+# ## Export new data -------------------------------------------------------------
+# outdir <- "~/CM_21_GLB/CM21_inclined_global/export"
+# dir.create(outdir, showWarnings = FALSE)
+#
+# de_Sensitivity <- 600
+#
+# for (ad in unique(as.Date(gapdata$Date))) {
+#     tmp   <- gapdata[ day == ad, ]
+#     dateD <- as.Date(ad, origin = "1970-01-01")
+#     yyyy  <- year(dateD)
+#     doy   <- yday(dateD)
+#
+#     ## create all minutes of day
+#     D_minutes <- seq(as.POSIXct(paste(dateD, "00:00:30"), "%F %T"),
+#                      as.POSIXct(paste(dateD, "23:59:30")), by = "mins")
+#     tmp <- merge(tmp, data.table(Date = D_minutes), all = TRUE)
+#
+#     ## daily output file name
+#     filename <- paste0(outdir, "/", strftime(dateD, format = "%d%m%y03.test"))
+#
+#     ## sanity check
+#     stopifnot(nrow(tmp) == 1440)
+#
+#     ## apply conversion to Volt
+#     expdt <- data.frame(V1 = tmp$INC_watt    / de_Sensitivity,
+#                         V2 = tmp$INC_watt_sd / de_Sensitivity)
+#
+#     ## round
+#     expdt$V1 <- signif( expdt$V1, digits =  7 )
+#     expdt$V2 <- signif( expdt$V2, digits = 15 )
+#
+#     ## write formatted data to file
+#     write.table(format(expdt,
+#                        digits    = 15,
+#                        # width     = 15,
+#                        row.names = FALSE,
+#                        scietific = c(FALSE, TRUE),
+#                        nsmall    = 2 ),
+#                 file      = filename,
+#                 quote     = FALSE,
+#                 col.names = FALSE,
+#                 row.names = FALSE,
+#                 eol = "\r\n")
+#
+#     ## set na value
+#     expdt[is.na(expdt)] <- "-9"
+#
+#     ## scientific notation capital
+#     system(paste0("sed -i 's|e|E|g' ", filename))
+#
+#     ## NA to number
+#     system(paste0("sed -i 's|NA|-9|g' ", filename))
+# }
 
-de_Sensitivity <- 600
 
-for (ad in unique(as.Date(gapdata$Date))) {
-    tmp   <- gapdata[ day == ad, ]
-    dateD <- as.Date(ad, origin = "1970-01-01")
-    yyyy  <- year(dateD)
-    doy   <- yday(dateD)
-
-    ## create all minutes of day
-    D_minutes <- seq(as.POSIXct(paste(dateD, "00:00:30"), "%F %T"),
-                     as.POSIXct(paste(dateD, "23:59:30")), by = "mins")
-    tmp <- merge(tmp, data.table(Date = D_minutes), all = TRUE)
-
-    ## daily output file name
-    filename <- paste0(outdir, "/", strftime(dateD, format = "%d%m%y03.test"))
-
-    ## sanity check
-    stopifnot(nrow(tmp) == 1440)
-
-    ## apply conversion to Volt
-    expdt <- data.frame(V1 = tmp$INC_watt    / de_Sensitivity,
-                        V2 = tmp$INC_watt_sd / de_Sensitivity)
-
-    ## round
-    expdt$V1 <- signif( expdt$V1, digits =  7 )
-    expdt$V2 <- signif( expdt$V2, digits = 15 )
-
-    ## write formatted data to file
-    write.table(format(expdt,
-                       digits    = 15,
-                       # width     = 15,
-                       row.names = FALSE,
-                       scietific = c(FALSE, TRUE),
-                       nsmall    = 2 ),
-                file      = filename,
-                quote     = FALSE,
-                col.names = FALSE,
-                row.names = FALSE,
-                eol = "\r\n")
-
-    ## set na value
-    expdt[is.na(expdt)] <- "-9"
-
-    ## scientific notation capital
-    system(paste0("sed -i 's|e|E|g' ", filename))
-
-    ## NA to number
-    system(paste0("sed -i 's|NA|-9|g' ", filename))
-}
 
 
 #' **END**
