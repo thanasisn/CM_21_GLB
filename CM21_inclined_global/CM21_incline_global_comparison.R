@@ -2,7 +2,7 @@
 #' ---
 #' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
 #' author:        "Natsis Athanasios"
-#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined."
+#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined, and new Global measurements."
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
 #' documentclass: article
@@ -39,8 +39,11 @@
 
 
 
+
 #'
 #' # Description
+#'
+#' **Source code: [`github.com/thanasisn/CM_21_GLB/tree/main/CM21_inclined_global`](https://github.com/thanasisn/CM_21_GLB/tree/main/CM21_inclined_global)**
 #'
 #' Got measurements from inclined CM-21:
 #' : $V_{IN}$
@@ -860,7 +863,6 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' **Radiometric values are on the same scale now**
 #'
-#'
 #+ include=T, echo=F
 
 
@@ -1056,7 +1058,7 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' ## Gap data inspection
 #'
-#'
+#+ include=T, echo=F
 
 
 gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
@@ -1070,8 +1072,6 @@ gapdata <- merge(gapdata,
                                        to   = max(gapdata$Date),
                                        by   = "min")),
                  all = T)
-
-names(gapdata)
 
 
 for (ad in unique(gapdata$day)) {
@@ -1088,6 +1088,68 @@ for (ad in unique(gapdata$day)) {
     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
 
 }
+
+
+
+## Export new data -------------------------------------------------------------
+
+outdir <- "~/CM_21_GLB/CM21_inclined_global/export"
+dir.create(outdir, showWarnings = FALSE)
+
+
+
+
+
+
+for (ad in unique(as.Date(gapdata$Date))) {
+    tmp   <- gapdata[ day == ad, ]
+    dateD <- as.Date(ad, origin = "1970-01-01")
+    yyyy  <- year(dateD)
+    doy   <- yday(dateD)
+
+    D_minutes <- seq(as.POSIXct(paste(dateD, "00:00:30"), "%F %T"),
+                     as.POSIXct(paste(dateD, "23:59:30")), by = "mins")
+
+    tmp <- merge(tmp, data.table(Date = D_minutes), all = TRUE)
+
+    ## this day output file
+    filename <- paste0(outdir, "/", strftime(dateD, format = "%d%m%y03.test"))
+
+    ## apply conversion
+    expdt <- data.frame(V1 = tmp$INC_watt    / 666,
+                        V2 = tmp$INC_watt_sd / 666)
+
+
+    ## round
+    expdt$V1 <- signif( expdt$V1, digits =  7 )
+    expdt$V2 <- signif( expdt$V2, digits = 15 )
+
+
+
+    ## write formatted data to file
+    write.table(format(expdt,
+                       # digits    = 7,
+                       width     = 15,
+                       row.names = FALSE,
+                       scietific = c(F, T),
+                       nsmall    = 2 ),
+                file      = filename,
+                quote     = FALSE,
+                col.names = FALSE,
+                row.names = FALSE,
+                eol = "\r\n")
+
+    ## set na value
+    expdt[is.na(expdt)] <- "-9"
+
+
+}
+
+
+
+
+
+
 
 
 
