@@ -1,8 +1,8 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
 #' author:        "Natsis Athanasios"
-#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined, and new Global measurements."
+#' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined, and new Global measurements to fill calibration period gaps in records."
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
 #' documentclass: article
@@ -65,8 +65,6 @@
 #'
 #' Select an arbitrary $S_{new}$ value for archive usage.
 #'
-#'
-#'
 #+ echo=F, include=T
 
 
@@ -102,7 +100,6 @@ library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
 library(MASS,       quietly = TRUE, warn.conflicts = FALSE)
-source("~/CM_21_GLB/Functions_write_data.R")
 source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/CM_21_GLB/Functions_dark_calculation.R")
 
@@ -139,22 +136,16 @@ END_DAY_exact   <- as.POSIXct("2022-06-27 08:40")
 START_DAY_miss <- as.POSIXct("2022-02-28 06:00")
 END_DAY_miss   <- as.POSIXct("2022-06-03 12:00")
 
-
 ## color values
 col_hor <- "green"
 col_inc <- "magenta"
-
 
 
 ##  Load HOR_CM21  -------------------------------------------------------------
 HORIZ <- readRDS("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L1_2022.Rds")
 
 
-
-
 ##  Load INC_CM  ---------------------------------------------------------------
-INCLI <- data.table()
-
 incfiles <- list.files(path        = "~/DATA_RAW/Bband/CM21_LAP.INC",
                        pattern     = "[0-9]{6}01.LAP",
                        full.names  = TRUE,
@@ -166,6 +157,8 @@ stopifnot(length(incfiles) > 0)
 
 dayswecare <- seq.Date(as.Date(START_DAY),
                        as.Date(END_DAY), by = "day")
+
+INCLI         <- data.table()
 missing_files <- c()
 for (aday in dayswecare) {
     aday  <- as.Date(aday, origin = "1970-01-01")
@@ -185,14 +178,14 @@ for (aday in dayswecare) {
                      length.out = 1440,
                      by         = "min" )
 
-    ## . .  Read LAP file  ####
+    ## . . Read LAP file  ------------------------------------------------------
     lap <- fread( incfiles[found], na.strings = "-9" )
     lap[ V1 < -8, V1 := NA ]
     lap[ V2 < -8, V2 := NA ]
     stopifnot( dim(lap)[1] == 1440 )
 
+    ## . . Read SUN file  ------------------------------------------------------
     sunfl <- paste0(SUN_FOLDER, "sun_path_", format(aday, "%F"), ".dat.gz")
-    #### . . Read SUN file  ####
     if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_construction_cron.py\n")))
     sun_temp <- read.table( sunfl,
                             sep         = ";",
@@ -201,7 +194,7 @@ for (aday in dayswecare) {
                             strip.white = TRUE,
                             as.is       = TRUE)
 
-    ##  Day table to save
+    ##  Daily table to keep
     day_data <- data.table( Date        = D_minutes, # Date of the data point
                             INC_value   = lap$V1,    # Raw value for CM21
                             INC_sd      = lap$V2,    # Raw SD value for CM21
@@ -215,13 +208,12 @@ for (aday in dayswecare) {
 
 
 
-##  Complete data set
+##  Unify data sets
 DATA <- merge(HORIZ, INCLI, all = TRUE)
-# DATA[, HOR_value := wattGLB / cm21factor(Date) ]
+rm(HORIZ, INCLI)
 
-##  USE common data for analysis
+##  Get common data for corelation analysis
 DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
-
 
 
 #'
@@ -249,8 +241,6 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
 #+ include=F, echo=F
-if (!interactive()) {  # workaround plot setup
-
 plot(DATA$Date,
      DATA$wattGLB,
      xlim = c(as.POSIXct(START_DAY), as.POSIXct(END_DAY)),
@@ -267,7 +257,6 @@ plot(DATA$Date,
      xlab = "",
      main = "Inclined CM-21 signal")
 
-} # workaround plot setup
 
 
 #'
@@ -1056,7 +1045,9 @@ for (ad in unique(as.Date(DT$Date))) {
 
 ## Gap data --------------------------------------------------------------------
 #'
-#' ## Gap data inspection
+#' \newpage
+#'
+#' ## CM21 calibration data gap inspection
 #'
 #+ include=T, echo=F
 
@@ -1067,12 +1058,12 @@ gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
 gapdata <- gapdata[ Date > START_DAY_miss]
 gapdata <- gapdata[ Date <   END_DAY_miss]
 
+## create all minutes
 gapdata <- merge(gapdata,
                  data.frame(Date = seq(from = min(gapdata$Date),
                                        to   = max(gapdata$Date),
                                        by   = "min")),
                  all = T)
-
 
 for (ad in unique(gapdata$day)) {
     tmp <- gapdata[ day == ad, ]
@@ -1086,7 +1077,6 @@ for (ad in unique(gapdata$day)) {
          tmp$INC_watt, "l")
 
     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-
 }
 
 
@@ -1096,10 +1086,7 @@ for (ad in unique(gapdata$day)) {
 outdir <- "~/CM_21_GLB/CM21_inclined_global/export"
 dir.create(outdir, showWarnings = FALSE)
 
-
-
-
-
+de_Sensitivity <- 600
 
 for (ad in unique(as.Date(gapdata$Date))) {
     tmp   <- gapdata[ day == ad, ]
@@ -1107,29 +1094,29 @@ for (ad in unique(as.Date(gapdata$Date))) {
     yyyy  <- year(dateD)
     doy   <- yday(dateD)
 
+    ## create all minutes of day
     D_minutes <- seq(as.POSIXct(paste(dateD, "00:00:30"), "%F %T"),
                      as.POSIXct(paste(dateD, "23:59:30")), by = "mins")
-
     tmp <- merge(tmp, data.table(Date = D_minutes), all = TRUE)
 
-    ## this day output file
+    ## daily output file name
     filename <- paste0(outdir, "/", strftime(dateD, format = "%d%m%y03.test"))
 
-    ## apply conversion
-    expdt <- data.frame(V1 = tmp$INC_watt    / 666,
-                        V2 = tmp$INC_watt_sd / 666)
+    ## sanity check
+    stopifnot(nrow(tmp) == 1440)
 
+    ## apply conversion to Volt
+    expdt <- data.frame(V1 = tmp$INC_watt    / de_Sensitivity,
+                        V2 = tmp$INC_watt_sd / de_Sensitivity)
 
     ## round
     expdt$V1 <- signif( expdt$V1, digits =  7 )
     expdt$V2 <- signif( expdt$V2, digits = 15 )
 
-
-
     ## write formatted data to file
     write.table(format(expdt,
-                       # digits    = 7,
-                       width     = 15,
+                       digits    = 15,
+                       # width     = 15,
                        row.names = FALSE,
                        scietific = c(F, T),
                        nsmall    = 2 ),
@@ -1142,6 +1129,11 @@ for (ad in unique(as.Date(gapdata$Date))) {
     ## set na value
     expdt[is.na(expdt)] <- "-9"
 
+    ## scientific notation capital
+    system(paste0("sed -i 's|e|E|g' ", filename))
+
+    ## na to number
+    system(paste0("sed -i 's|NA|-9|g' ", filename))
 
 }
 
