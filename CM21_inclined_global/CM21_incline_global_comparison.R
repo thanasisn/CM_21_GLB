@@ -136,7 +136,7 @@ START_DAY_miss <- as.POSIXct("2022-02-28 06:00")
 END_DAY_miss   <- as.POSIXct("2022-06-03 12:00")
 
 ## Sun elevation limit
-elevation_lim  <- 8
+elevation_lim  <- 10
 
 ## color values
 col_hor <- "green"
@@ -894,33 +894,13 @@ pander(summary(fit),
 
 
 
-##  Distribution of ratios  ----------------------------------------------------
+##  Calibration factor  --------------------------------------------------------
 #'
 #' \newpage
 #'
-#' ## Distribution of ratios
+#' ## Calibration factor
 #'
 #+ include=T, echo=F
-
-ratiolim <- 0.02
-vec <- DT$INC_value/DT$wattGLB
-vec <- vec[!is.infinite(vec)]
-
-#vec <- vec[abs(vec) < ratiolim]
-
-hist(vec,
-     breaks = 2000,
-     xlim = c(-0.01,0.03),
-     main = "All values INC_value / wattGLB")
-
-abline(v =   mean(vec, na.rem = TRUE), col = "blue" )
-abline(v = median(vec, na.rem = TRUE), col = "green")
-
-legend("topright", lty = 1,
-       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 6)),
-                  paste("Median:", signif(median(vec, na.rem = TRUE), 6))),
-       col    = c("blue", "green")
-)
 
 
 ##  Removed offending for histogram
@@ -979,6 +959,19 @@ pander(as.data.frame(pp),
        table.alignment.default = "left")
 
 
+
+
+
+##  Plot common calibrated  --------------------------------------------------------
+#'
+#' \newpage
+#'
+#' ## Plot common calibrated
+#'
+#' Using .....CF......
+#'
+#'
+#+ include=T, echo=F
 
 ## Create new data  ------------------------------------------------------------
 DT$INC_watt            <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_value)
