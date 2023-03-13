@@ -38,8 +38,6 @@
 #' ---
 
 
-
-
 #'
 #' # Description
 #'
@@ -86,7 +84,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_incline_global_comparison_") })
+                            return("CM21_incline_global_comparison.R") })
 if (!interactive()) {
     pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
@@ -120,9 +118,8 @@ STD_relMAX     =  1   ## Standard deviation can not be > STD_relMAX * MAX(daily 
 
 
 
-
 ##  Variables  -----------------------------------------------------------------
-tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y"))
 
 ## data extend
 START_DAY <- "2022-02-21"
@@ -206,13 +203,11 @@ for (aday in dayswecare) {
 }
 
 
-
-
 ##  Unify data sets
 DATA <- merge(HORIZ, INCLI, all = TRUE)
 rm(HORIZ, INCLI)
 
-##  Get common data for corelation analysis
+##  Get common data for correlation analysis
 DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 
 
@@ -267,8 +262,6 @@ plot(DATA$Date,
 #+ include=T, echo=F
 
 #+ include=F, echo=F
-if (!interactive()) {  # workaround plot setup
-
 plot(DT$wattGLB, DT$INC_value,
      pch  = ".",
      main = "Common measurements")
@@ -287,8 +280,6 @@ plot(DT$Date,
      xlab = "",
      main = "Inclined CM-21 signal")
 
-} # workaround plot setup
-
 
 
 # #'
@@ -297,20 +288,18 @@ plot(DT$Date,
 # #+ include=T, echo=F
 
 #+ include=F, echo=F
-if (!interactive()) {  # workaround plot setup
-
 for (ad in unique(as.Date(DT$Date))) {
     pp <- DT[ as.Date(Date) == ad ]
     ad <- as.Date(ad, origin = "1970-01-01")
 
     par(mar = c(2,2,2,1))
 
-    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
+    layout(rbind(1,2), heights = c(7,1))  # legend on bottom 1/8th of the chart
 
     plot.new()
 
-    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-    par(new = T)
+    title(main = paste0(ad, " d:", yday(ad), " "), cex.main = .8)
+    par(new = TRUE)
     plot(pp$Date,
          pp$wattGLB,
          col  = col_hor,
@@ -320,7 +309,7 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.3)
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          pp$INC_value,
          col  = col_inc,
@@ -333,28 +322,27 @@ for (ad in unique(as.Date(DT$Date))) {
     vec <- pp$INC_value / pp$wattGLB
     vec[!is.finite(vec)] <- NA
 
-    range <- diff(range(vec, na.rm = T))
+    range <- diff(range(vec, na.rm = TRUE))
     range <- range * 0.01
-    mean  <- mean(vec, na.rm = T)
+    mean  <- mean(vec, na.rm = TRUE)
     ylim  <- c(mean - range, mean + range)
 
     vec[vec > ylim[2]] <- NA
     vec[vec < ylim[1]] <- NA
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
-         vec ,
+         vec,
          col  = "blue",
          xlab = "",  ylab = "",
          xaxs = "i",
          pch  = 19,
          log  = "y",
          cex  = 0.4)
-    # abline(h = 1, lty = 1 , col = "black")
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
-         vec ,
+         vec,
          ylim = ylim,
          col  = "cyan",
          xlab = "",
@@ -364,9 +352,9 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.4)
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$INC_value,
-         pp$wattGLB ,
+         pp$wattGLB,
          col  = "red",
          xlab = "",
          ylab = "",
@@ -375,21 +363,20 @@ for (ad in unique(as.Date(DT$Date))) {
          cex  = 0.2)
 
     par(mar = c(0, 0, 0, 0))
-    # c(bottom, left, top, right)
     plot.new()
     legend("center",
            legend = c("Global Horizontal [W/m^2]",
                       "Inclined Signal [V]",
                       "log(Inclined / Horizontal)",
                       "Inclined / Horizontal"),
-           col  = c(col_hor, col_inc, 'blue', "cyan"),
+           col  = c(col_hor, col_inc, "blue", "cyan"),
            pch  = 19,
            ncol = 2,
            bty  = "n")
-
 }
 
-} # workaround plot setup
+
+
 
 #'
 #'
@@ -430,7 +417,7 @@ for (ddd in daystodo) {
     daydata     <- DATA[as.Date(Date) == as.Date(theday) & !is.na(INC_value), ]
 
     ## fill all minutes for nicer graphs
-    daydata     <- merge(daydata, daymimutes, by = "Date", all = T)
+    daydata     <- merge(daydata, daymimutes, by = "Date", all = TRUE)
     daydata$day <- as.Date(daydata$Date)
 
 
@@ -440,14 +427,14 @@ for (ddd in daystodo) {
     ## apply rule if there are enough data
     if (pre_count > STD_ret_ap_for) {
         ## filter SD relative to the signal
-        vec <- daydata[, INC_sd < STD_relMAX * max(INC_value, na.rm = T) ]
+        vec <- daydata[, INC_sd < STD_relMAX * max(INC_value, na.rm = TRUE)]
         if (sum(!vec, na.rm = T) > 0) {
-            cat("Extreme SD values detected N:",sum(!vec, na.rm = T) ,"\n" )
-            cat("Will be ignored from dark calculation\n" )
+            cat("Extreme SD values detected N:",sum(!vec, na.rm = TRUE), "\n")
+            cat("Will be ignored from dark calculation\n")
         }
         daydata <- daydata[vec]
 
-        NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(INC_value), .N ]
+        NR_extreme_SD <- NR_extreme_SD + pre_count - daydata[ !is.na(INC_value), .N]
         if (nrow(daydata[!is.na(INC_value)]) < 1) {
             cat('\n')
             cat(paste(theday, "SKIP DAY: No data after extreme SD filtering!!"),"\n\n")
@@ -458,11 +445,11 @@ for (ddd in daystodo) {
 
     ####    Calculate Dark signal   ########################################
     suppressWarnings({
-    dark_day <- dark_calculations( dates      = daydata$Date,
-                                   values     = daydata$INC_value,
-                                   elevatio   = daydata$Elevat,
-                                   nightlimit = DARK_ELEV,
-                                   dstretch   = DSTRETCH)
+        dark_day <- dark_calculations( dates      = daydata$Date,
+                                       values     = daydata$INC_value,
+                                       elevatio   = daydata$Elevat,
+                                       nightlimit = DARK_ELEV,
+                                       dstretch   = DSTRETCH)
     })
 
     if (!((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
@@ -487,7 +474,7 @@ for (ddd in daystodo) {
         #     }
         # }
 
-        } else {
+    } else {
         ####    Dark Correction function   #################################
         dark_generator <- dark_function(dark_day    = dark_day,
                                         DCOUNTLIM   = DCOUNTLIM,
@@ -505,36 +492,31 @@ for (ddd in daystodo) {
     ####    Apply dark correction    #######################################
     daydata[, INC_valueWdark := INC_value - todays_dark_correction ]
 
-
     ####    Get processed and unprocessed data    ##########################
-    daydata    <- merge( daydata, wholeday,
-                         by = intersect(names(daydata),names(wholeday)), all = T)
+    daydata    <- merge(daydata, wholeday,
+                        by = intersect(names(daydata),names(wholeday)),
+                        all = TRUE)
 
     globaldata <- rbind( globaldata, daydata, fill = TRUE )
 }
 
 
-# par(def.par)
-#
-# plot(globaldata$Date,
-#      globaldata[, INC_valueWdark - INC_value],
-#      pch = 19,
-#      cex = 0.3,
-#      ylab = "Zero offset [V]",
-#      xlab = "",
-#      main = "Dark Signal Correction for Inclined CM-21")
+
+#+ include=F, echo=F
+par(def.par)
+plot(globaldata$Date,
+     globaldata[, INC_valueWdark - INC_value],
+     pch = 19,
+     cex = 0.3,
+     ylab = "Zero offset [V]",
+     xlab = "",
+     main = "Dark Signal Correction for Inclined CM-21")
 
 
 
-## keep only dark correction data
-## data for output
-globaldata[, INC_value := INC_valueWdark ]
-globaldata[, INC_valueWdark := NULL ]
-
-
-
-
-
+## Keep only dark corrected data, data for output  -----------------------------
+globaldata[, INC_value      := INC_valueWdark]
+globaldata[, INC_valueWdark := NULL]
 
 ##  Use only common data for correlation analysis ------------------------------
 DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
@@ -542,6 +524,7 @@ DT <- globaldata[ !is.na(INC_value) & !is.na(wattGLB), ]
 ##  Use only exact date range --------------------------------------------------
 DT <- DT[Date > START_DAY_exact]
 DT <- DT[Date < END_DAY_exact  ]
+
 
 
 ## Correlation Inclined ~ Horizontal CM-21. ------------------------------------
@@ -564,6 +547,7 @@ DT$Offending <- vec
 ## robust linear fit
  rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
 Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
+
 
 
 #'
@@ -596,12 +580,12 @@ legend("bottom",
        col = c("red", "blue"),
        legend = c(paste("lm: y= ",
                         signif(abs(fit[[1]][1]), 3),
-                        if (fit[[1]][2] > 0) '+' else '-',
+                        if (fit[[1]][2] > 0) "+" else "-",
                         signif(abs(fit[[1]][2]), 4),
                         " * x"),
                   paste("robust lm: y= ",
                         signif(abs(rfit[[1]][1]), 3),
-                        if (rfit[[1]][2] > 0) '+' else '-',
+                        if (rfit[[1]][2] > 0) "+" else "-",
                         signif(abs(rfit[[1]][2]), 4),
                         " * x")
        )
@@ -642,17 +626,17 @@ hist(vec,
      xlim = c(-0.005,0.015),
      main = "All values INC_value / wattGLB")
 
-abline(v = mean(vec,   na.rem = T), col = "blue" )
-abline(v = median(vec, na.rem = T), col = "green" )
+abline(v =   mean(vec, na.rem = TRUE), col = "blue" )
+abline(v = median(vec, na.rem = TRUE), col = "green")
 
 legend("topright", lty = 1,
-       legend = c(paste("Mean:",  signif(mean(vec,   na.rem = T), 5)),
-                  paste("Median:", signif(median(vec, na.rem = T), 5))),
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 5)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 5))),
        col    = c("blue", "green")
 )
 
-## removed offending
 
+##  Removed offending for histogram
 vec <- DT$INC_value[!DT$Offending] / DT$wattGLB[!DT$Offending]
 vec <- vec[abs(vec) < ratiolim]
 
@@ -665,13 +649,10 @@ abline(v = mean(vec,   na.rem = T), col = "blue" )
 abline(v = median(vec, na.rem = T), col = "green" )
 
 legend("topright", lty = 1,
-       legend = c(paste("Mean:",  signif(mean(vec,   na.rem = T), 5)),
-                  paste("Median:", signif(median(vec, na.rem = T), 5))),
+       legend = c(paste("Mean:",   signif(  mean(vec, na.rem = TRUE), 5)),
+                  paste("Median:", signif(median(vec, na.rem = TRUE), 5))),
        col    = c("blue", "green")
 )
-
-
-
 
 
 
@@ -685,19 +666,17 @@ legend("topright", lty = 1,
 #'
 #+ include=T, echo=F
 
-
 for (ad in unique(as.Date(DT$Date))) {
     pp <- DT[ as.Date(Date) == ad ]
     ad <- as.Date(ad, origin = "1970-01-01")
 
     par(mar = c(2,2,2,1))
 
-    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
-
+    layout(rbind(1,2), heights = c(7,1))  # put legend on bottom 1/8th of the chart
     plot.new()
 
     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          pp$wattGLB,
          col  = col_hor,
@@ -707,14 +686,13 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.3)
 
-
     points(pp$Date[pp$Offending],
            pp$wattGLB[pp$Offending],
            col  = "red",
            pch  = 1,
            cex  = 1)
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          pp$INC_value,
          col  = col_inc,
@@ -733,29 +711,29 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = 1,
            cex  = 1)
 
+    ## ratio plot scale
     vec <- pp$INC_value / pp$wattGLB
     vec[!is.finite(vec)] <- NA
 
-    range <- diff(range(vec, na.rm = T))
+    range <- diff(range(vec, na.rm = TRUE))
     range <- range * 0.01
-    mean  <- mean(vec, na.rm = T)
+    mean  <- mean(vec, na.rm = TRUE)
     ylim  <- c(mean - range, mean + range)
 
     vec[vec > ylim[2]] <- NA
     vec[vec < ylim[1]] <- NA
 
-    #         par(new = T)
-    #         plot(pp$Date,
-    #              vec ,
-    #              col  = "blue",
-    #              xlab = "",  ylab = "",
-    #              xaxs = "i",
-    #              pch  = 19,
-    #              log  = "y",
-    #              cex  = 0.4)
-    # abline(h = 1, lty = 1 , col = "black")
+    # par(new = T)
+    # plot(pp$Date,
+    #      vec ,
+    #      col  = "blue",
+    #      xlab = "",  ylab = "",
+    #      xaxs = "i",
+    #      pch  = 19,
+    #      log  = "y",
+    #      cex  = 0.4)
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          vec ,
          ylim = ylim,
@@ -772,13 +750,14 @@ for (ad in unique(as.Date(DT$Date))) {
     LOESS_CRITERIO <-  c("aicc", "gcv")[2]
     vec2 <- !is.na(vec)
     FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
-                         degree = 1,
-                         criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+                         degree    = 1,
+                         criterion = LOESS_CRITERIO,
+                         user.span = NULL,
+                         plot      = FALSE)
     FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
     lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
 
-
-    par(new = T)
+    par(new = TRUE)
     plot(pp$INC_value,
          pp$wattGLB ,
          col  = "darkblue",
@@ -790,9 +769,7 @@ for (ad in unique(as.Date(DT$Date))) {
          pch  = 19,
          cex  = 0.2)
 
-
     par(mar = c(0, 0, 0, 0))
-    # c(bottom, left, top, right)
     plot.new()
     legend("center",
            legend = c("Global Horizontal [W/m^2]",
@@ -808,7 +785,6 @@ for (ad in unique(as.Date(DT$Date))) {
            bty = "n")
 
     layout(rbind(1,2), heights=c(7,1))
-
     par(def.par)
 }
 
@@ -835,9 +811,6 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-
-
-
 ## Calibrated daily data -------------------------------------------------------
 #'
 #' \newpage
@@ -854,10 +827,10 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #+ include=T, echo=F
 
-
 ## remove offending
-DT <- DT[ Offending == FALSE , ]
-## recalculate fits
+DT <- DT[ Offending == FALSE, ]
+
+## Recalculate fits for use !! -------------------------------------------------
 
 ## linear regression
 fit   <- lm(DT$INC_value ~ DT$wattGLB  )
@@ -866,9 +839,6 @@ Pfit  <- lm(DT$wattGLB   ~ DT$INC_value)
 ## robust linear fit
  rfit <- rlm(DT$INC_value ~ DT$wattGLB  )
 Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
-
-
-
 
 
 par(def.par)
@@ -882,7 +852,7 @@ plot(DT$wattGLB, DT$INC_value,
      ylab = "Inclined [V]",
      main = "Common measurements witout offending")
 
-abline(fit, col = "red", lwd = 2)
+abline( fit, col = "red",  lwd = 2)
 abline(rfit, col = "blue", lwd = 2)
 
 legend("bottom",
@@ -891,21 +861,19 @@ legend("bottom",
        col = c("red", "blue"),
        legend = c(paste("lm: y= ",
                         signif(abs(fit[[1]][1]), 3),
-                        if (fit[[1]][2] > 0) '+' else '-',
+                        if (fit[[1]][2] > 0) "+" else "-",
                         signif(abs(fit[[1]][2]), 4),
                         " * x"),
                   paste("robust lm: y= ",
                         signif(abs(rfit[[1]][1]), 3),
-                        if (rfit[[1]][2] > 0) '+' else '-',
+                        if (rfit[[1]][2] > 0) "+" else "-",
                         signif(abs(rfit[[1]][2]), 4),
                         " * x")
        )
 )
 
-
 pander(summary(fit),
        caption = "Linear regression **RED**")
-
 
 pander(summary(fit),
        caption = "Robust Linear regression **BLUE**")
@@ -913,7 +881,6 @@ pander(summary(fit),
 
 
 ##  Predict new values  --------------------------------------------------------
-
 
 ## Select model
 
@@ -923,9 +890,8 @@ pander(summary(fit),
 ## simple linear model
 LMS <- Pfit
 
-## Make predictions
 
-# DT$INC_watt <- predict(LMS, DT)
+## Create new data  ------------------------------------------------------------
 DT$INC_watt            <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_value)
 DT$INC_watt_sd         <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_sd)
 
@@ -939,12 +905,11 @@ for (ad in unique(as.Date(DT$Date))) {
 
     par(mar = c(2,2,2,1))
 
-    layout(rbind(1,2), heights=c(7,1))  # put legend on bottom 1/8th of the chart
-
+    layout(rbind(1,2), heights = c(7,1))  # legend on bottom 1/8th of the chart
     plot.new()
 
     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          pp$wattGLB,
          col  = col_hor,
@@ -976,7 +941,7 @@ for (ad in unique(as.Date(DT$Date))) {
 
     vec <- pp$INC_watt / pp$wattGLB
     vec[!is.finite(vec)] <- NA
-    ylim <- range(vec, na.rm = T)
+    ylim <- range(vec, na.rm = TRUE)
 
     # range <- diff(range(vec, na.rm = T))
     # range <- range * 0.02
@@ -986,7 +951,7 @@ for (ad in unique(as.Date(DT$Date))) {
     # vec[vec > ylim[2]] <- NA
     # vec[vec < ylim[1]] <- NA
 
-    par(new = T)
+    par(new = TRUE)
     plot(pp$Date,
          vec ,
          ylim = ylim,
@@ -1003,8 +968,10 @@ for (ad in unique(as.Date(DT$Date))) {
     LOESS_CRITERIO <-  c("aicc", "gcv")[2]
     vec2 <- !is.na(vec)
     FTSE.lo3 <- loess.as(pp$Date[vec2], vec[vec2],
-                         degree = 1,
-                         criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+                         degree    = 1,
+                         criterion = LOESS_CRITERIO,
+                         user.span = NULL,
+                         plot      = FALSE)
     FTSE.lo.predict3 <- predict(FTSE.lo3, pp$Date)
     lines(pp$Date, FTSE.lo.predict3, col = "yellow", lwd = 2.5)
 
@@ -1020,8 +987,7 @@ for (ad in unique(as.Date(DT$Date))) {
     #      pch  = 19,
     #      cex  = 0.2)
 
-    par(mar=c(0, 0, 0, 0))
-    # c(bottom, left, top, right)
+    par(mar = c(0, 0, 0, 0))
     plot.new()
     legend("center",
            legend = c("Global Horizontal [W/m^2]",
@@ -1034,10 +1000,9 @@ for (ad in unique(as.Date(DT$Date))) {
            pch  = c(     19,       19,       19,     19,     1,       NA),
            lty  = c(     NA,       NA,       NA,     NA,    NA,        1),
            ncol = 2,
-           bty = "n")
+           bty  = "n")
 
     layout(rbind(1,2), heights = c(7,1))
-
     par(def.par)
 }
 
@@ -1051,7 +1016,6 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #+ include=T, echo=F
 
-
 gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
 
 ## focus on missing data
@@ -1063,8 +1027,9 @@ gapdata <- merge(gapdata,
                  data.frame(Date = seq(from = min(gapdata$Date),
                                        to   = max(gapdata$Date),
                                        by   = "min")),
-                 all = T)
+                 all = TRUE)
 
+## Plot new Global  ------------------------------------------------------------
 for (ad in unique(gapdata$day)) {
     tmp <- gapdata[ day == ad, ]
     ad  <- as.Date(ad, origin = "1970-01-01")
@@ -1081,8 +1046,8 @@ for (ad in unique(gapdata$day)) {
 
 
 
-## Export new data -------------------------------------------------------------
 
+## Export new data -------------------------------------------------------------
 outdir <- "~/CM_21_GLB/CM21_inclined_global/export"
 dir.create(outdir, showWarnings = FALSE)
 
@@ -1118,7 +1083,7 @@ for (ad in unique(as.Date(gapdata$Date))) {
                        digits    = 15,
                        # width     = 15,
                        row.names = FALSE,
-                       scietific = c(F, T),
+                       scietific = c(FALSE, TRUE),
                        nsmall    = 2 ),
                 file      = filename,
                 quote     = FALSE,
@@ -1132,21 +1097,9 @@ for (ad in unique(as.Date(gapdata$Date))) {
     ## scientific notation capital
     system(paste0("sed -i 's|e|E|g' ", filename))
 
-    ## na to number
+    ## NA to number
     system(paste0("sed -i 's|NA|-9|g' ", filename))
-
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 #' **END**
