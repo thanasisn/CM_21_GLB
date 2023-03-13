@@ -1,7 +1,9 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Correlate Horizontal and Inclined CM21 signal **INC ~ HOR**."
-#' author:        "Natsis Athanasios"
+#' author:
+#'   - Natsis Athanasios^[Laboratory of Atmospheric Physics, AUTH, natsisphysicist@gmail.com]
+#'   - Alkiviadis Bais^[Laboratory of Atmospheric Physics, AUTH]
 #' abstract:      "Compare Inclined CM21 with Global CM21 to produce a calibration factor for inclined, and new Global measurements to fill calibration period gaps in records."
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
