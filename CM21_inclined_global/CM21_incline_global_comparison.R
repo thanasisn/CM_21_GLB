@@ -242,6 +242,8 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #+ include=T, echo=F
 
 
+START_DAY_exact
+
 #+ include=F, echo=F
 plot(DATA$Date,
      DATA$wattGLB,
@@ -289,12 +291,12 @@ plot(DT$Date,
 
 
 
-# #'
-# #' ## Daily plot
-# #'
-# #+ include=T, echo=F
+#'
+#' ## Daily plot of raw data
+#'
+#+ include=T, echo=F
 
-#+ include=F, echo=F
+#+ include=T, echo=F
 for (ad in unique(as.Date(DT$Date))) {
     pp <- DT[ as.Date(Date) == ad ]
     ad <- as.Date(ad, origin = "1970-01-01")
@@ -563,7 +565,7 @@ Prfit <- rlm(DT$wattGLB   ~ DT$INC_value)
 #'
 #' ### Linear regression
 #'
-#' Outliers selection by $`r res_threshold`σ$ distance
+#' Outliers selection by **$`r res_threshold`σ$ distance**.
 #'
 #+ include=T, echo=F
 
@@ -609,7 +611,7 @@ OffendingPoints <- DT[vec, ]
 
 pander(
     data.frame(table(DT$day[vec])),
-    caption = "Offending points"
+    caption = "Outliers points"
 )
 
 pander(summary(fit),
@@ -655,7 +657,7 @@ vec <- vec[!is.infinite(vec)]
 hist(vec,
      breaks = 2000,
      xlim = c(-0.01,0.03),
-     main = "Without offending INC_value / wattGLB")
+     main = "Without outliers INC_value / wattGLB")
 
 abline(v = mean(vec,   na.rem = T), col = "blue" )
 abline(v = median(vec, na.rem = T), col = "green" )
@@ -788,7 +790,7 @@ for (ad in unique(as.Date(DT$Date))) {
                       "Inclined Signal [V]",
                       "Correlation Inclined ~ Horizontal",
                       "Inclined / Horizontal",
-                      "Offending points",
+                      "Outliers points",
                       "LOESS"),
            col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
            pch  = c(     19,       19,       19,     19,     1,       NA),
@@ -833,7 +835,7 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' Using the linear fit model
 #'
-#' With removed offending data points
+#' With removed outlier data points
 #'
 #' **Radiometric values are on the same scale now**
 #'
@@ -862,7 +864,7 @@ plot(DT$wattGLB, DT$INC_value,
      cex  = 0.3,
      xlab = "Global [W]",
      ylab = "Inclined [V]",
-     main = "Common measurements without offending")
+     main = "Common measurements without outliers")
 
 abline( fit, col = "red",  lwd = 2)
 abline(rfit, col = "blue", lwd = 2)
@@ -912,7 +914,7 @@ vec <- vec[!is.infinite(vec)]
 hist(vec,
      breaks = 2000,
      xlim = c(-0.01,0.03),
-     main = "Without offending INC_value / wattGLB")
+     main = "Without outliers INC_value / wattGLB")
 
 abline(v = mean(vec,   na.rem = T), col = "blue" )
 abline(v = median(vec, na.rem = T), col = "green")
@@ -949,6 +951,8 @@ pp <- data.frame(Median    = median(vec, na.rm = TRUE),
                  Simple_lm = fit[[1]][2])
 pp <- data.frame(Parameter = names(pp),
                  CF        = unlist(pp[1,]))
+CF <- pp
+
 row.names(pp) <- NULL
 setorder(pp , CF)
 
@@ -968,17 +972,28 @@ pander(as.data.frame(pp),
 #'
 #' ## Plot common calibrated
 #'
-#' Using .....CF......
+#'  **Using median as calibration factor**
 #'
+#' **`r CF$CF[CF$Parameter == "Median"]`**
 #'
 #+ include=T, echo=F
 
-## Create new data  ------------------------------------------------------------
-DT$INC_watt            <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_value)
-DT$INC_watt_sd         <- (LMS[[1]][1] + LMS[[1]][2] * DT$INC_sd)
 
-globaldata$INC_watt    <- (LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_value)
-globaldata$INC_watt_sd <- (LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_sd)
+## Create new data  ------------------------------------------------------------
+# DT$INC_watt            <- LMS[[1]][1] + LMS[[1]][2] * DT$INC_value
+# DT$INC_watt_sd         <- LMS[[1]][1] + LMS[[1]][2] * DT$INC_sd
+#
+# globaldata$INC_watt    <- LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_value
+# globaldata$INC_watt_sd <- LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_sd
+
+
+DT$INC_watt            <- 1 / CF$CF[CF$Parameter == "Median"] * DT$INC_value
+DT$INC_watt_sd         <- 1 / CF$CF[CF$Parameter == "Median"] * DT$INC_sd
+
+globaldata$INC_watt    <- 1 / CF$CF[CF$Parameter == "Median"] * globaldata$INC_value
+globaldata$INC_watt_sd <- 1 / CF$CF[CF$Parameter == "Median"] * globaldata$INC_sd
+
+
 
 
 for (ad in unique(as.Date(DT$Date))) {
@@ -1078,7 +1093,7 @@ for (ad in unique(as.Date(DT$Date))) {
                       "Inclined Signal [W/m^2]",
                       "Correlation Inclined ~ Horizontal",
                       "Inclined / Horizontal",
-                      "Offending points",
+                      "Outliers points",
                       "LOESS"),
            col  = c(col_hor, col_inc,'darkblue', "cyan", "red", "yellow"),
            pch  = c(     19,       19,       19,     19,     1,       NA),
