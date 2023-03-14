@@ -233,16 +233,17 @@ DT <- DATA[ !is.na(INC_value) & !is.na(wattGLB), ]
 #'
 #' Correlation period:
 #'
-#' Start day exact: **`r START_DAY_exact`**
+#' Start day exact: **`r START_DAY_exact`** m:`r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1`
 #'
-#' End day exact: **`r END_DAY_exact`**
+#' End day exact: **`r END_DAY_exact`** m:`r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1`
 #'
 #' Correlate data with sun elevation **$>`r elevation_lim`^\circ$**
 #'
 #+ include=T, echo=F
 
+# hour(as.POSIXct("1970-01-01 00:00:30")) * 60 + minute(as.POSIXct("1970-01-01 00:00:30")) + 1
+# hour(as.POSIXct("1970-01-01 23:59:30")) * 60 + minute(as.POSIXct("1970-01-01 23:59:30")) + 1
 
-START_DAY_exact
 
 #+ include=F, echo=F
 plot(DATA$Date,
@@ -290,99 +291,99 @@ plot(DT$Date,
      main = "Inclined CM-21 signal")
 
 
-
-#'
-#' ## Daily plot of raw data
-#'
-#+ include=T, echo=F
-
-#+ include=T, echo=F
-for (ad in unique(as.Date(DT$Date))) {
-    pp <- DT[ as.Date(Date) == ad ]
-    ad <- as.Date(ad, origin = "1970-01-01")
-
-    par(mar = c(2,2,2,1))
-
-    layout(rbind(1,2), heights = c(7,1))  # legend on bottom 1/8th of the chart
-
-    plot.new()
-
-    title(main = paste0(ad, " d:", yday(ad), " "), cex.main = .8)
-    par(new = TRUE)
-    plot(pp$Date,
-         pp$wattGLB,
-         col  = col_hor,
-         xlab = "",  ylab = "",
-         yaxt = "n",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.3)
-
-    par(new = TRUE)
-    plot(pp$Date,
-         pp$INC_value,
-         col  = col_inc,
-         xlab = "",  ylab = "",
-         yaxt = "n",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.2)
-
-    vec <- pp$INC_value / pp$wattGLB
-    vec[!is.finite(vec)] <- NA
-
-    range <- diff(range(vec, na.rm = TRUE))
-    range <- range * 0.01
-    mean  <- mean(vec, na.rm = TRUE)
-    ylim  <- c(mean - range, mean + range)
-
-    vec[vec > ylim[2]] <- NA
-    vec[vec < ylim[1]] <- NA
-
-    par(new = TRUE)
-    plot(pp$Date,
-         vec,
-         col  = "blue",
-         xlab = "",  ylab = "",
-         xaxs = "i",
-         pch  = 19,
-         log  = "y",
-         cex  = 0.4)
-
-    par(new = TRUE)
-    plot(pp$Date,
-         vec,
-         ylim = ylim,
-         col  = "cyan",
-         xlab = "",
-         ylab = "",
-         yaxt = "n",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.4)
-
-    par(new = TRUE)
-    plot(pp$INC_value,
-         pp$wattGLB,
-         col  = "red",
-         xlab = "",
-         ylab = "",
-         xaxs = "i",
-         pch  = 19,
-         cex  = 0.2)
-
-    par(mar = c(0, 0, 0, 0))
-    plot.new()
-    legend("center",
-           legend = c("Global Horizontal [W/m^2]",
-                      "Inclined Signal [V]",
-                      "log(Inclined / Horizontal)",
-                      "Inclined / Horizontal"),
-           col  = c(col_hor, col_inc, "blue", "cyan"),
-           pch  = 19,
-           ncol = 2,
-           bty  = "n")
-}
+# ##  Daily plot of raw data  ----------------------------------------------------
+# #'
+# #' ## Daily plot of raw data
+# #'
+# #+ include=T, echo=F
+#
+# #+ include=T, echo=F
+# for (ad in unique(as.Date(DT$Date))) {
+#     pp <- DT[ as.Date(Date) == ad ]
+#     ad <- as.Date(ad, origin = "1970-01-01")
+#
+#     par(mar = c(2,2,2,1))
+#
+#     layout(rbind(1,2), heights = c(7,1))  # legend on bottom 1/8th of the chart
+#
+#     plot.new()
+#
+#     title(main = paste0(ad, " d:", yday(ad), " "), cex.main = .8)
+#     par(new = TRUE)
+#     plot(pp$Date,
+#          pp$wattGLB,
+#          col  = col_hor,
+#          xlab = "",  ylab = "",
+#          yaxt = "n",
+#          xaxs = "i",
+#          pch  = 19,
+#          cex  = 0.3)
+#
+#     par(new = TRUE)
+#     plot(pp$Date,
+#          pp$INC_value,
+#          col  = col_inc,
+#          xlab = "",  ylab = "",
+#          yaxt = "n",
+#          xaxs = "i",
+#          pch  = 19,
+#          cex  = 0.2)
+#
+#     vec <- pp$INC_value / pp$wattGLB
+#     vec[!is.finite(vec)] <- NA
+#
+#     range <- diff(range(vec, na.rm = TRUE))
+#     range <- range * 0.01
+#     mean  <- mean(vec, na.rm = TRUE)
+#     ylim  <- c(mean - range, mean + range)
+#
+#     vec[vec > ylim[2]] <- NA
+#     vec[vec < ylim[1]] <- NA
+#
+#     par(new = TRUE)
+#     plot(pp$Date,
+#          vec,
+#          col  = "blue",
+#          xlab = "",  ylab = "",
+#          xaxs = "i",
+#          pch  = 19,
+#          log  = "y",
+#          cex  = 0.4)
+#
+#     par(new = TRUE)
+#     plot(pp$Date,
+#          vec,
+#          ylim = ylim,
+#          col  = "cyan",
+#          xlab = "",
+#          ylab = "",
+#          yaxt = "n",
+#          xaxs = "i",
+#          pch  = 19,
+#          cex  = 0.4)
+#
+#     par(new = TRUE)
+#     plot(pp$INC_value,
+#          pp$wattGLB,
+#          col  = "red",
+#          xlab = "",
+#          ylab = "",
+#          xaxs = "i",
+#          pch  = 19,
+#          cex  = 0.2)
+#
+#     par(mar = c(0, 0, 0, 0))
+#     plot.new()
+#     legend("center",
+#            legend = c("Global Horizontal [W/m^2]",
+#                       "Inclined Signal [V]",
+#                       "log(Inclined / Horizontal)",
+#                       "Inclined / Horizontal"),
+#            col  = c(col_hor, col_inc, "blue", "cyan"),
+#            pch  = 19,
+#            ncol = 2,
+#            bty  = "n")
+# }
 
 
 
@@ -625,8 +626,6 @@ pander(summary(fit),
 #'
 #' ## Distribution of ratios
 #'
-#'
-#'
 #+ include=T, echo=F
 
 ratiolim <- 0.02
@@ -835,7 +834,7 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' Using the linear fit model
 #'
-#' With removed outlier data points
+#' With removed outliers data points
 #'
 #' **Radiometric values are on the same scale now**
 #'
@@ -972,27 +971,25 @@ pander(as.data.frame(pp),
 #'
 #' ## Plot common calibrated
 #'
-#'  **Using median as calibration factor**
+#'  **Using median as calibration factor**:
 #'
-#' **`r CF$CF[CF$Parameter == "Median"]`**
+#' **`r format( CF$CF[CF$Parameter == "Median"], digits = 10)`**
 #'
 #+ include=T, echo=F
+
+
 
 
 ## Create new data  ------------------------------------------------------------
 # DT$INC_watt            <- LMS[[1]][1] + LMS[[1]][2] * DT$INC_value
 # DT$INC_watt_sd         <- LMS[[1]][1] + LMS[[1]][2] * DT$INC_sd
-#
 # globaldata$INC_watt    <- LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_value
 # globaldata$INC_watt_sd <- LMS[[1]][1] + LMS[[1]][2] * globaldata$INC_sd
 
-
 DT$INC_watt            <- 1 / CF$CF[CF$Parameter == "Median"] * DT$INC_value
 DT$INC_watt_sd         <- 1 / CF$CF[CF$Parameter == "Median"] * DT$INC_sd
-
 globaldata$INC_watt    <- 1 / CF$CF[CF$Parameter == "Median"] * globaldata$INC_value
 globaldata$INC_watt_sd <- 1 / CF$CF[CF$Parameter == "Median"] * globaldata$INC_sd
-
 
 
 
@@ -1005,7 +1002,7 @@ for (ad in unique(as.Date(DT$Date))) {
     layout(rbind(1,2), heights = c(7,1))  # legend on bottom 1/8th of the chart
     plot.new()
 
-    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+    title(main = paste0(ad, " d:", yday(ad), " "), cex.main = .8)
     par(new = TRUE)
     plot(pp$Date,
          pp$wattGLB,
@@ -1111,7 +1108,7 @@ for (ad in unique(as.Date(DT$Date))) {
 #'
 #' \newpage
 #'
-#' ## CM21 calibration data gap inspection
+#' ## CM-21 calibration data gap inspection
 #'
 #+ include=T, echo=F
 
