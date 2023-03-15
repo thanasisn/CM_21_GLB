@@ -1165,29 +1165,27 @@ setorder(tomove,day)
 
 
 tomove[, newbase := sub("01\\.LAP", "06\\.LAP", basename) ]
-movedir <- "~/CM_21_GLB/CM21_inclined_global/export/01/2022/"
-dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
-movedir <- "~/CM_21_GLB/CM21_inclined_global/export/06/2022/"
-dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
-
-
-cc <- file.copy(from      = tomove$filein,
-                to        = paste0(movedir, tomove$newbase),
-                overwrite = FALSE,
-                copy.mode = TRUE,
-                copy.date = TRUE)
-
-
-cc <- file.copy(tomove[day == min(day), filein],
-                "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
-                overwrite = FALSE,
-                copy.mode = TRUE,
-                copy.date = TRUE)
-cc <- file.copy(tomove[day == max(day), filein],
-                "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
-                overwrite = FALSE,
-                copy.mode = TRUE,
-                copy.date = TRUE)
+# movedir <- "~/CM_21_GLB/CM21_inclined_global/export/01/2022/"
+# dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
+# movedir <- "~/CM_21_GLB/CM21_inclined_global/export/06/2022/"
+# dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
+#
+# cc <- file.copy(from      = tomove$filein,
+#                 to        = paste0(movedir, tomove$newbase),
+#                 overwrite = FALSE,
+#                 copy.mode = TRUE,
+#                 copy.date = TRUE)
+#
+# cc <- file.copy(tomove[day == min(day), filein],
+#                 "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
+#                 overwrite = FALSE,
+#                 copy.mode = TRUE,
+#                 copy.date = TRUE)
+# cc <- file.copy(tomove[day == max(day), filein],
+#                 "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
+#                 overwrite = FALSE,
+#                 copy.mode = TRUE,
+#                 copy.date = TRUE)
 
 pp <- tomove[, .(day, basename, newbase)]
 setorder(pp, day)
@@ -1209,6 +1207,7 @@ pander(pp,
 #'
 #' - Lines after  `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1`      will be included to the horizontal.
 #' - Lines before `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1 - 10` will be included to the inclined.
+#' - The start of the file has the regular CHP-1 global/inclined measurements.
 #'
 #' For the last file of the period:
 #'
@@ -1216,6 +1215,7 @@ pander(pp,
 #'
 #' - Lines before `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1`     will be included to the horizontal.
 #' - Lines after  `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1 +10` will be included to the inclined.
+#' - The end of the file has the regular CHP-1 global/inclined measurements.
 #'
 #' The intermediate lines will be set to "NA" ("-9") for both instruments.
 #'
