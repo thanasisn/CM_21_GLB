@@ -59,7 +59,6 @@
 #' Assume:
 #' : $E_{IN} = E_{GL}$
 #'
-#'
 #' Produce Global "measurements":
 #' : $V_{GL} = E_{IN} / S_{new}$
 #'
@@ -1166,8 +1165,11 @@ setorder(tomove,day)
 
 
 tomove[, newbase := sub("01\\.LAP", "06\\.LAP", basename) ]
+movedir <- "~/CM_21_GLB/CM21_inclined_global/export/01/2022/"
+dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
 movedir <- "~/CM_21_GLB/CM21_inclined_global/export/06/2022/"
 dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
+
 
 cc <- file.copy(from      = tomove$filein,
                 to        = paste0(movedir, tomove$newbase),
