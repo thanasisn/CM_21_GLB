@@ -1175,6 +1175,18 @@ cc <- file.copy(from      = tomove$filein,
                 copy.mode = TRUE,
                 copy.date = TRUE)
 
+
+cc <- file.copy(tomove[day == min(day), filein],
+                "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
+                overwrite = FALSE,
+                copy.mode = TRUE,
+                copy.date = TRUE)
+cc <- file.copy(tomove[day == max(day), filein],
+                "~/CM_21_GLB/CM21_inclined_global/export/01/2022/",
+                overwrite = FALSE,
+                copy.mode = TRUE,
+                copy.date = TRUE)
+
 pp <- tomove[, .(day, basename, newbase)]
 setorder(pp, day)
 names(pp)[names(pp) == "basename"] <- "Original inclined CM-21"
