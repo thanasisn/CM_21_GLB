@@ -78,6 +78,8 @@ knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(fig.pos    = '!h'     )
 
+knitr::opts_chunk$set(cache      =     T     )
+
 
 
 #+ include=F, echo=F
@@ -1151,7 +1153,17 @@ gapdata[, day := as.Date(Date)]
 #'
 #' # Sirena archive data manipulation!!
 #'
+#' $$W = V \times 1 \frac {`r format(CF$CF[CF$Parameter == "Median"], digits = 10)`}$$
+#'
+#' $$1 \frac `r CF$CF[CF$Parameter == "Median"]` = gain \frac Sensitivity$$
+#'
+#' $$gain = 4E-2$$
+#'
+#' $$Sensitivity = `r format(CF$CF[CF$Parameter == "Median"] * 4E-2 , scientific = T, digits = 4, nsmall = 2)`$$
+#'
 #+ include=T, echo=F
+
+# 11.96E-6,   4E-2,
 
 
 tomove <- gapdata[, .(day = min(day)), by = filein]
@@ -1186,17 +1198,21 @@ pander(pp,
 #'
 #' For the first file of the period:
 #'
+#' `r format(pp[day == min(day)])`
+#'
 #' - Lines after  `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1`      will be included to the horizontal.
 #' - Lines before `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1 - 10` will be included to the inclined.
 #'
 #' For the last file of the period:
 #'
+#' `r format(pp[day == max(day)])`
+#'
 #' - Lines before `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1`     will be included to the horizontal.
 #' - Lines after  `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1 +10` will be included to the inclined.
 #'
-#' The intermediate lines will be set to "NA" ("-9").
+#' The intermediate lines will be set to "NA" ("-9") for both instruments.
 #'
-#' Backup of the whole year for each instrument have been created.
+#' A backup of the whole year for each instrument have been created prior to edits.
 #'
 #+ echo=F, include=T
 
