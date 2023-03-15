@@ -54,7 +54,7 @@
 #' or
 #'
 #' Use median of the ratio:
-#' : $E_{IN} = a * E_{GL}$
+#' : $E_{IN} = a * V_{IN}$
 #'
 #' Assume:
 #' : $E_{IN} = E_{GL}$
@@ -78,7 +78,6 @@ knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(fig.pos    = '!h'     )
 
-knitr::opts_chunk$set(cache      =     T     )
 
 
 
@@ -1153,13 +1152,7 @@ gapdata[, day := as.Date(Date)]
 #'
 #' # Sirena archive data manipulation!!
 #'
-#' $$W = V \times 1 \frac {`r format(CF$CF[CF$Parameter == "Median"], digits = 10)`}$$
-#'
-#' $$1 \frac `r CF$CF[CF$Parameter == "Median"]` = gain \frac Sensitivity$$
-#'
-#' $$gain = 4E-2$$
-#'
-#' $$Sensitivity = `r format(CF$CF[CF$Parameter == "Median"] * 4E-2 , scientific = T, digits = 4, nsmall = 2)`$$
+
 #'
 #+ include=T, echo=F
 
@@ -1213,6 +1206,17 @@ pander(pp,
 #' The intermediate lines will be set to "NA" ("-9") for both instruments.
 #'
 #' A backup of the whole year for each instrument have been created prior to edits.
+#'
+#'
+#' ## Produce sensitivity for the period
+#'
+#' $$W = V \times  \frac {1} {`r format(CF$CF[CF$Parameter == "Median"], digits = 10)`}$$
+#'
+#' $$\frac {1} {`r format(CF$CF[CF$Parameter == "Median"], digits = 10)`} = \frac {gain} {Sensitivity}$$
+#'
+#' $${gain} = 4E-2$$
+#'
+#' $${Sensitivity} = `r format(CF$CF[CF$Parameter == "Median"] * 4E-2 , scientific = T, digits = 4, nsmall = 2)`$$
 #'
 #+ echo=F, include=T
 
