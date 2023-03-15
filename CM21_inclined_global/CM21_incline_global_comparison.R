@@ -1105,13 +1105,13 @@ for (ad in unique(as.Date(DT$Date))) {
 
 
 
-## Gap data --------------------------------------------------------------------
-#'
-#' \newpage
-#'
-#' ## CM-21 calibration data gap inspection
-#'
-#+ include=T, echo=F
+# ## Gap data --------------------------------------------------------------------
+# #'
+# #' \newpage
+# #'
+# #' ## CM-21 calibration data gap inspection
+# #'
+# #+ include=T, echo=F
 
 gapdata <- globaldata[ is.na(wattGLB) & !is.na(INC_value) ]
 
@@ -1128,41 +1128,77 @@ gapdata <- merge(gapdata,
 gapdata[, day := as.Date(Date)]
 
 
-
-## Plot new Global  ------------------------------------------------------------
-for (ad in unique(gapdata$day)) {
-    tmp <- gapdata[ day == ad, ]
-    ad  <- as.Date(ad, origin = "1970-01-01")
-
-    par(mar = c(2,2,2,1))
-
-    if (all(is.na(tmp$INC_watt))) next()
-
-    plot(tmp$Date,
-         tmp$INC_watt, "l")
-
-    title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
-}
-
-gapdata[is.na(day)]
-gapdata[is.na(filein)]
+# ## Plot new Global  ------------------------------------------------------------
+# for (ad in unique(gapdata$day)) {
+#     tmp <- gapdata[ day == ad, ]
+#     ad  <- as.Date(ad, origin = "1970-01-01")
+#
+#     par(mar = c(2,2,2,1))
+#
+#     if (all(is.na(tmp$INC_watt))) next()
+#
+#     plot(tmp$Date,
+#          tmp$INC_watt, "l")
+#
+#     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
+# }
 
 
-unique(gapdata$filein)
+## Sirena data manipulation!! --------------------------------------------------
+
+#'
+#' \newpage
+#'
+#' # Sirena archive data manipulation!!
+#'
+#+ include=T, echo=F
+
 
 tomove <- gapdata[, .(day = min(day)), by = filein]
 tomove <- tomove[!is.na(filein)]
 tomove[, basename := basename(filein)]
 setorder(tomove,day)
-tomove
 
-tomove[, newbase := sub("01\\.LAP", "03\\.LAP", basename) ]
-movedir <- "~/CM_21_GLB/CM21_inclined_global/export/"
-dir.create(movedir, showWarnings = F)
 
-paste0(movedir, tomove$newbase)
+tomove[, newbase := sub("01\\.LAP", "06\\.LAP", basename) ]
+movedir <- "~/CM_21_GLB/CM21_inclined_global/export/06/2022/"
+dir.create(movedir, showWarnings = FALSE, recursive = TRUE)
 
-file.copy(tomove$filein, paste0(movedir, tomove$newbase))
+cc <- file.copy(from      = tomove$filein,
+                to        = paste0(movedir, tomove$newbase),
+                overwrite = FALSE,
+                copy.mode = TRUE,
+                copy.date = TRUE)
+
+pp <- tomove[, .(day, basename, newbase)]
+setorder(pp, day)
+names(pp)[names(pp) == "basename"] <- "Original inclined CM-21"
+names(pp)[names(pp) == "newbase" ] <- "Copied from inclined CM-21 to horizontal"
+
+
+#+ echo=F, include=T
+#' \footnotesize
+#+ echo=F, include=T
+pander(pp,
+       cap = "Affected sirena files.")
+#'
+#' \normalsize
+#'
+#' For the first file of the period:
+#'
+#' - Lines after  `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1`      will be included to the horizontal.
+#' - Lines before `r hour(START_DAY_exact) * 60 + minute(START_DAY_exact) + 1 - 10` will be included to the inclined.
+#'
+#' For the last file of the period:
+#'
+#' - Lines before `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1`     will be included to the horizontal.
+#' - Lines after  `r hour(END_DAY_exact) * 60 + minute(END_DAY_exact) + 1 +10` will be included to the inclined.
+#'
+#' The intermediate lines will be set to "NA" ("-9").
+#'
+#' Backup of the whole year for each instrument have been created.
+#'
+#+ echo=F, include=T
 
 
 # ## Export new data -------------------------------------------------------------
