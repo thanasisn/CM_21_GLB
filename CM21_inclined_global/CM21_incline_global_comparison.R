@@ -201,7 +201,8 @@ for (aday in dayswecare) {
                             INC_value   = lap$V1,    # Raw value for CM21
                             INC_sd      = lap$V2,    # Raw SD value for CM21
                             # Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
-                            Elevat      = sun_temp$ELEV)
+                            Elevat      = sun_temp$ELEV,
+                            filein      = incfiles[found])
 
     ##  Gather data
     INCLI <- rbind(INCLI, day_data)
@@ -1124,6 +1125,9 @@ gapdata <- merge(gapdata,
                                        to   = max(gapdata$Date),
                                        by   = "min")),
                  all = TRUE)
+gapdata[, day := as.Date(Date)]
+
+
 
 ## Plot new Global  ------------------------------------------------------------
 for (ad in unique(gapdata$day)) {
@@ -1140,7 +1144,25 @@ for (ad in unique(gapdata$day)) {
     title(main = paste0(ad, " d:", yday(ad), " " ), cex.main = .8)
 }
 
+gapdata[is.na(day)]
+gapdata[is.na(filein)]
 
+
+unique(gapdata$filein)
+
+tomove <- gapdata[, .(day = min(day)), by = filein]
+tomove <- tomove[!is.na(filein)]
+tomove[, basename := basename(filein)]
+setorder(tomove,day)
+tomove
+
+tomove[, newbase := sub("01\\.LAP", "03\\.LAP", basename) ]
+movedir <- "~/CM_21_GLB/CM21_inclined_global/export/"
+dir.create(movedir, showWarnings = F)
+
+paste0(movedir, tomove$newbase)
+
+file.copy(tomove$filein, paste0(movedir, tomove$newbase))
 
 
 # ## Export new data -------------------------------------------------------------
