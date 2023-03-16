@@ -109,8 +109,8 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
-# ALL_YEARS <- TRUE
+# TEST      <- TRUE
+ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
@@ -178,6 +178,7 @@ years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y")
 ## TEST
 if (TEST) {
     years_to_do <- 2022
+    warning("Overriding years to do: ", years_to_do)
 }
 
 
@@ -229,12 +230,13 @@ if (!params$ALL_YEARS) {
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
 
+
+## Loop year to do -------------------------------------------------------------
+
 #'
 #' Years to do: `r years_to_do`
 #'
 #+ include=TRUE, echo=FALSE, results="asis"
-
-## loop all years
 for (YYYY in years_to_do) {
     yy           <- substr(YYYY, 3, 4)
     year_data    <- data.table()
@@ -267,13 +269,13 @@ for (YYYY in years_to_do) {
                          length.out = 1440,
                          by         = "min" )
 
-        ####    Read LAP file    ####
+        ## __  Read LAP file  --------------------------------------------------
         lap <- fread( sirena_files[found], na.strings = "-9" )
         lap[ V1 < -8, V1 := NA ]
         lap[ V2 < -8, V2 := NA ]
         stopifnot( dim(lap)[1] == 1440 )
 
-        #### . . Read SUN file  ####
+        ## __  Read SUN file  --------------------------------------------------
         if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_construction_cron.py\n")))
         sun_temp <- read.table( sunfl,
                                 sep         = ";",
@@ -282,14 +284,14 @@ for (YYYY in years_to_do) {
                                 strip.white = TRUE,
                                 as.is       = TRUE)
 
-        ####  Day table to save  ####
+        ##  Day data table to save
         day_data <- data.table( Date        = D_minutes,      # Date of the data point
                                 CM21value   = lap$V1,         # Raw value for CM21
                                 CM21sd      = lap$V2,         # Raw SD value for CM21
                                 Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
                                 Elevat      = sun_temp$ELEV ) # Elevation sun angle
 
-        ####  Gather data  ####
+        ## __ Gather day data  -------------------------------------------------
         year_data <- rbind( year_data, day_data )
     }
     ## order data
@@ -311,13 +313,13 @@ for (YYYY in years_to_do) {
     cat(missing_files,sep = "\n\n")
 
 
-    # #### . . Add all the minutes of the year ####
+    # #### . . Add all the minutes of the year
     # all_min   <- seq(as.POSIXct(paste0(YYYY,"-01-01 00:00:30")),
     #                  as.POSIXct(paste0(YYYY,"-12-31 23:59:30")), by = "mins")
     # all_min   <- data.frame(Date = all_min)
     # year_data <- merge(year_data, all_min, all = T)
 
-    ## add signal limits on plots
+    ## __ Add signal limits on plots -------------------------------------------
     year_data[ , sig_lowlim := signal_lower_limit(Date)]
     year_data[ , sig_upplim := signal_upper_limit(Date)]
 
@@ -327,7 +329,7 @@ for (YYYY in years_to_do) {
     ####    Yearly Plots    ####################################################
 
 
-    ##  Do some plots for this year before filtering  --------------------------
+    ## __ Do some plots for this year before filtering  -----------------------
     suppressWarnings({
         ## Try to find outliers
         yearlims <- data.table()
@@ -385,9 +387,9 @@ for (YYYY in years_to_do) {
     cat('\n\n')
 
 
-    ## Plots of exceptions -----------------------------------------------------
-    ## use to investigate problems
+    ## __ Plots of exceptions for investigation  -------------------------------
 
+    ## ____ 1995 ---------------------------------------------------------------
     if (YYYY == 1995) {
         part <- year_data[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
@@ -419,6 +421,7 @@ for (YYYY in years_to_do) {
     }
 
 
+    ## ____ 1996 ---------------------------------------------------------------
     if (YYYY == 1996) {
         part <- year_data[ Date > as.POSIXct("1996-02-01") &
                            Date < as.POSIXct("1996-03-7") ]
@@ -435,6 +438,7 @@ for (YYYY in years_to_do) {
 
     }
 
+    ## ____ 2004 ---------------------------------------------------------------
     if (YYYY == 2004) {
         cat("\n### BEWARE!\n\n")
         cat("There is an un expected +2.5V offset in the recording singal for
@@ -462,7 +466,7 @@ for (YYYY in years_to_do) {
 
     }
 
-
+    ## ____ 2005 ---------------------------------------------------------------
     if (YYYY == 2005) {
         part <- year_data[Date > as.POSIXct("2005-11-15") &
                           Date < as.POSIXct("2005-12-31") ]
@@ -482,7 +486,7 @@ for (YYYY in years_to_do) {
         points(testdata$Date, testdata$WATTTOT / cm21factor(testdata$Date), pch = ".", col = "cyan")
     }
 
-
+    ## ____ 2015 ---------------------------------------------------------------
     if (YYYY == 2015) {
         part <- year_data[Date > as.POSIXct("2015-04-10") &
                           Date < as.POSIXct("2015-05-01") ]
@@ -503,7 +507,7 @@ for (YYYY in years_to_do) {
     }
 
 
-
+    ## __  More yearly plots  --------------------------------------------------
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
          main = paste("CM21 signal SD", YYYY ),
@@ -550,7 +554,7 @@ for (YYYY in years_to_do) {
     title(main = paste("Azimuth by month", YYYY))
     cat('\n\n')
 
-    ####  Save signal data to file  ####
+    ## __ Save years signal data to file ---------------------------------------
     if (!TEST) {
         write_RDS(object = year_data,
                   file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
