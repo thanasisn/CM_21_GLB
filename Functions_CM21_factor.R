@@ -17,7 +17,9 @@ cm21_calibration_data <- matrix(
           "2005-12-05 00:00:00", 11.99E-6,   4E-2,
           "2011-12-30 00:00:00", 11.96E-6,   4E-2,
           "2012-01-31 00:00:00", 11.96E-6,   4E-2,
+          "2022-02-28 11:44:00", 12.02E-6,   4E-2, ## use the last calibration to gap the span
           "2022-02-28 11:45:00", 46.63E-4, 	    1, ## use of INCLINED CM-21 data
+          "2022-06-03 08:44:00", 46.63E-4, 	    1, ## use of INCLINED CM-21 data to gap the span
           "2022-06-03 08:45:00", 12.02E-6,   4E-2, ## use of calibrated HORIZONTAL CM-21
           NULL),
        byrow = TRUE,
@@ -106,8 +108,8 @@ signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 rule   = 1:2  )
 
 
-# dd <- seq.POSIXt(as.POSIXct("2004-06-01"), as.POSIXct("2004-09-01"), by = "day")
-# plot(dd, cm21factor(dd))
-# plot(dd, signal_upper_limit(dd))
-# (signal_lower_limit(dd) + (signal_upper_limit(dd) - signal_lower_limit(dd)) * 0.3)
-# signal_lower_limit(dd) * cm21factor(dd)
+dd <- seq.POSIXt(as.POSIXct("2020-06-01"), as.POSIXct("2023-09-01"), by = "day")
+plot(dd, cm21factor(dd))
+plot(dd, signal_upper_limit(dd))
+(signal_lower_limit(dd) + (signal_upper_limit(dd) - signal_lower_limit(dd)) * 0.3)
+signal_lower_limit(dd) * cm21factor(dd)
