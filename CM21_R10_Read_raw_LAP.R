@@ -109,7 +109,7 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-# TEST      <- TRUE
+TEST      <- TRUE
 # ALL_YEARS <- TRUE
 
 ## When running
@@ -175,10 +175,10 @@ rm(rad_names, radmon_files)
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y")
 
-# ## TEST
-# if (TEST) {
-#     years_to_do <- 2004
-# }
+## TEST
+if (TEST) {
+    years_to_do <- 2022
+}
 
 
 #'
@@ -317,10 +317,9 @@ for (YYYY in years_to_do) {
     # all_min   <- data.frame(Date = all_min)
     # year_data <- merge(year_data, all_min, all = T)
 
-
     ## add signal limits on plots
-    year_data[ , sig_lowlim := signal_lower_limit(Date) ]
-    year_data[ , sig_upplim := signal_upper_limit(Date) ]
+    year_data[ , sig_lowlim := signal_lower_limit(Date)]
+    year_data[ , sig_upplim := signal_upper_limit(Date)]
 
 
 
@@ -328,7 +327,7 @@ for (YYYY in years_to_do) {
     ####    Yearly Plots    ####################################################
 
 
-    ####  Do some plots for this year before filtering  ####
+    ##  Do some plots for this year before filtering  --------------------------
     suppressWarnings({
         ## Try to find outliers
         yearlims <- data.table()
@@ -346,7 +345,6 @@ for (YYYY in years_to_do) {
     cat("\n\n")
     cat(pander(yearlims))
     cat("\n\n")
-
 
     # cat('\\scriptsize\n')
     # cat(pander( summary(year_data[,-c('Date','Azimuth')]) ))
@@ -387,7 +385,7 @@ for (YYYY in years_to_do) {
     cat('\n\n')
 
 
-    ## Plots for exceptions ------
+    ## Plots of exceptions -----------------------------------------------------
     ## use to investigate problems
 
     if (YYYY == 1995) {
