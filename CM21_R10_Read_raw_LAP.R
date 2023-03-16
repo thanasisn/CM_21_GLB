@@ -270,26 +270,31 @@ for (YYYY in years_to_do) {
                          by         = "min" )
 
         ## __  Read LAP file  --------------------------------------------------
-        lap <- fread( sirena_files[found], na.strings = "-9" )
-        lap[ V1 < -8, V1 := NA ]
-        lap[ V2 < -8, V2 := NA ]
-        stopifnot( dim(lap)[1] == 1440 )
+        lap <- fread(sirena_files[found], na.strings = "-9")
+        lap$V1 <- as.numeric(lap$V1)
+        lap$V2 <- as.numeric(lap$V2)
+        stopifnot(is.numeric(lap$V1))
+        stopifnot(is.numeric(lap$V2))
+        stopifnot(dim(lap)[1] == 1440)
+        lap[V1 < -8, V1 := NA]
+        lap[V2 < -8, V2 := NA]
+
 
         ## __  Read SUN file  --------------------------------------------------
         if (!file.exists(sunfl)) stop(cat(paste("Missing:", sunfl, "\nRUN! Sun_vector_construction_cron.py\n")))
-        sun_temp <- read.table( sunfl,
-                                sep         = ";",
-                                header      = TRUE,
-                                na.strings  = "None",
-                                strip.white = TRUE,
-                                as.is       = TRUE)
+        sun_temp <- read.table(sunfl,
+                               sep         = ";",
+                               header      = TRUE,
+                               na.strings  = "None",
+                               strip.white = TRUE,
+                               as.is       = TRUE)
 
         ##  Day data table to save
-        day_data <- data.table( Date        = D_minutes,      # Date of the data point
-                                CM21value   = lap$V1,         # Raw value for CM21
-                                CM21sd      = lap$V2,         # Raw SD value for CM21
-                                Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
-                                Elevat      = sun_temp$ELEV ) # Elevation sun angle
+        day_data <- data.table(Date        = D_minutes,      # Date of the data point
+                               CM21value   = lap$V1,         # Raw value for CM21
+                               CM21sd      = lap$V2,         # Raw SD value for CM21
+                               Azimuth     = sun_temp$AZIM,  # Azimuth sun angle
+                               Elevat      = sun_temp$ELEV ) # Elevation sun angle
 
         ## __ Gather day data  -------------------------------------------------
         year_data <- rbind( year_data, day_data )
@@ -302,7 +307,7 @@ for (YYYY in years_to_do) {
     if (!all( testsanity$N == 1440 )) {
         cat("\n**There are days with not exactly 1440 minutes**\n\n")
         cat('\n\n')
-        pander(testsanity[ N != 1440])
+        pander(testsanity[N != 1440])
         cat('\n\n')
     } else {
         cat("\n**All days have exactly 1440 minutes**\n\n")
@@ -353,6 +358,8 @@ for (YYYY in years_to_do) {
     # cat('\\normalsize\n')
 
     cat('\n\n')
+
+    as.numeric(year_data$CM21value)
 
     hist(year_data$CM21value, breaks = 50, main = paste("CM21 signal ",  YYYY ) )
     cat('\n\n')
@@ -493,7 +500,7 @@ for (YYYY in years_to_do) {
 
         ylim <- range(-1,2, part$sig_lowlim, part$sig_upplim )
 
-        plot(  part$Date, part$CM21value, pch = ".", ylim = ylim)
+        plot(  part$Date, part$CM21value,  pch = ".", ylim = ylim)
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
@@ -557,11 +564,12 @@ for (YYYY in years_to_do) {
     ## __ Save years signal data to file ---------------------------------------
     if (!TEST) {
         write_RDS(object = year_data,
-                  file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds") )
+                  file   = paste0(SIGNAL_DIR,"/LAP_CM21_H_SIG_",YYYY,".Rds")
+        )
     }
 }
 ## sort list of missing files
-system(paste("sort -u -o ", MISSING_INP, MISSING_INP ))
+system(paste("sort -u -o ", MISSING_INP, MISSING_INP))
 
 
 #' **END**
