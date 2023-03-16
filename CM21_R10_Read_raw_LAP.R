@@ -65,7 +65,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
@@ -110,12 +110,12 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ALL_YEARS <- FALSE
 TEST      <- FALSE
 # TEST      <- TRUE
-ALL_YEARS <- TRUE
+# ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (!TEST | any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (!TEST | any(args == "NOTEST"  )) { TEST <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
