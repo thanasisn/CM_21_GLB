@@ -109,13 +109,13 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
-ALL_YEARS <- TRUE
+# TEST      <- TRUE
+# ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (!TEST | any(args == "NOTEST"  )) { TEST <- FALSE }
+    if (!TEST | any(args == "NOTEST")) { TEST <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
     if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
     if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
@@ -131,7 +131,7 @@ cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 #+ include=TRUE, echo=FALSE, results = 'asis'
 
-## Source data files for import from stoarage
+## Source data files for import from storage
 sirena_files <- list.files(path        = SIRENA_DIR,
                            recursive   = TRUE,
                            pattern     = "[0-9]*06.LAP$",
@@ -215,7 +215,7 @@ if (!params$ALL_YEARS) {
 
     # missing_years <- 2015:2022
 
-    ## decide what to do
+    ## Decide what to do
     if (TEST | length(missing_years) != 0 | NEWDATA) {
         years_to_do <- sort(unique(c(missing_years, new_to_do)))
     } else {
@@ -367,10 +367,10 @@ for (YYYY in years_to_do) {
 
     cat('\n\n')
 
-    hist(year_data$CM21value, breaks = 30, main = paste("CM21 signal ",  YYYY))
+    hist(year_data$CM21value, breaks = 30, main = paste("CM-21 signal ",  YYYY))
     cat('\n\n')
 
-    hist(year_data$CM21sd,    breaks = 30, main = paste("CM21 signal SD",YYYY))
+    hist(year_data$CM21sd,    breaks = 30, main = paste("CM-21 signal SD",YYYY))
     cat('\n\n')
 
     ylim <- range(year_data$sig_lowlim,
@@ -379,9 +379,9 @@ for (YYYY in years_to_do) {
                   na.rm = TRUE)
 
     plot(year_data$Elevat, year_data$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", YYYY),
+         main = paste("CM-21 signal ", YYYY),
          xlab = "Elevation",
-         ylab = "CM21 signal",
+         ylab = "CM-21 signal",
          ylim = ylim)
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
@@ -389,9 +389,9 @@ for (YYYY in years_to_do) {
 
 
     plot(year_data$Date, year_data$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", YYYY),
+         main = paste("CM-21 signal ", YYYY),
          xlab = "Elevation",
-         ylab = "CM21 signal",
+         ylab = "CM-21 signal",
          ylim = ylim)
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
@@ -411,7 +411,7 @@ for (YYYY in years_to_do) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM21 signal ",  YYYY) )
+         main = paste("Cum Sum of CM-21 signal ",  YYYY) )
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -436,7 +436,7 @@ for (YYYY in years_to_do) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM21 sd ",  YYYY) )
+         main = paste("Cum Sum of CM-21 sd ",  YYYY) )
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -454,6 +454,8 @@ for (YYYY in years_to_do) {
 
     ## ____ 1995 ---------------------------------------------------------------
     if (YYYY == 1995) {
+        cat("\n### Year:", YYYY, " exceptions \n\n" )
+
         part <- year_data[ Date > as.POSIXct("1995-10-8") &
                            Date < as.POSIXct("1995-11-15") ]
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-2,3))
@@ -486,6 +488,8 @@ for (YYYY in years_to_do) {
 
     ## ____ 1996 ---------------------------------------------------------------
     if (YYYY == 1996) {
+        cat("\n### Year:", YYYY, " exceptions \n\n" )
+
         part <- year_data[ Date > as.POSIXct("1996-02-01") &
                            Date < as.POSIXct("1996-03-7") ]
         plot(part$Date, part$CM21value, pch = ".", ylim = c(-1,2))
@@ -503,12 +507,12 @@ for (YYYY in years_to_do) {
 
     ## ____ 2004 ---------------------------------------------------------------
     if (YYYY == 2004) {
-        cat("\n### BEWARE!\n\n")
-        cat("There is an un expected +2.5V offset in the recording singal for
+        cat("\n### Year:", YYYY, " exceptions \n\n" )
+        cat("\n#### BEWARE!\n")
+        cat("There is an unexpected +2.5V offset in the recording signal for
             2004-07-03 00:00 until 2004-07-22 00:00.
-            We changed the allowed physical signal limits to copensate.
+            We changed the allowed physical signal limits to compensate.
             Have to check dark calculation and the final output for problems.\n")
-
 
         part <- year_data[Date > as.POSIXct("2004-06-01") &
                           Date < as.POSIXct("2004-08-01") ]
@@ -531,6 +535,8 @@ for (YYYY in years_to_do) {
 
     ## ____ 2005 ---------------------------------------------------------------
     if (YYYY == 2005) {
+        cat("\n### Year:", YYYY, " exceptions \n\n" )
+
         part <- year_data[Date > as.POSIXct("2005-11-15") &
                           Date < as.POSIXct("2005-12-31") ]
 
@@ -551,6 +557,8 @@ for (YYYY in years_to_do) {
 
     ## ____ 2015 ---------------------------------------------------------------
     if (YYYY == 2015) {
+        cat("\n### Year:", YYYY, " exceptions \n\n" )
+
         part <- year_data[Date > as.POSIXct("2015-04-10") &
                           Date < as.POSIXct("2015-05-01") ]
 
@@ -573,15 +581,15 @@ for (YYYY in years_to_do) {
     ## __  More yearly plots  --------------------------------------------------
 
     plot(year_data$Elevat, year_data$CM21sd,    pch = 19, cex = .5,
-         main = paste("CM21 signal SD", YYYY ),
+         main = paste("CM-21 signal SD", YYYY ),
          xlab = "Elevation",
-         ylab = "CM21 signal Standard Deviations")
+         ylab = "CM-21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
     cat('\n\n')
 
 
-    par(mar = c(2,4,2,1))
+    par(mar = c(2, 4, 2, 1))
     month_vec <- strftime( year_data$Date, format = "%m")
     dd        <- aggregate(year_data[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
                            list(month_vec), FUN = summary, digits = 6 )
@@ -602,11 +610,11 @@ for (YYYY in years_to_do) {
     # cat(pander(dd$Azimuth))
 
     boxplot(year_data$CM21value ~ month_vec )
-    title(main = paste("CM21value by month", YYYY))
+    title(main = paste("CM-21 value by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$CM21sd ~ month_vec )
-    title(main = paste("CM21sd by month", YYYY))
+    title(main = paste("CM-21 sd by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$Elevat ~ month_vec )
