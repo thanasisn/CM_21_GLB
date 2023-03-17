@@ -109,8 +109,8 @@ extra <- readRDS("~/DATA/Broad_Band/CM21_TOT.Rds")
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-# TEST      <- TRUE
-# ALL_YEARS <- TRUE
+TEST      <- TRUE
+ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
@@ -175,11 +175,7 @@ rm(rad_names, radmon_files)
 ## all allowed years
 years_to_do <- format(seq(START_DAY, END_DAY, by = "year"), "%Y")
 
-## TEST
-if (TEST) {
-    years_to_do <- 2022
-    warning("Overriding years to do: ", years_to_do)
-}
+
 
 
 #'
@@ -228,6 +224,17 @@ if (!params$ALL_YEARS) {
 }
 #+ include=TRUE, echo=FALSE
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
+
+## TEST
+if (TEST) {
+    years_to_do <- 2022
+    years_to_do <- c(1995, 2015, 2022)
+    warning("Overriding years to do: ", years_to_do)
+}
+
+
+
 
 
 
@@ -353,18 +360,17 @@ for (YYYY in years_to_do) {
     cat(pander(yearlims))
     cat("\n\n")
 
+
     # cat('\\scriptsize\n')
     # cat(pander( summary(year_data[,-c('Date','Azimuth')]) ))
     # cat('\\normalsize\n')
 
     cat('\n\n')
 
-    as.numeric(year_data$CM21value)
-
-    hist(year_data$CM21value, breaks = 50, main = paste("CM21 signal ",  YYYY ) )
+    hist(year_data$CM21value, breaks = 30, main = paste("CM21 signal ",  YYYY))
     cat('\n\n')
 
-    hist(year_data$CM21sd,    breaks = 50, main = paste("CM21 signal SD",YYYY ) )
+    hist(year_data$CM21sd,    breaks = 30, main = paste("CM21 signal SD",YYYY))
     cat('\n\n')
 
     ylim <- range(year_data$sig_lowlim,
@@ -391,6 +397,56 @@ for (YYYY in years_to_do) {
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
     ## plot config changes
     abline(v = signal_physical_limits$Date, lty = 3)
+    cat('\n\n')
+
+
+    all    <- cumsum(tidyr::replace_na(year_data$CM21value, 0))
+    pos    <- year_data[ CM21value > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21value, 0))
+    neg    <- year_data[ CM21value < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21value, 0))
+    xlim   <- range(year_data$Date)
+    plot(year_data$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM21 signal ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    cat('\n\n')
+
+
+    all    <- cumsum(tidyr::replace_na(year_data$CM21sd, 0))
+    pos    <- year_data[ CM21value > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21sd, 0))
+    neg    <- year_data[ CM21value < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21sd, 0))
+    xlim   <- range(year_data$Date)
+    plot(year_data$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM21 sd ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
     cat('\n\n')
 
 
