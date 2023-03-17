@@ -64,7 +64,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 
@@ -77,7 +77,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
                             return("CM21_R50_") })
 if(!interactive()) {
     pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
+    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
     filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
@@ -189,7 +189,7 @@ pander(cm21_calibration_data, caption = "CM21 calibrations")
 
 
 ## create some plot data
-dates <- seq(cm21_calibration_data$Date[1],Sys.time(),by="day")
+dates <- seq(cm21_calibration_data$Date[1], Sys.time(), by = "day")
 
 
 
@@ -274,7 +274,7 @@ cat("\n\n")
 
 
 #+ include=TRUE, echo=F, results="asis"
-for ( yyyy in years_to_do) {
+for (yyyy in years_to_do) {
 
     cat("\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
@@ -404,8 +404,8 @@ for ( yyyy in years_to_do) {
             uuuu <- max(daydata$wattGLB,
                         daydata$wattGLB_SD,
                         daydata$withdark , na.rm = TRUE)
-            if (dddd > -5  ) { dddd = 0  }
-            if (uuuu < 190 ) { uuuu = 200}
+            if (dddd > -5  ) {dddd <- 0  } ## explain?
+            if (uuuu < 190 ) {uuuu <- 800} ## set the min of the upper plot limit
             ylim = c(dddd , uuuu)
 
             plot(daydata$Date, daydata$withdark,
