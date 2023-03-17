@@ -201,17 +201,26 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# ## TEST
-# if (TEST) {
-#     years_to_do <- 2004
-# }
+
 
 
 ## Decide what to do
-if (length(years_to_do) == 0 ) {
+if (TEST | length(years_to_do) != 0 ) {
+    years_to_do <- sort(unique(years_to_do))
+} else {
     stop("NO new data! NO need to parse!")
 }
+#+ include=TRUE, echo=FALSE
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
+
+## TEST
+if (TEST) {
+    years_to_do <- 2022
+    years_to_do <- c(1995, 2015, 2022)
+    warning("Overriding years to do: ", years_to_do)
+}
+
 
 
 #'
@@ -251,7 +260,7 @@ pander(signal_physical_limits)
 
 
 
-#+ include=TRUE, echo=F, results="asis"
+#+ include=TRUE, echo=FALSE, results="asis"
 for (yyyy in years_to_do) {
 
     #### Get raw data ####
@@ -321,29 +330,79 @@ for (yyyy in years_to_do) {
 
     cat('\n\n')
 
-    rawdata[!is.na(CM21value)]
-    hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ",   yyyy))
+    hist(rawdata$CM21value, breaks = 50, main = paste("CM-21 signal ",   yyyy))
     cat('\n\n')
 
-    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM21 signal SD", yyyy))
+    hist(rawdata$CM21sd,    breaks = 50, main = paste("CM-21 signal SD", yyyy))
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21value, pch = 19, cex = .5,
-         main = paste("CM21 signal ", yyyy),
+         main = paste("CM-21 signal ", yyyy),
          xlab = "Elevation",
-         ylab = "CM21 signal" )
+         ylab = "CM-21 signal" )
     abline( h = yearlims[ an == "CM21value", low], col = "red")
     abline( h = yearlims[ an == "CM21value", upe], col = "red")
     cat('\n\n')
 
     plot(rawdata$Elevat, rawdata$CM21sd,    pch = 19, cex = .5,
-         main = paste("CM21 signal SD", yyyy),
+         main = paste("CM-21 signal SD", yyyy),
          xlab = "Elevation",
-         ylab = "CM21 signal Standard Deviations")
+         ylab = "CM-21 signal Standard Deviations")
     abline( h = yearlims[ an == "CM21sd", low], col = "red")
     abline( h = yearlims[ an == "CM21sd", upe], col = "red")
     cat('\n\n')
 
+
+    all    <- cumsum(tidyr::replace_na(rawdata$CM21value, 0))
+    pos    <- rawdata[ CM21value > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21value, 0))
+    neg    <- rawdata[ CM21value < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21value, 0))
+    xlim   <- range(rawdata$Date)
+    plot(rawdata$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM-21 signal ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    cat('\n\n')
+
+
+    all    <- cumsum(tidyr::replace_na(rawdata$CM21sd, 0))
+    pos    <- rawdata[ CM21value > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21sd, 0))
+    neg    <- rawdata[ CM21value < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21sd, 0))
+    xlim   <- range(rawdata$Date)
+    plot(rawdata$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM-21 sd ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    cat('\n\n')
+
+stop()
 
     par(mar = c(2,4,2,1))
     month_vec <- strftime( rawdata$Date, format = "%m")
@@ -372,12 +431,14 @@ for (yyyy in years_to_do) {
 
     ## mark too negative signal values
     rawdata[CM21value * cm21factor(Date) < MINLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToolowDark"]
-    ## drop too positive signal values
+    ## mark too positive signal values
     rawdata[CM21value * cm21factor(Date) > MAXLIMnight & Elevat < DARK_ELEV, QFlag_1 := "ToohigDark"]
 
-    ## special case for 2004 of set problem
+
+    ## Special case for 2004 of set problem ------------------------------------
     if (yyyy == 2004) {
-        cat("\n### BEWARE!\n\n")
+        cat("\n### Year:", YYYY, " exceptions \n\n")
+        cat("\n#### BEWARE!\n")
         cat("There is an un expected +2.5V offset in the recording singal for
             2004-07-03 00:00 until 2004-07-22 00:00.
             We changed the allowed physical signal limits to copensate.
