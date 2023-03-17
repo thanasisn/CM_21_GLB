@@ -437,7 +437,7 @@ for (yyyy in years_to_do) {
 
     ## Special case for 2004 of set problem ------------------------------------
     if (yyyy == 2004) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
+        cat("\n### Year:", yyyy, " exceptions \n\n")
         cat("\n#### BEWARE!\n")
         cat("There is an un expected +2.5V offset in the recording singal for
             2004-07-03 00:00 until 2004-07-22 00:00.
