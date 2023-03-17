@@ -364,7 +364,7 @@ for (yyyy in years_to_do) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 signal ",  YYYY) )
+         main = paste("Cum Sum of CM-21 signal ", yyyy))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -389,7 +389,7 @@ for (yyyy in years_to_do) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 sd ",  YYYY) )
+         main = paste("Cum Sum of CM-21 sd ", yyyy))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -402,9 +402,9 @@ for (yyyy in years_to_do) {
          ylab = "", yaxt = "n", xlab = "", xaxt = "n")
     cat('\n\n')
 
-stop()
 
-    par(mar = c(2,4,2,1))
+
+    par(mar = c(2, 4, 2, 1))
     month_vec <- strftime( rawdata$Date, format = "%m")
     dd        <- aggregate(rawdata[,c("CM21value", "CM21sd", "Elevat", "Azimuth")],
                            list(month_vec), FUN = summary, digits = 6)
