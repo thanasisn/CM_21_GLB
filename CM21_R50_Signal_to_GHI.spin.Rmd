@@ -1,64 +1,64 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "CM21 signal to radiation. **S1 -> L0**"
-#' author:        "Natsis Athanasios"
-#' institute:     "AUTH"
-#' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Read signal and dark correction and convert to global radiation."
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        7
-#'     fig_height:       4.5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#' date: "`r format(Sys.time(), '%F')`"
-#' params:
-#'    ALL_YEARS: TRUE
-#' ---
+---
+title:         "CM21 signal to radiation. **S1 -> L0**"
+author:        "Natsis Athanasios"
+institute:     "AUTH"
+affiliation:   "Laboratory of Atmospheric Physics"
+abstract:      "Read signal and dark correction and convert to global radiation."
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 
-#'
-#' **S1 -> L0**
-#'
-#'
-#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
-#'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
-#'
-#' Convert CM21 signal $[V]$ to radiation $[W/m^2]$.
-#'
-#' - Apply proper gain by the acquisition system
-#' - Use an interpolated sensitivity between calibrations.
-#' - No filtering of data at this point.
-#' - Mark negative global during day
-#' - Mark too low global in the night
-#' - Mark too much global in the night
-#'
-#+ echo=F, include=T
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        7
+    fig_height:       4.5
+  html_document:
+    toc:        true
+    fig_width:  7.5
+    fig_height: 5
+date: "`r format(Sys.time(), '%F')`"
+params:
+   ALL_YEARS: TRUE
+---
+
+**S1 -> L0**
+
+
+**Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
+
+**Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+
+Convert CM21 signal $[V]$ to radiation $[W/m^2]$.
+
+- Apply proper gain by the acquisition system
+- Use an interpolated sensitivity between calibrations.
+- No filtering of data at this point.
+- Mark negative global during day
+- Mark too low global in the night
+- Mark too much global in the night
+
+
+```{r echo=F, include=T}
 
 
 ####_  Document options _####
 
-#+ echo=F, include=F
+```
+```{r echo=F, include=F}
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -68,7 +68,8 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -86,7 +87,8 @@ if(!interactive()) {
 # options(warn=-1) ## hide warnings
 # options(warn=2)  ## stop on warnings
 
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 ####  External code  ####
 library(data.table, quietly = TRUE, warn.conflicts = FALSE)
 library(pander,     quietly = TRUE, warn.conflicts = FALSE)
@@ -175,15 +177,14 @@ if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
 }
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+```
+
+
+## CM21 conversion factor calculation
 
 
 
-
-#'
-#' ## CM21 conversion factor calculation
-#'
-#'
-#+ include=T, echo=F
+```{r include=T, echo=F}
 
 pander(cm21_calibration_data, caption = "CM21 calibrations")
 
@@ -235,45 +236,43 @@ plot(cm21_calibration_data$Date, 100*c(NA, diff(cm21_calibration_data$Sensitivit
      main = "CM21 Sensitivity change %",
      xlab = "", ylab = "%", col = "blue")
 cat("\n\n")
+```
+
+
+### Mark negative global when sun is up
+
+When elevation is above `r SUN_ELEV` mark
+Global radiation less than `r MINglbSUNup`.
+These values are considered to be erroneous records.
+
+
+### Mark minimum Global irradiance.
+
+Reject data when GHI is below an acceptable limit.
+
+**Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,**
+
+**after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.**
+
+This is due to changes in instrumentation. This filter may is superseded by another.
+
+
+### Mark positive radiation when sun is down
+
+when elevation is below `r SUN_TOO_LOW`
+mark Global greater than `r ERROR_GLOBA`.
 
 
 
-
-#'
-#' ### Mark negative global when sun is up
-#'
-#' When elevation is above `r SUN_ELEV` mark
-#' Global radiation less than `r MINglbSUNup`.
-#' These values are considered to be erroneous records.
-#'
-
-
-#'
-#' ### Mark minimum Global irradiance.
-#'
-#' Reject data when GHI is below an acceptable limit.
-#'
-#' **Before `r BREAKDATE` we use `r GLB_LOW_LIM_01`,**
-#'
-#' **after  `r BREAKDATE` we use `r GLB_LOW_LIM_02`.**
-#'
-#' This is due to changes in instrumentation. This filter may is superseded by another.
-#'
-#'
-#' ### Mark positive radiation when sun is down
-#'
-#' when elevation is below `r SUN_TOO_LOW`
-#' mark Global greater than `r ERROR_GLOBA`.
-#'
-#'
-#+ include=T, echo=F
+```{r include=T, echo=F}
 
 
 
 
 
 
-#+ include=TRUE, echo=F, results="asis"
+```
+```{r include=TRUE, echo=F, results="asis"}
 for (yyyy in years_to_do) {
 
     cat("\n\\FloatBarrier\n\n")
@@ -537,18 +536,22 @@ for (yyyy in years_to_do) {
     # cat("\n\n")
 
 }
-#'
-#+ include=T, echo=F
+```
+
+
+
+```{r include=T, echo=F}
 
 
 ##TODO
 ## drop data at next level
 ## copy filters from here and Aerosols for level 1
+```
 
+**END**
 
-
-
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
