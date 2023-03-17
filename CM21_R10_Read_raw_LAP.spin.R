@@ -436,7 +436,7 @@ for (YYYY in years_to_do) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM21 sd ",  YYYY) )
+         main = paste("Cum Sum of CM21 signal ",  YYYY) )
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
