@@ -105,7 +105,7 @@ wattlimit <- 50  ## radiation limit for histograms
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
+# TEST      <- TRUE
 # ALL_YEARS <- TRUE
 
 ## When running
