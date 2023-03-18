@@ -171,7 +171,15 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1996
+
+
+## TEST
+if (TEST) {
+    cat("\nTEST MODE IS ON!!\n\n")
+    years_to_do <- 2022
+    # years_to_do <- c(1995, 2015, 2022)
+    warning("Overriding years to do: ", years_to_do)
+}
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
@@ -535,9 +543,9 @@ for (yyyy in years_to_do) {
 
     all    <- cumsum(tidyr::replace_na(gather$wattGLB_SD, 0))
     pos    <- gather[ wattGLB_SD > 0 ]
-    pos$V1 <- cumsum(tidyr::replace_na(wattGLB_SD, 0))
+    pos$V1 <- cumsum(tidyr::replace_na(pos$wattGLB_SD, 0))
     neg    <- gather[ wattGLB_SD < 0 ]
-    neg$V1 <- cumsum(tidyr::replace_na(wattGLB_SD, 0))
+    neg$V1 <- cumsum(tidyr::replace_na(neg$wattGLB_SD, 0))
     xlim   <- range(gather$Date)
     plot(gather$Date, all,
          type = "l",
@@ -550,13 +558,14 @@ for (yyyy in years_to_do) {
          xlim = xlim,
          col = "blue", type = "l",
          ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    par(new = TRUE)
-    plot(neg$Date, neg$V1,
-         xlim = xlim,
-         col = "red", type = "l",
-         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    cat('\n\n')
-
+    if (nrow(neg)>0){
+        par(new = TRUE)
+        plot(neg$Date, neg$V1,
+             xlim = xlim,
+             col = "red", type = "l",
+             ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+        cat('\n\n')
+    }
 
 
 
