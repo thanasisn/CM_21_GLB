@@ -502,7 +502,7 @@ for (yyyy in years_to_do) {
     cat("\n\n")
 
 
-    par(mar = c(4,4,2,1))
+    par(mar = c(4, 4, 2, 1))
     morning  <-   gather$preNoon & gather$Elevat > elevlim
     evening  <- ! gather$preNoon & gather$Elevat > elevlim
 

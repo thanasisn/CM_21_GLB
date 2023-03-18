@@ -25,12 +25,13 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     fig_width:        7
-#'     fig_height:       4.5
+#'     fig_width:        8
+#'     fig_height:       5
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  7.5
 #'     fig_height: 5
+#'
 #' date: "`r format(Sys.time(), '%F')`"
 #' params:
 #'    ALL_YEARS: TRUE
@@ -39,10 +40,9 @@
 #'
 #' **S0 -> L1**
 #'
+#' **Source code: [`github.com/thanasisn/CM_21_GLB`](https://github.com/thanasisn/CM_21_GLB)**
 #'
-#' **Source code: [github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB)**
-#'
-#' **Data display: [thanasisn.netlify.app/3-data_display/2-cm21_global/](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display/2-cm21_global/`](https://thanasisn.netlify.app/3-data_display/2-cm21_global/)**
 #'
 #'
 #' - Drop marked data
@@ -58,7 +58,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
@@ -70,9 +70,9 @@ Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("CM21_R60_") })
 if(!interactive()) {
-    pdf(  file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(paste0("~/CM_21_GLB/LOGs/",  basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+    pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CM_21_GLB/LOGs/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 
@@ -105,13 +105,16 @@ wattlimit <- 50  ## radiation limit for histograms
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
+TEST      <- TRUE
+# ALL_YEARS <- TRUE
+
 ## When running
 args <- commandArgs( trailingOnly = TRUE )
 if ( length(args) > 0 ) {
-    if (any(args == "NOTEST"  )) { TEST      <- FALSE }
+    if (!TEST | any(args == "NOTEST")) { TEST <- FALSE }
     if (any(args == "NOTALL"  )) { ALL_YEARS <- FALSE }
-    if ( any(args == "ALL")      ) { ALL_YEARS <- TRUE }
-    if ( any(args == "ALLYEARS") ) { ALL_YEARS <- TRUE }
+    if (any(args == "ALL"     )) { ALL_YEARS <- TRUE  }
+    if (any(args == "ALLYEARS")) { ALL_YEARS <- TRUE  }
 }
 ## When knitting
 if (!exists("params")) {
@@ -121,6 +124,7 @@ cat(paste("\n**ALL_YEARS:", ALL_YEARS, "**\n"))
 cat(paste("\n**TEST     :", TEST,      "**\n"))
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+
 
 
 
@@ -161,13 +165,22 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# years_to_do <- 1996
+
+
+## TEST
+if (TEST) {
+    cat("\nTEST MODE IS ON!!\n\n")
+    years_to_do <- 2022
+    # years_to_do <- c(1995, 2015, 2022)
+    warning("Overriding years to do: ", years_to_do)
+}
 
 ## Decide what to do
 if (length(years_to_do) == 0 ) {
     stop("NO new data! NO need to parse!")
 }
 cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
+
 
 
 
@@ -186,7 +199,7 @@ cat(c("\n**YEARS TO DO:", years_to_do, "**\n"))
 
 
 #+ include=TRUE, echo=F, results="asis"
-for ( yyyy in years_to_do) {
+for (yyyy in years_to_do) {
 
     cat("\n\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
@@ -337,7 +350,7 @@ for ( yyyy in years_to_do) {
     cat("\n\n")
 
 
-    par(mar = c(4,4,2,1))
+    par(mar = c(4, 4, 2, 1))
     morning  <-   rawdata$preNoon & rawdata$Elevat > elevlim
     evening  <- ! rawdata$preNoon & rawdata$Elevat > elevlim
 
@@ -347,6 +360,62 @@ for ( yyyy in years_to_do) {
     legend("topleft", legend = c("Before noon", "After noon"),
            bty="n" ,text.col = c("blue", "green"), cex = 1)
     cat("\n\n")
+
+
+
+    all    <- cumsum(tidyr::replace_na(rawdata$wattGLB, 0))
+    pos    <- rawdata[ wattGLB > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$wattGLB, 0))
+    neg    <- rawdata[ wattGLB < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$wattGLB, 0))
+    xlim   <- range(rawdata$Date)
+    plot(rawdata$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM-21 signal ",  yyyy) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    cat('\n\n')
+
+
+    all    <- cumsum(tidyr::replace_na(rawdata$wattGLB_SD, 0))
+    pos    <- rawdata[ wattGLB_SD > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$wattGLB_SD, 0))
+    neg    <- rawdata[ wattGLB_SD < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$wattGLB_SD, 0))
+    xlim   <- range(rawdata$Date)
+    plot(rawdata$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CM-21 sd ",  yyyy) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    if (nrow(neg)>0){
+        par(new = TRUE)
+        plot(neg$Date, neg$V1,
+             xlim = xlim,
+             col = "red", type = "l",
+             ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+        cat('\n\n')
+    }
+
+
+
 
 
     hist(rawdata$wattGLB[ rawdata$wattGLB > wattlimit],
