@@ -12,15 +12,15 @@ is.POSIXct <- function(x) inherits(x, "POSIXct")
 cm21_calibration_data <- matrix(
        c( "1991-01-01 00:00:00", 11.98E-6, 0.5E-2,
           "1995-10-21 00:00:00", 11.98E-6,   2E-2,
-          "1995-11-02 00:00:00", 11.98E-6,   1E-2,  ## <- this is correct!!!
-          "2004-07-01 00:00:00", 11.98E-6,   4E-2,  ## <- this is correct!!!
+          "1995-11-02 00:00:00", 11.98E-6,   1E-2, ## <- this is correct!!!
+          "2004-07-01 00:00:00", 11.98E-6,   4E-2, ## <- this is correct!!!
           "2005-12-05 00:00:00", 11.99E-6,   4E-2,
           "2011-12-30 00:00:00", 11.96E-6,   4E-2,
           "2012-01-31 00:00:00", 11.96E-6,   4E-2,
-          "2022-02-28 11:44:00", 12.02E-6,   4E-2, ## use the last calibration to gap the span
-          "2022-02-28 11:45:00", 46.63E-4, 	    1, ## use of INCLINED CM-21 data
-          "2022-06-03 08:44:00", 46.63E-4, 	    1, ## use of INCLINED CM-21 data to gap the span
-          "2022-06-03 08:45:00", 12.02E-6,   4E-2, ## use of calibrated HORIZONTAL CM-21
+          "2022-02-28 11:44:00", 12.02E-6,   4E-2, ## Replay future calibration to gap the span
+          "2022-02-28 11:45:00", 46.63E-4, 	    1, ## Start using INCLINED CM-21 data
+          "2022-06-03 08:44:00", 46.63E-4, 	    1, ## Replay INCLINED CM-21 calibration factor to gap the span
+          "2022-06-03 08:45:00", 12.02E-6,   4E-2, ## Normal use of calibrated HORIZONTAL CM-21
           NULL),
        byrow = TRUE,
        ncol = 3)
