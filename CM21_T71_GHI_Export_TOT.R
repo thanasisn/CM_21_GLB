@@ -47,7 +47,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-# knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 
 
@@ -116,8 +116,7 @@ stopifnot(length(input_files) == length(yearstodo))
 #' **Sun angles are calculated with other method than the rest of the broadband.**
 #' This will change in the future.
 #'
-#' **We don't allow negative values on export.**
-#' Negative GHI is set to zero and SD is set to NA (-9)
+#' **We allow negative values of Global Radiation on export.**
 #'
 #' All missing values (NA) are set to "-9".
 #'
@@ -146,8 +145,8 @@ for (afile in input_files) {
     # cat('\\scriptsize\n')
 
     ## create all minutes
-    allminutes <- seq( as.POSIXct( paste0(yyyy, "-01-01 00:00:30") ),
-                       as.POSIXct( paste0(yyyy, "-12-31 23:59:30") ),
+    allminutes <- seq( as.POSIXct(paste0(yyyy, "-01-01 00:00:30")),
+                       as.POSIXct(paste0(yyyy, "-12-31 23:59:30")),
                        by = "mins" )
 
     ## be sure to have all minutes
@@ -169,9 +168,9 @@ for (afile in input_files) {
     ayear <- merge(ayear, temp_sun, by = "Date", all = T)
 
 
-    ## don't allow negative values at the output
-    ayear$wattGLB[    ayear$wattGLB < 0 ]    <- 0L
-    ayear$wattGLB_SD[ ayear$wattGLB < 0 ]    <- NA
+    # ## don't allow negative values at the output
+    # ayear$wattGLB[    ayear$wattGLB < 0 ]    <- 0L
+    # ayear$wattGLB_SD[ ayear$wattGLB < 0 ]    <- NA
 
     ## convert NA to -9
     ayear$wattGLB[   is.na(ayear$wattGLB)    ] <- -9L
