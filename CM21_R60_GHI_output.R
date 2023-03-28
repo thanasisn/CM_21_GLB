@@ -273,7 +273,7 @@ for (yyyy in years_to_do) {
                         daydata$wattGLB_SD, na.rm = TRUE)
             xlim <- range(daydata$Date)
             if (dddd > -5  ) {dddd = 0  }
-            if (uuuu < 190 ) {uuuu = 200}
+            if (uuuu < 190 ) {uuuu = 300}
             ylim = c(dddd, uuuu)
 
             plot(1, type = "n",                         # Remove all elements of plot

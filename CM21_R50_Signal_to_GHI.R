@@ -416,7 +416,7 @@ for (yyyy in years_to_do) {
                         daydata$wattGLB_SD,
                         daydata$withdark , na.rm = TRUE)
             if (dddd > -5  ) {dddd <- 0  } ## explain?
-            if (uuuu < 190 ) {uuuu <- 800} ## set the min of the upper plot limit
+            if (uuuu < 190 ) {uuuu <- 300} ## set the min of the upper plot limit
             ylim = c(dddd , uuuu)
 
             plot(daydata$Date, daydata$withdark,
