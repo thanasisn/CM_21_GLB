@@ -32,7 +32,7 @@ source_list <- c(
     "./CM21_R40_Missing_dark_construct.R",
     "./CM21_R50_Signal_to_GHI.R",
     "./CM21_R60_GHI_output.R",
-    "./CM21_T70_GHI_Export_WRDC.R",
+    # "./CM21_T70_GHI_Export_WRDC.R",
     "./CM21_T71_GHI_Export_TOT.R",
     "./CM21_T80_check_sirena_export.R",
     "./CM21_T81_check_wrdc_output.R",
@@ -56,7 +56,7 @@ for (as in source_list) {
 }
 
 
-cat("Run manually to create the graphs:\n")
+cat("Run manually to create the graphs if everything seems good:\n")
 cat("./CM21_P98_Plot_all_years_LAP.R\n")
 cat("./CM21_P99_Plot_all_daily_LAP.R\n")
 

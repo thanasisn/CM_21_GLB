@@ -235,17 +235,17 @@ for (yyyy in years_to_do) {
     }
 
 
-    ####    Set near zero to zero    ###########################################
-    N <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup, .N ]
-    cat(paste0("\n\n**",
-               N, " points with global near zero set to zero**\n\n"))
-    rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup,
-             wattGLB := 0 ]
+    # ####    Set near zero to zero    ###########################################
+    # N <- rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup, .N ]
+    # cat(paste0("\n\n**",
+    #            N, " points with global near zero set to zero**\n\n"))
+    # rawdata[ Elevat >= SUN_ELEV & wattGLB < 0 & wattGLB > MINglbSUNup,
+    #          wattGLB := 0 ]
 
 
-    ####    Drop night data    #################################################
-    rawdata <- rawdata[ Elevat >= NIGHT_DROP ]
-    rawdata <- rawdata[ ! is.na(wattGLB) ]
+    # ####    Drop night data    #################################################
+    # rawdata <- rawdata[ Elevat >= NIGHT_DROP ]
+    # rawdata <- rawdata[ ! is.na(wattGLB) ]
 
 
     ####    Plot daily    ######################################################
