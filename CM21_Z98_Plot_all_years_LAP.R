@@ -29,10 +29,10 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 ## run twice !!
 
 ## for pdf only
-CREATE_PDF = TRUE
+CREATE_PDF <- TRUE
 
 ## for video
-CREATE_PDF = FALSE
+# CREATE_PDF <- FALSE
 
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
@@ -130,25 +130,27 @@ dev.off()
 
 
 if (!CREATE_PDF) {
-#     system(
-#         paste0("ffmpeg -y -framerate ", framerate, " -i ", paste0(tempfolder,"/Agregate%03d.png"),
-#                " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
-#                mp4file)
-#     )
-#
-#
-# system(
-#     paste0("ffmpeg -y -framerate 15 -i ", paste0(tempfolder,"/Agregate%03d.png"),
-#            " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
-#            mp4file)
-# )
 
-system(
-    paste0("ffmpeg -y -framerate 12 -i ", paste0(tempfolder,"/Agregate%03d.png"),
-           " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
-           mp4file)
-)
+    #     system(
+    #         paste0("ffmpeg -y -framerate ", framerate, " -i ", paste0(tempfolder,"/Agregate%03d.png"),
+    #                " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+    #                mp4file)
+    #     )
+    #
+    #
+    # system(
+    #     paste0("ffmpeg -y -framerate 15 -i ", paste0(tempfolder,"/Agregate%03d.png"),
+    #            " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+    #            mp4file)
+    # )
+
+    system(
+        paste0("ffmpeg -y -framerate 12 -i ", paste0(tempfolder,"/Agregate%03d.png"),
+               " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
+               mp4file)
+    )
 }
+
 
 # ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4
 
