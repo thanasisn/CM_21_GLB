@@ -11,10 +11,6 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
-#~ if(!interactive()) {
-#~     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#~     sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
-#~ }
 
 
 library(data.table)
@@ -23,16 +19,18 @@ library(data.table)
 ####  . . Variables  ####
 source("~/CM_21_GLB/DEFINITIONS.R")
 
-source("~/CM_21_GLB/CM21_functions.R")
+source("~/CM_21_GLB/Functions_CM21_factor.R")
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
 ####  Files for import  ####
 ## . get data input files ####
-input_files <- list.files( path       = GLOBAL_DIR,
-                           pattern    = "LAP_CM21H_GHI_[0-9]{4}_L2.Rds",
-                           full.names = T )
+input_files <- list.files(path       = GLOBAL_DIR,
+                          pattern    = "LAP_CM21_H_L1_[0-9]{4}.Rds",
+                          full.names = TRUE)
+
+
 input_files <- sort(input_files)
 
 
@@ -41,7 +39,7 @@ for (afile in input_files) {
 
     #### Get raw data ####
     ayear        <- readRDS(afile)
-    NR_loaded    <- ayear[ !is.na(CM21value), .N ]
+    NR_loaded    <- ayear[ !is.na(wattGLB), .N ]
     yyyy         <- year(ayear$Date[1])
 
     ## create all minutes
@@ -57,7 +55,7 @@ for (afile in input_files) {
 
 
     daystodo  <- unique( ayear$day )
-
+stop()
     pdffile = paste0(REPORT_DIR, "Daily_GHI_", yyyy, ".pdf")
     pdf(pdffile)
 
@@ -72,29 +70,25 @@ for (afile in input_files) {
         ## get daily data
         daydata <- ayear[ day == as.Date(aday) ]
 
-
         ## Main data plot
-        dddd = min(daydata$Global, daydata$GLstd , na.rm = TRUE)
-        uuuu = max(daydata$Global, daydata$GLstd , na.rm = TRUE)
+        dddd = min(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
+        uuuu = max(daydata$wattGLB, daydata$wattGLB_SD , na.rm = TRUE)
         if (dddd > -5  ) { dddd = 0  }
         if (uuuu < 190 ) { uuuu = 200}
         ylim = c(dddd , uuuu)
 
-        plot(daydata$Date, daydata$Global,
+        plot(daydata$Date, daydata$wattGLB,
              "l", xlab = "UTC", ylab = expression(W / m^2),
              col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim, xaxs = "i" )
         abline(h = 0, col = "gray60")
         abline(v   = axis.POSIXct(1, at = pretty(daydata$Date, n = 12, min.n = 8 ), format = "%H:%M" ),
                col = "lightgray", lty = "dotted", lwd = par("lwd"))
-        points(daydata$Date, daydata$GLstd, pch = ".", cex = 2, col = "red" )
+        points(daydata$Date, daydata$wattGLB_SD, pch = ".", cex = 2, col = "red" )
         title( main = paste(test, format(daydata$Date[1] , format = "  %F")))
         text(daydata$Date[1], uuuu, labels = tag, pos = 4, cex =.7 )
 
-
-
     }
     dev.off()
-
 }
 
 
