@@ -5,7 +5,9 @@
 ## ffmpeg -framerate 15 -i Agregate%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p yearr.mp4
 
 
-
+#'
+#' Plot global from TOT files exported
+#'
 
 ####  Set environment  ####
 closeAllConnections()
@@ -32,7 +34,7 @@ source("~/CM_21_GLB/DEFINITIONS.R")
 CREATE_PDF <- TRUE
 
 ## for video
-# CREATE_PDF <- FALSE
+CREATE_PDF <- FALSE
 
 
 tag = paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
@@ -68,16 +70,17 @@ input_files <- input_files[
 
 
 ## found manually for plot only
-Gl_max = 1420
-Gl_min = -11
+Gl_max <- 1420
+Gl_min <- -11
 
-dayofyears = 366
+dayofyears <- 366
 # dayofyears = 20
-videodura  = 60
-framerate  = as.integer(dayofyears / videodura)
+videodura  <- 60
+framerate  <- as.integer(dayofyears / videodura)
 
 times <- hms::hms(hours = 1:24 )
-pretty((1:1440)/60)
+
+
 
 if (CREATE_PDF) {
     pdf( pdffile , onefile = TRUE )
@@ -85,8 +88,6 @@ if (CREATE_PDF) {
     png(paste0(tempfolder,"/Agregate%03d.png"),width = 900, height = 900, units = "px", pointsize = 14)
 }
 
-
-# png(file = "~/Aerosols/CM21datavalidation/dayofyeartest/Agregate%03d.png")
 
 for (doy in 1:dayofyears) {
     cat(paste(doy,"\n"))
@@ -101,26 +102,45 @@ for (doy in 1:dayofyears) {
          xlab = "UTC", ylab = expression( W/m^2),
          pch = 19, cex = .1,
          col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = c(Gl_min, Gl_max), xlim = c(2*60,19*60) )
+
     abline(h = 0, col = "gray60")
+
     axis(1, at = (0:24) * 60, labels = paste(0:24) )
+
     abline(v   = (0:24) * 60 ,
            col = "lightgray", lty = "dotted", lwd = par("lwd"))
+
     ## sd under graph
     for (afil in this_day) {
         data <- fread(afil)
-        data$`[W.m-2]`[ "[W.m-2]" < -90 ] <- NA
+        data$st.dev[ data$"[W.m-2]" < -8 ] <- NA
+        data$st.dev[ data$st.dev    < -8 ] <- NA
         points(data$st.dev, pch = "p", cex = .09, col = "red" )
     }
 
-    ## global
+
+    # ## global with lines
+    # for (afil in this_day) {
+    #     data <- fread(afil)
+    #     data$`[W.m-2]`[ "[W.m-2]" < -90 ] <- NA
+    #     # points(data$`[W.m-2]`, pch = "p", cex = .09, col = "blue" )
+    #     lines(data$`[W.m-2]`, lwd = 1.1, lty = 1, col = "blue")
+    # }
+
+    ## global with points
     for (afil in this_day) {
         data <- fread(afil)
-        data$`[W.m-2]`[ "[W.m-2]" < -90 ] <- NA
-        # points(data$`[W.m-2]`, pch = "p", cex = .09, col = "blue" )
-        lines(data$`[W.m-2]`, lwd = 1.1, lty = 1, col = "blue")
+        data$`[W.m-2]`[ data$"[W.m-2]" < -8 ] <- NA
+        points(data$`[W.m-2]`, pch = ".", cex = 1, col = "blue")
     }
 
-    title( main = paste(format(as.Date(doy-1, origin = "2016-01-01"), "%d %b" ),"  ",sprintf("(%03d)",doy)))
+
+
+    title( main = paste(sprintf("%2d files",length(this_day)),
+                        "TOT*.DAT  for  ",
+                        format(as.Date(doy - 1, origin = "2016-01-01"), "%d %b" ),
+                        "  ",
+                        sprintf("(%03d)",doy)))
 
     text(120, Gl_max, labels = tag, pos = 4, cex =.8 )
 
@@ -136,7 +156,6 @@ if (!CREATE_PDF) {
     #                " -c:v libx264 -profile:v high  -pix_fmt yuv420p ",
     #                mp4file)
     #     )
-    #
     #
     # system(
     #     paste0("ffmpeg -y -framerate 15 -i ", paste0(tempfolder,"/Agregate%03d.png"),
