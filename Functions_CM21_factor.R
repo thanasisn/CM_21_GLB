@@ -97,19 +97,19 @@ signal_physical_limits$Upper_radiation_lim <- cm21factor(signal_physical_limits$
 
 
 ####  Functions to get upper and lower limit for acquisition signal  ####
-signal_lower_limit <- approxfun(x      = signal_physical_limits$Date,
+cm21_signal_lower_limit <- approxfun(x      = signal_physical_limits$Date,
                                 y      = signal_physical_limits$Lower_lim,
                                 method = "constant",
                                 rule   = 1:2  )
 
-signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
+cm21_signal_upper_limit <- approxfun(x      = signal_physical_limits$Date,
                                 y      = signal_physical_limits$Upper_lim,
                                 method = "constant",
                                 rule   = 1:2  )
 
 
-dd <- seq.POSIXt(as.POSIXct("2020-06-01"), as.POSIXct("2023-09-01"), by = "day")
-plot(dd, cm21factor(dd))
-plot(dd, signal_upper_limit(dd))
-(signal_lower_limit(dd) + (signal_upper_limit(dd) - signal_lower_limit(dd)) * 0.3)
-signal_lower_limit(dd) * cm21factor(dd)
+# dd <- seq.POSIXt(as.POSIXct("2020-06-01"), as.POSIXct("2023-09-01"), by = "day")
+# plot(dd, cm21factor(dd))
+# plot(dd, cm21_signal_upper_limit(dd))
+# (cm21_signal_lower_limit(dd) + (cm21_signal_upper_limit(dd) - cm21_signal_lower_limit(dd)) * 0.3)
+# cm21_signal_lower_limit(dd) * cm21factor(dd)
