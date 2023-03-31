@@ -54,10 +54,10 @@ bwlimit="  --bwlimit=${bwlim}k"
 
 
 info "Upload  CM21_Reports"
-"${rclone}" ${otheropt} "${bwlimit}" --config "$config" copy "$HOME/CM_21_GLB/REPORTS/REPORTS" lapauththanasis:/Aerosols/CM21_Reports
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/CM_21_GLB/REPORTS/REPORTS" lapauththanasis:/Aerosols/CM21_Reports
 
 info "Upload  CM21_Daily"
-"${rclone}" ${otheropt} "${bwlimit}" --config "$config" copy "$HOME/CM_21_GLB/REPORTS/DAILY"   lapauththanasis:/Aerosols/CM21_Daily
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/CM_21_GLB/REPORTS/DAILY"   lapauththanasis:/Aerosols/CM21_Daily
 
 
 ## end coding
