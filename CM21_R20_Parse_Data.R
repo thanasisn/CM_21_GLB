@@ -452,12 +452,12 @@ for (yyyy in years_to_do) {
                 QFlag_1 := NA]
         ## set low flag
         rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV &
-                    CM21value < signal_lower_limit(Date),
+                    CM21value < cm21_signal_lower_limit(Date),
                 QFlag_1 := "ToolowDark"]
         ## set high flag
         ## use the lower part of posible physical signal as a threshold
         rawdata[Date > "2004-07-03" & Date < "2004-07-22" & Elevat < DARK_ELEV &
-                    CM21value > (signal_lower_limit(Date) + (signal_upper_limit(Date) - signal_lower_limit(Date)) * 0.4),
+                    CM21value > (cm21_signal_lower_limit(Date) + (cm21_signal_upper_limit(Date) - cm21_signal_lower_limit(Date)) * 0.4),
                 QFlag_1 := "ToohigDark"]
     }
     ############################################################################
@@ -533,8 +533,8 @@ for (yyyy in years_to_do) {
     hist(rawdata$CM21value, breaks = 50, main = paste("CM21 signal ", yyyy))
     abline(v = yearlims[ an == "CM21value", low], col = "cyan")
     abline(v = yearlims[ an == "CM21value", upe], col = "cyan")
-    abline(v = unique(signal_lower_limit(rawdata$Date)), col = "red")
-    abline(v = unique(signal_upper_limit(rawdata$Date)), col = "red")
+    abline(v = unique(cm21_signal_lower_limit(rawdata$Date)), col = "red")
+    abline(v = unique(cm21_signal_upper_limit(rawdata$Date)), col = "red")
 
     cat('\n\n')
 
@@ -548,8 +548,8 @@ for (yyyy in years_to_do) {
          ylab = "CM21 signal" )
     abline(h = yearlims[ an == "CM21value", low], col = "cyan")
     abline(h = yearlims[ an == "CM21value", upe], col = "cyan")
-    abline(h = unique(signal_lower_limit(rawdata$Date)), col = "red")
-    abline(h = unique(signal_upper_limit(rawdata$Date)), col = "red")
+    abline(h = unique(cm21_signal_lower_limit(rawdata$Date)), col = "red")
+    abline(h = unique(cm21_signal_upper_limit(rawdata$Date)), col = "red")
 
     cat('\n\n')
 

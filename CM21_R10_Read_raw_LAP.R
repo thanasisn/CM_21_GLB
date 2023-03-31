@@ -141,32 +141,12 @@ cat("\n**Found:",paste(length(sirena_files), "files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
 sirena_files <- grep("OLD", sirena_files, ignore.case = T, invert = T, value = T )
 
-## Source data files for import from recording machine
-radmon_files <- list.files( path        = RADMON_DIR,
-                            recursive   = TRUE,
-                            pattern     = "[0-9]*06.LAP$",
-                            ignore.case = TRUE,
-                            full.names  = TRUE )
-cat("\n**Found:", paste(length(radmon_files), "files from Radmon**\n"))
 
-
-####  Check files between Radmon and Sirena  ####
-
-sir_names <- basename(sirena_files)
-rad_names <- basename(radmon_files)
-
-missing_from_sir <- rad_names[ !rad_names %in% sir_names ]
-if ( length(missing_from_sir) > 0 ) {
-    warning(paste("\nThere are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n"))
-    cat(missing_from_sir,sep = "\n\n")
-    cat("\n\n")
-}
-rm(rad_names, radmon_files)
 
 #'
 #+ include=TRUE, echo=FALSE
 
-####  Read files of all years  ####
+####  Read files of all yearsi ####
 
 ## TEST
 # START_DAY  <- as.POSIXct("2004-01-01 00:00:00 UTC")
@@ -332,8 +312,8 @@ for (YYYY in years_to_do) {
     # year_data <- merge(year_data, all_min, all = T)
 
     ## __ Add signal limits on plots -------------------------------------------
-    year_data[ , sig_lowlim := signal_lower_limit(Date)]
-    year_data[ , sig_upplim := signal_upper_limit(Date)]
+    year_data[ , sig_lowlim := cm21_signal_lower_limit(Date)]
+    year_data[ , sig_upplim := cm21_signal_upper_limit(Date)]
 
 
 
