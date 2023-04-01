@@ -93,13 +93,13 @@ dark_calculations <- function(elevatio,
 #' @export
 #'
 #' @examples
-dark_function <- function( dark_day,
-                           DCOUNTLIM,
-                           type,
-                           adate,
-                           test,
-                           missfiles,
-                           missingdark) {
+dark_function <- function(dark_day,
+                          DCOUNTLIM,
+                          type,
+                          adate,
+                          test,
+                          missfiles,
+                          missingdark) {
     ## ignore dark signal if too low counts
     if (dark_day$Mcnt < DCOUNTLIM) { dark_day$Mmed = dark_day$Mavg = NA }
     if (dark_day$Ecnt < DCOUNTLIM) { dark_day$Emed = dark_day$Eavg = NA }
