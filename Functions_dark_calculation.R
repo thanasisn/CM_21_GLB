@@ -4,6 +4,9 @@
 
 Sys.setenv(TZ = "UTC")
 
+## Min and max that will work with zero length elements
+RobustMax <- function(x, ...) {if (length(x) > 0) max(x, ...) else NA}
+RobustMin <- function(x, ...) {if (length(x) > 0) min(x, ...) else NA}
 
 
 #' Calculate dark statistics for a day
@@ -71,6 +74,76 @@ dark_calculations <- function(elevatio,
             Emed = median(    values[eveningdark],  na.rm = TRUE ),
             Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
             Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
+            Ecnt = sum(!is.na(values[eveningdark]))
+        )
+    )
+}
+
+
+
+
+#' Calculate dark statistics for a day improved
+#'
+#' @param elevatio   Vector record of sun elevation
+#' @param nightlimit Sun elevation limit to consider night time
+#' @param dates      Vector record of dates
+#' @param dstretch   Duration of dark signal sample
+#' @param values     Vector of signal values
+#'
+#' @details          Improved from `dark_calculations` to hanlde missing data
+#'                   better.
+#'
+#' @return           Data frame with dark signal statistical values
+#' @export
+#'
+dark_calculations_2 <- function(elevatio,
+                                nightlimit,
+                                dates,
+                                dstretch,
+                                values) {
+
+    require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
+
+    ## Check input requirements
+    if (!all(!is.na(elevatio))) {
+        cat("\n\nSTOP: NAs in elevation vector!!\n\n")
+        stop("NAs in elevation vector!!")
+    }
+    if (!all(!is.na(dates))) {
+        cat("\n\nSTOP: NAs in dates vector!!\n\n")
+        stop("NAs in dates vector!!")
+    }
+
+    ## find local noun
+    nounindex    <- which.max(elevatio)
+    ## split day in half
+    selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
+    selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
+    ## all morning and evening dates
+    morning      <- dates[selectmorn]
+    evening      <- dates[selecteven]
+    ## morning selection with time limit
+    mornigend    <- morning[RobustMax(index(morning))]
+    mornigstart  <- mornigend - dstretch
+    ## selection for morning dark
+    morningdark  <- selectmorn & dates <= mornigend    & mornigstart < dates
+    ## evening selection with time limit
+    eveningstart <- evening[RobustMin(index(evening))]
+    eveningend   <- eveningstart + dstretch
+    ## selection for evening dark
+    eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
+
+    return(
+        data.frame(
+            Mavg = mean(      values[morningdark],  na.rm = TRUE ),
+            Mmed = median(    values[morningdark],  na.rm = TRUE ),
+            Msta = RobustMax( dates[ morningdark],  na.rm = TRUE ),
+            Mend = RobustMin( dates[ morningdark],  na.rm = TRUE ),
+            Mcnt = sum(!is.na(values[morningdark])),
+            Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
+            Emed = median(    values[eveningdark],  na.rm = TRUE ),
+            Esta = RobustMin( dates[ eveningdark],  na.rm = TRUE ),
+            Eend = RobustMax( dates[ eveningdark],  na.rm = TRUE ),
             Ecnt = sum(!is.na(values[eveningdark]))
         )
     )
@@ -160,3 +233,86 @@ dark_function <- function(dark_day,
     }
     return(dark_line)
 }
+
+
+
+
+#' Create dark correction offset signal
+#'
+#' @param dark_day     Data.frame from `dark_calculations`
+#' @param DCOUNTLIM    Minimum number of points for a valid dark calculation.
+#' @param type         Use  "median" or "mean" method for dark calculation
+#' @param adate        Date for message
+#' @param missingdark  Use this value when no dark can be calculated
+#'
+#' @return
+#' @export
+#'
+#' @examples
+dark_function_2 <- function(dark_day,
+                            DCOUNTLIM,
+                            type,
+                            missingdark) {
+    ## ignore dark signal if data count below limit
+    if (dark_day$Mcnt < DCOUNTLIM) { dark_day$Mmed = dark_day$Mavg = NA }
+    if (dark_day$Ecnt < DCOUNTLIM) { dark_day$Emed = dark_day$Eavg = NA }
+
+    if (type == "median") {
+        ## Values to use
+        dar_x = c(dark_day$Msta, dark_day$Esta)
+        dar_y = c(dark_day$Mmed, dark_day$Emed)
+    } else if (type == "mean") {
+        ## Values to use
+        dar_x = c(dark_day$Msta, dark_day$Esta)
+        dar_y = c(dark_day$Mavg, dark_day$Eavg)
+    } else {
+        print("Don't know what to do")
+        stop("Invalid argument in Dark correction")
+    }
+
+    ## Choose scenario based on available dark information
+
+    ## Left and right dark
+    if (sum(is.na(dar_y)) == 0) {
+        dark_line <- approxfun(x = dar_x,
+                               y = dar_y,
+                               rule = 2,
+                               method = "linear")
+    }
+
+    ## Only one side dark
+    if (sum(is.na(dar_y)) == 1) {
+        dark_line <- approxfun(x = dar_x[!is.na( dar_y )],
+                               y = dar_y[!is.na( dar_y )],
+                               method = "constant",
+                               rule = 2 )
+    }
+
+    ## With out dark should break of have another solution
+    if (sum(is.na(dar_y)) >= 2) {
+        text = paste("No dark don't know what to do!! using > ",
+                     missingdark,
+                     " < for Dark!!" )
+        warning(text)
+
+        ## protect from empty variable
+        if (is.na(missingdark)) {
+            stop("No value for dark can be resolved!!")
+        }
+
+        ## Create dark signal function
+        dark_line <- approxfun(x = dar_x,
+                               y = c(missingdark, missingdark),
+                               rule = 2,
+                               method = "linear")
+    }
+    ## one of the three possible functions
+    return(dark_line)
+}
+
+
+
+
+
+
+
