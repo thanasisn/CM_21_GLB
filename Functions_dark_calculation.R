@@ -5,8 +5,9 @@
 Sys.setenv(TZ = "UTC")
 
 ## Min and max that will work with zero length elements
-RobustMax <- function(x, ...) {if (length(x) > 0) max(x, ...) else NA}
-RobustMin <- function(x, ...) {if (length(x) > 0) min(x, ...) else NA}
+RobustMax  <- function(x, ...) {if (length(x) > 0)  max(x, ...) else NA}
+RobustMin  <- function(x, ...) {if (length(x) > 0)  min(x, ...) else NA}
+RobustMean <- function(x, ...) {if (length(x) > 0) mean(x, ...) else NA}
 
 
 #' Calculate dark statistics for a day
@@ -102,7 +103,7 @@ dark_calculations_2 <- function(elevatio,
                                 dstretch,
                                 values) {
 
-    require(zoo,   quietly = TRUE, warn.conflicts = FALSE)
+    require(zoo, quietly = TRUE, warn.conflicts = FALSE)
 
     ## Check input requirements
     if (!all(!is.na(elevatio))) {
@@ -135,15 +136,15 @@ dark_calculations_2 <- function(elevatio,
 
     return(
         data.frame(
-            dark_Mor_avg = mean(      values[morningdark],  na.rm = TRUE ),
-            dark_Mor_med = median(    values[morningdark],  na.rm = TRUE ),
-            dark_Mor_sta = RobustMax( dates[ morningdark],  na.rm = TRUE ),
-            dark_Mor_end = RobustMin( dates[ morningdark],  na.rm = TRUE ),
+            dark_Mor_avg = RobustMean(values[morningdark],  na.rm = TRUE),
+            dark_Mor_med = median(    values[morningdark],  na.rm = TRUE),
+            dark_Mor_sta = as.POSIXct(RobustMax( dates[ morningdark],  na.rm = TRUE)),
+            dark_Mor_end = as.POSIXct(RobustMin( dates[ morningdark],  na.rm = TRUE)),
             dark_Mor_cnt = sum(!is.na(values[morningdark])),
-            dark_Eve_avg = mean(      values[eveningdark],  na.rm = TRUE ),
-            dark_Eve_med = median(    values[eveningdark],  na.rm = TRUE ),
-            dark_Eve_sta = RobustMin( dates[ eveningdark],  na.rm = TRUE ),
-            dark_Eve_end = RobustMax( dates[ eveningdark],  na.rm = TRUE ),
+            dark_Eve_avg = RobustMean(values[eveningdark],  na.rm = TRUE),
+            dark_Eve_med = median(    values[eveningdark],  na.rm = TRUE),
+            dark_Eve_sta = as.POSIXct(RobustMin( dates[ eveningdark],  na.rm = TRUE)),
+            dark_Eve_end = as.POSIXct(RobustMax( dates[ eveningdark],  na.rm = TRUE)),
             dark_Eve_cnt = sum(!is.na(values[eveningdark]))
         )
     )
@@ -255,12 +256,12 @@ dark_function_2 <- function(dark_day,
                             missingdark) {
     ## ignore dark signal if data count below limit
     if (dark_day$dark_Mor_cnt < DCOUNTLIM) {
-        dark_day$dark_Mor_med <- NA
-        dark_day$dark_Mor_avg <- NA
+        dark_day$dark_Mor_med <- as.numeric(NA)
+        dark_day$dark_Mor_avg <- as.numeric(NA)
     }
     if (dark_day$dark_Eve_cnt < DCOUNTLIM) {
-        dark_day$dark_Eve_med <- NA
-        dark_day$dark_Eve_avg <- NA
+        dark_day$dark_Eve_med <- as.numeric(NA)
+        dark_day$dark_Eve_avg <- as.numeric(NA)
     }
 
 
