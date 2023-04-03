@@ -135,16 +135,16 @@ dark_calculations_2 <- function(elevatio,
 
     return(
         data.frame(
-            Mavg = mean(      values[morningdark],  na.rm = TRUE ),
-            Mmed = median(    values[morningdark],  na.rm = TRUE ),
-            Msta = RobustMax( dates[ morningdark],  na.rm = TRUE ),
-            Mend = RobustMin( dates[ morningdark],  na.rm = TRUE ),
-            Mcnt = sum(!is.na(values[morningdark])),
-            Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
-            Emed = median(    values[eveningdark],  na.rm = TRUE ),
-            Esta = RobustMin( dates[ eveningdark],  na.rm = TRUE ),
-            Eend = RobustMax( dates[ eveningdark],  na.rm = TRUE ),
-            Ecnt = sum(!is.na(values[eveningdark]))
+            dark_Mor_avg = mean(      values[morningdark],  na.rm = TRUE ),
+            dark_Mor_med = median(    values[morningdark],  na.rm = TRUE ),
+            dark_Mor_sta = RobustMax( dates[ morningdark],  na.rm = TRUE ),
+            dark_Mor_end = RobustMin( dates[ morningdark],  na.rm = TRUE ),
+            dark_Mor_cnt = sum(!is.na(values[morningdark])),
+            dark_Eve_avg = mean(      values[eveningdark],  na.rm = TRUE ),
+            dark_Eve_med = median(    values[eveningdark],  na.rm = TRUE ),
+            dark_Eve_sta = RobustMin( dates[ eveningdark],  na.rm = TRUE ),
+            dark_Eve_end = RobustMax( dates[ eveningdark],  na.rm = TRUE ),
+            dark_Eve_cnt = sum(!is.na(values[eveningdark]))
         )
     )
 }
@@ -254,17 +254,30 @@ dark_function_2 <- function(dark_day,
                             type,
                             missingdark) {
     ## ignore dark signal if data count below limit
-    if (dark_day$Mcnt < DCOUNTLIM) { dark_day$Mmed = dark_day$Mavg = NA }
-    if (dark_day$Ecnt < DCOUNTLIM) { dark_day$Emed = dark_day$Eavg = NA }
+    if (dark_day$dark_Mor_cnt < DCOUNTLIM) {
+        dark_day$dark_Mor_med <- NA
+        dark_day$dark_Mor_avg <- NA
+    }
+    if (dark_day$dark_Eve_cnt < DCOUNTLIM) {
+        dark_day$dark_Eve_med <- NA
+        dark_day$dark_Eve_avg <- NA
+    }
+
 
     if (type == "median") {
         ## Values to use
-        dar_x = c(dark_day$Msta, dark_day$Esta)
-        dar_y = c(dark_day$Mmed, dark_day$Emed)
+        ## use dates at the center of each dark signal used
+        dar_x = c(dark_day$dark_Mor_sta + (dark_day$dark_Mor_end - dark_day$dark_Mor_sta) / 2,
+                  dark_day$dark_Eve_sta + (dark_day$dark_Eve_end - dark_day$dark_Eve_sta) / 2
+        )
+        dar_y = c(dark_day$dark_Mor_med, dark_day$dark_Eve_med)
     } else if (type == "mean") {
         ## Values to use
-        dar_x = c(dark_day$Msta, dark_day$Esta)
-        dar_y = c(dark_day$Mavg, dark_day$Eavg)
+        ## use dates at the center of each dark signal used
+        dar_x = c(dark_day$dark_Mor_sta + (dark_day$dark_Mor_end - dark_day$dark_Mor_sta) / 2,
+                  dark_day$dark_Eve_sta + (dark_day$dark_Eve_end - dark_day$dark_Eve_sta) / 2
+        )
+        dar_y = c(dark_day$dark_Mor_avg, dark_day$dark_Eve_avg)
     } else {
         print("Don't know what to do")
         stop("Invalid argument in Dark correction")
@@ -290,7 +303,7 @@ dark_function_2 <- function(dark_day,
 
     ## With out dark should break of have another solution
     if (sum(is.na(dar_y)) >= 2) {
-        text = paste("No dark don't know what to do!! using > ",
+        text <- paste("No dark don't know what to do!! using > ",
                      missingdark,
                      " < for Dark!!" )
         warning(text)
