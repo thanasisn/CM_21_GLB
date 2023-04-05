@@ -71,9 +71,8 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CM21_R30_") })
+Script.Name <- "~/CM_21_GLB/CM21_R30_Compute_dark.R"
+
 if (!interactive()) {
     pdf( file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CM_21_GLB/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
@@ -133,7 +132,7 @@ dailyplots <- paste0(BASED,"/REPORTS/", sub(pattern = "\\..*", "" , basename(Scr
 daylystat  <- paste0(dirname(GLOBAL_DIR), "/", sub(pattern = "\\..*", "", basename(Script.Name)), "_stats")
 
 
-## . Get data input files ####
+## . Get data input files ------------------------------------------------------
 input_files <- list.files( path    = SIGNAL_DIR,
                            pattern = "LAP_CM21_H_S0_[0-9]{4}.Rds",
                            full.names = T )
@@ -143,14 +142,12 @@ input_years <- as.numeric(
         sub(".*_S0_","",
             basename(input_files),),ignore.case = T))
 
-
-## . Get storage files ####
+## . Get storage files ---------------------------------------------------------
 output_files <- list.files( path    = SIGNAL_DIR,
                             pattern = "LAP_CM21_H_S1_[0-9]{4}.Rds",
                             full.names = T )
 
-
-## . Resolve years to do -----
+## . Resolve years to do -------------------------------------------------------
 if (!params$ALL_YEARS) {
     years_to_do <- c()
     for (ay in input_years) {
@@ -197,7 +194,6 @@ if (file.exists(DARKCONST)) {
 
 
 
-
 #'
 #' Calculate dark signal.
 #'
@@ -208,8 +204,6 @@ if (file.exists(DARKCONST)) {
 #' valid data points for a day
 #'
 #+ include=T, echo=F
-
-
 
 
 #+ include=TRUE, echo=F, results="asis"
@@ -252,12 +246,10 @@ for (yyyy in years_to_do) {
                         as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
         )
 
-
         ## get all day
         wholeday    <- rawdata[ day == as.Date(theday) ]
         ## use only valid data for dark
         daydata     <- rawdata[ day == as.Date(theday) & is.na(QFlag_1) ]
-
 
         ## fill all minutes for nicer graphs
         daydata     <- merge(daydata, daymimutes, all = T)
@@ -278,7 +270,6 @@ for (yyyy in years_to_do) {
             }
         }
         ########################################################################
-
 
 
 
@@ -330,42 +321,43 @@ for (yyyy in years_to_do) {
         ####    Apply dark correction    #######################################
         daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
 
-
-        ## plot to external pdf
-        pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
-        if (any(grepl( "CM21valueWdark", names(daydata)))) {
-            ## plot night
-            somedata <- daydata[ Elevat < 1 & !is.na(CM21value) ]
-            if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
-                ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                plot(  somedata$Date, somedata$CM21value,
-                       pch  = 19, cex = 0.5,
-                       ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-                points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
-                abline(h=0,col="orange")
-                title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
-                text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
-                ## or plot day
-            } else {
-                somedata <- daydata[ Elevat >=1 & !is.na(CM21value) ]
-                if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
-                    ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
-                    plot(  somedata$Date, somedata$CM21value,
-                           pch = 19, cex = 0.5,
-                           ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
-                    points(somedata$Date, somedata$CM21valueWdark,
-                           pch = 19, cex = 0.5, col = "blue")
-                    abline(h=0,col="orange")
-                    title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
-                    text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
-                } else {
-                    ## or plot empty for consistency
-                    plot.new()
-                    title(main = paste(test, format(daydata$Date[1], format = "%F"), "NOT PLOTABLE"))
-                }
-            }
-        }
-        dev.off()
+## Deprecated!! ##
+#         ## plot to external pdf
+#         pdf(file = paste0(tmpfolder,"/daily_", sprintf("%05d.pdf", pbcount)), )
+#         if (any(grepl( "CM21valueWdark", names(daydata)))) {
+#             ## plot night
+#             somedata <- daydata[ Elevat < 1 & !is.na(CM21value) ]
+#             if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
+#                 ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+#                 plot(  somedata$Date, somedata$CM21value,
+#                        pch  = 19, cex = 0.5,
+#                        ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+#                 points(somedata$Date, somedata$CM21valueWdark,pch=19,cex=0.5, col = "blue")
+#                 abline(h=0,col="orange")
+#                 title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
+#                 text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+#                 ## or plot day
+#             } else {
+#                 somedata <- daydata[ Elevat >=1 & !is.na(CM21value) ]
+#                 if (nrow(somedata)>0 & any(!is.na(somedata$CM21valueWdark))) {
+#                     ylim <- range(somedata$CM21valueWdark, somedata$CM21value)
+#                     plot(  somedata$Date, somedata$CM21value,
+#                            pch = 19, cex = 0.5,
+#                            ylab = "CHP1 Signal V", xlab = "", ylim = ylim)
+#                     points(somedata$Date, somedata$CM21valueWdark,
+#                            pch = 19, cex = 0.5, col = "blue")
+#                     abline(h=0,col="orange")
+#                     title(main = paste(test, format(daydata$Date[1], format = "%F"), dark_flag))
+#                     text(somedata$Date[1], ylim[2], labels = tag, pos = 4, cex =.9)
+#                 } else {
+#                     ## or plot empty for consistency
+#                     plot.new()
+#                     title(main = paste(test, format(daydata$Date[1], format = "%F"), "NOT PLOTABLE"))
+#                 }
+#             }
+#         }
+#         dev.off()
+## Deprecated!! ##
 
 
         ####    Day stats    ###################################################
@@ -407,10 +399,13 @@ for (yyyy in years_to_do) {
         darkDT <- darkDT[ , .SD[which.max(CalcDate)], by = Date ]
         write_RDS(object = darkDT, file = DARKSTORE)
     }
-    ## create pdf with all daily plots
-    system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
-                  paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")),
-           ignore.stderr = T )
+
+## Deprecated!! ##
+#     ## create pdf with all daily plots
+#     system(paste0("pdftk ", tmpfolder, "/daily*.pdf cat output ",
+#                   paste0(DAILYgrDIR,"CM21_dark_daily_",yyyy,".pdf")),
+#            ignore.stderr = T )
+## Deprecated!! ##
 
 
     cat(paste0("**",
