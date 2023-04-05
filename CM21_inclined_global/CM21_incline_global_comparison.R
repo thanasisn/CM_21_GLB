@@ -40,6 +40,17 @@
 #' ---
 
 
+stop("This should now run now!")
+##
+## BEWARE !!!! -------------------------------------------
+##
+## This was made with the assumption that exist a data gap
+## on horizontal CHP1. Now you should create a virtual gap
+## to work as expected!!!
+##
+
+
+
 #'
 #' # Description
 #'
