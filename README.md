@@ -7,7 +7,9 @@ Data processing of CM-21 data to produce Total Irradiance data.
 This is a non real-time precessing procedure of the data of an
 CM-21 instrument, measuring the Global/Total whole sky Irradiance.
 
-This is used as operational procedures.
+This is used in operational procedures.
+
+Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
 
 Features:
 - Convert CM-21 instrument signal data to Global Irradiance.
