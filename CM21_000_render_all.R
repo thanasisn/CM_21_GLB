@@ -28,7 +28,7 @@ system("./get_data_from_sirena.sh")
 source_list <- c(
     # "./CM21_R10_Read_raw_LAP.R",  ## Deprecated by BBand_LAP
     # "./CM21_R20_Parse_Data.R",    ## Deprecated by BBand_LAP
-    "~/BBand_LAP/process/Legacy_CM21_R20_export.R",
+    # "~/BBand_LAP/process/Legacy_CM21_R20_export.R",  ## can not render in R 4.0.4
     "./CM21_R30_Compute_dark.R",
     "./CM21_R40_Missing_dark_construct.R",
     "./CM21_R50_Signal_to_GHI.R",
@@ -42,6 +42,8 @@ source_list <- c(
 
 cat("\n\nWill do:\n")
 cat(source_list,sep = "\n")
+
+
 
 
 for (as in source_list) {

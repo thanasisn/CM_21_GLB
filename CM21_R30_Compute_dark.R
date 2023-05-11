@@ -58,12 +58,12 @@
 ####_  Document options _####
 
 #+ echo=F, include=F
-knitr::opts_chunk$set(comment    = ""      )
-# knitr::opts_chunk$set(dev        = "pdf"   )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment   = ""      )
+# knitr::opts_chunk$set(dev       = "pdf"   )
+knitr::opts_chunk$set(dev       = "png"    )
+knitr::opts_chunk$set(out.width = "100%"   )
+knitr::opts_chunk$set(fig.align = "center" )
+knitr::opts_chunk$set(fig.pos   = '!h'     )
 
 
 
@@ -246,6 +246,11 @@ for (yyyy in years_to_do) {
                         as.POSIXct(paste(as.Date(theday), "23:59:30")), by = "min"  )
         )
 
+        ## This is a workaround for BBand_LAP!
+        if (!grepl("QFlag_1", names(rawdata))) {
+            rawdata$QFlag_1 <- NA
+        }
+
         ## get all day
         wholeday    <- rawdata[ day == as.Date(theday) ]
         ## use only valid data for dark
@@ -274,17 +279,17 @@ for (yyyy in years_to_do) {
 
 
         ####    Calculate Dark signal   ########################################
-        dark_day <- dark_calculations( dates      = daydata$Date,
-                                       values     = daydata$CM21value,
-                                       elevatio   = daydata$Eleva,
-                                       nightlimit = DARK_ELEV,
-                                       dstretch   = DSTRETCH)
+        dark_day <- dark_calculations(dates      = daydata$Date,
+                                      values     = daydata$CM21value,
+                                      elevatio   = daydata$Eleva,
+                                      nightlimit = DARK_ELEV,
+                                      dstretch   = DSTRETCH)
 
 
 
         # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
-        if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
-                (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+        if (! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+               (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM))) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
             dark_flag              <- "MISSING"
