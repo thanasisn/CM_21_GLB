@@ -56,6 +56,7 @@
 #'
 #+ echo=F, include=T
 
+warning("Deprecated by ./BBand_LAP/process/Legacy_CM21_R10_export.R")
 
 ####_  Document options _####
 

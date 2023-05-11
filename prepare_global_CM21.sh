@@ -18,11 +18,13 @@ info "START :: $0 :: $* ::"
 info "Try to get new files"
 "$(dirname "$0")/get_data_from_sirena.sh"
 
-info "Read raw files to SIG"
-Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
+## Deprecated: info "Read raw files to SIG"
+## Deprecated: Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
 
-info "Filter raw data to S0"
-Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R"
+## Deprecated: info "Filter raw data to S0"
+## Deprecated: Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R"
+
+/opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R20_export.R" 
 
 info "Compute dark to S1"
 Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
