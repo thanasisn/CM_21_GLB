@@ -11,6 +11,9 @@ This is used in operational procedures.
 
 Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
 
+**Notice**:
+Some processing is/will migrate to [BBand_LAP](https://github.com/thanasisn/BBand_LAP)
+
 Features:
 - Convert CM-21 instrument signal data to Global Irradiance.
 - Apply dark correction.
