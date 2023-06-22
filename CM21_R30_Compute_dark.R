@@ -100,8 +100,8 @@ panderOptions('table.split.table',        120   )
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-# TEST      <- TRUE
-# ALL_YEARS <- TRUE
+TEST      <- TRUE
+ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
@@ -167,10 +167,10 @@ if (!params$ALL_YEARS) {
     years_to_do <- sort(unique(input_years))
 }
 
-# ## TEST
-# if (TEST) {
-#     years_to_do <- 2004
-# }
+## TEST
+if (TEST) {
+    years_to_do <- 1993
+}
 
 
 ## Decide what to do
