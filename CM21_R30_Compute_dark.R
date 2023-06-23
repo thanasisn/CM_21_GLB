@@ -100,8 +100,8 @@ panderOptions('table.split.table',        120   )
 ## Default
 ALL_YEARS <- FALSE
 TEST      <- FALSE
-TEST      <- TRUE
-ALL_YEARS <- TRUE
+# TEST      <- TRUE
+# ALL_YEARS <- TRUE
 
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
@@ -168,9 +168,9 @@ if (!params$ALL_YEARS) {
 }
 
 ## TEST
-if (TEST) {
-    years_to_do <- 1993
-}
+# if (TEST) {
+#     years_to_do <- 1993
+# }
 
 
 ## Decide what to do
@@ -247,7 +247,7 @@ for (yyyy in years_to_do) {
         )
 
         ## This is a workaround for BBand_LAP!
-        if (!grepl("QFlag_1", names(rawdata))) {
+        if (!any(grepl("QFlag_1", names(rawdata)))) {
             rawdata$QFlag_1 <- NA
         }
 
