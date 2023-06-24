@@ -237,8 +237,8 @@ for (yyyy in years_to_do) {
     cat("\n## Year:", yyyy, "\n\n")
 
     for (ddd in daystodo) {
-        theday      <- as.POSIXct( as.Date(ddd, origin = "1970-01-01"))
-        test        <- format( theday, format = "%d%m%y06" )
+        theday      <- as.POSIXct(as.Date(ddd, origin = "1970-01-01"))
+        test        <- format(theday, format = "%d%m%y06")
         pbcount     <- pbcount + 1
 
         daymimutes  <- data.frame(
