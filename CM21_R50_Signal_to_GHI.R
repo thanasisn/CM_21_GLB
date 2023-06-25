@@ -312,9 +312,9 @@ for (yyyy in years_to_do) {
 
 
     ####  Convert to physical values  ####
-    rawdata[ , wattGLB    := CM21CF * CM21valueWdark ]
-    rawdata[ , wattGLB_SD := CM21CF * CM21sd         ]
-    rawdata[ , SZA        := 90     - Elevat         ]
+    rawdata[ , wattGLB    := CM21CF * CM21valueWdark]
+    rawdata[ , wattGLB_SD := CM21CF * CM21sd        ]
+    rawdata[ , SZA        := 90     - Elevat        ]
 
 
     ####  Mark some bad cases
@@ -470,7 +470,9 @@ for (yyyy in years_to_do) {
     gather$Times   <-  as.POSIXct( dummytimes,  format = "%H:%M:%S")
 
     cat("\n\n")
-    cat(pander(table(gather$QFlag_1)))
+    if (!all(is.na(gather$QFlag_1))) {
+        cat(pander(table(gather$QFlag_1)))
+    }
     cat("\n\n")
 
     cat(pander(table(gather$QFlag_2)))
