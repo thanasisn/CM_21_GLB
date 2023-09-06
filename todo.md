@@ -9,17 +9,6 @@
 indications.
 
 
-## Implement a data history columns 
-
-Similar to GC
-
-```
--------------
-S------------
-S1-----------
-S12-1-Q--C---
-```
-
 ## Add calibration events
 
 Mark calibration events on the plots
@@ -35,12 +24,13 @@ Mark calibration events on the plots
 1996-01-02...
 
 
-2012-05-19 wrong calibration
-2012-09-20 ..
-
-
-
 2022-03-01 GLB / TOT ?
 2022-03-02 GLB / TOT ?
 2022-03-03 GLB / TOT ?
 
+
+## To update everything 
+
+- rebuild BBand_LAP
+- run all CM21 with prepare_global_cm21_ALL
+- see scripts in ~/Aerosols/BASH_help
