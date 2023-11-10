@@ -22,13 +22,14 @@ info "Try to get new files"
 ## Deprecated: info "Filter raw data to S0"
 ## Deprecated: Rscript "$(dirname "$0")/CM21_R20_Parse_Data.R"             "ALL"
 
-/opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R20_export.R" 
+## /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R20_export.R" 
+/opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R30_export.R" 
 
-info "Compute dark to S1"
-Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"           "ALL"
+# info "Compute dark to S1"
+# Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"           "ALL"
 
-info "Construct missing dark for S1"
-Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R" "ALL"
+# info "Construct missing dark for S1"
+# Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R" "ALL"
 
 info "Convert S1 to L0 GHI"
 Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"          "ALL"

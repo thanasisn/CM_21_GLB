@@ -11,14 +11,11 @@ Script.Name <- tryCatch({ funr::sys.script() },
 library(rmarkdown)
 library(knitr)
 
-
 setwd("~/CM_21_GLB/")
-
 
 ## environmental variables are killed by rm(ls) inside each script
 
 OUTPUT_FORMAT = NULL
-
 
 ####  update raw data  ####
 system("./get_data_from_sirena.sh")
@@ -29,8 +26,8 @@ source_list <- c(
     # "./CM21_R10_Read_raw_LAP.R",  ## Deprecated by BBand_LAP
     # "./CM21_R20_Parse_Data.R",    ## Deprecated by BBand_LAP
     # "~/BBand_LAP/process/Legacy_CM21_R20_export.R",  ## can not render in R 4.0.4
-    "./CM21_R30_Compute_dark.R",
-    "./CM21_R40_Missing_dark_construct.R",
+    # "./CM21_R30_Compute_dark.R",
+    # "./CM21_R40_Missing_dark_construct.R",
     "./CM21_R50_Signal_to_GHI.R",
     "./CM21_R60_GHI_output.R",
     # "./CM21_T70_GHI_Export_WRDC.R",
