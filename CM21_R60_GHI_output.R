@@ -131,7 +131,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 ####  Get data input files  ####
 input_files <- list.files( path    = GLOBAL_DIR,
-                           pattern = "LAP_CM21_H_L0_[0-9]{4}.Rds",
+                           pattern = "^LAP_CM21_H_L0_[0-9]{4}.Rds",
                            full.names = T )
 input_years <- as.numeric(
     sub(".rds", "",
