@@ -55,6 +55,8 @@
 #'
 #+ echo=F, include=T
 
+warning("Deprecated by ~/BBand_LAP/process/Legacy_CM21_R50_export.R")
+stop("No need to run!")
 
 ####_  Document options _####
 

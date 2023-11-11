@@ -28,7 +28,7 @@ source_list <- c(
     # "~/BBand_LAP/process/Legacy_CM21_R20_export.R",  ## can not render in R 4.0.4
     # "./CM21_R30_Compute_dark.R",
     # "./CM21_R40_Missing_dark_construct.R",
-    "./CM21_R50_Signal_to_GHI.R",
+    # "./CM21_R50_Signal_to_GHI.R",
     "./CM21_R60_GHI_output.R",
     # "./CM21_T70_GHI_Export_WRDC.R",
     "./CM21_T71_GHI_Export_TOT.R",
