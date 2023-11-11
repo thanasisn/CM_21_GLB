@@ -29,7 +29,7 @@ source_list <- c(
     # "./CM21_R30_Compute_dark.R",                    ## Deprecated by BBand_LAP
     # "./CM21_R40_Missing_dark_construct.R",          ## Deprecated by BBand_LAP
     # "./CM21_R50_Signal_to_GHI.R",                   ## Deprecated by BBand_LAP
-    "./CM21_R60_GHI_output.R",
+    # "./CM21_R60_GHI_output.R",
     # "./CM21_T70_GHI_Export_WRDC.R",
     "./CM21_T71_GHI_Export_TOT.R",
     "./CM21_T80_check_sirena_export.R",

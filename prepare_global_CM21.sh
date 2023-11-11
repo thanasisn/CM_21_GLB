@@ -15,8 +15,8 @@ info "START :: $0 :: $* ::"
 
 
 
-info "Try to get new files"
-"$(dirname "$0")/get_data_from_sirena.sh"
+## info "Try to get new files"
+## "$(dirname "$0")/get_data_from_sirena.sh"
 
 ## Deprecated: info "Read raw files to SIG"
 ## Deprecated: Rscript "$(dirname "$0")/CM21_R10_Read_raw_LAP.R"
@@ -26,7 +26,8 @@ info "Try to get new files"
 
 ## /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R20_export.R" 
 ## /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R30_export.R" 
-/opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R50_export.R" 
+## /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R50_export.R" 
+/opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R60_export.R" 
 
 ## Deprecated: info "Compute dark to S1"
 ## Deprecated: Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
@@ -37,8 +38,8 @@ info "Try to get new files"
 ## Deprecated: info "Convert S1 to L0 GHI"
 ## Deprecated: Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
 
-info "Clean output L0 to L1 GHI"
-Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
+## info "Clean output L0 to L1 GHI"
+## Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
 
 
 ## extra output to run occational and inspect output
