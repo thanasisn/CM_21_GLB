@@ -23,12 +23,12 @@ system("./get_data_from_sirena.sh")
 
 ## render all in list
 source_list <- c(
-    # "./CM21_R10_Read_raw_LAP.R",  ## Deprecated by BBand_LAP
-    # "./CM21_R20_Parse_Data.R",    ## Deprecated by BBand_LAP
-    # "~/BBand_LAP/process/Legacy_CM21_R20_export.R",  ## can not render in R 4.0.4
-    # "./CM21_R30_Compute_dark.R",
-    # "./CM21_R40_Missing_dark_construct.R",
-    # "./CM21_R50_Signal_to_GHI.R",
+    # "./CM21_R10_Read_raw_LAP.R",                    ## Deprecated by BBand_LAP
+    # "./CM21_R20_Parse_Data.R",                      ## Deprecated by BBand_LAP
+    # "~/BBand_LAP/process/Legacy_CM21_R20_export.R", ## Deprecated by BBand_LAP can not render in R 4.0.4
+    # "./CM21_R30_Compute_dark.R",                    ## Deprecated by BBand_LAP
+    # "./CM21_R40_Missing_dark_construct.R",          ## Deprecated by BBand_LAP
+    # "./CM21_R50_Signal_to_GHI.R",                   ## Deprecated by BBand_LAP
     "./CM21_R60_GHI_output.R",
     # "./CM21_T70_GHI_Export_WRDC.R",
     "./CM21_T71_GHI_Export_TOT.R",

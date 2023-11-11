@@ -28,14 +28,14 @@ info "Try to get new files"
 ## /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R30_export.R" 
 /opt/R/4.2.3/bin/Rscript "$HOME/BBand_LAP/process/Legacy_CM21_R50_export.R" 
 
-# info "Compute dark to S1"
-# Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
+## Deprecated: info "Compute dark to S1"
+## Deprecated: Rscript "$(dirname "$0")/CM21_R30_Compute_dark.R"
 
-# info "Construct missing dark for S1"
-# Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R"
+## Deprecated: info "Construct missing dark for S1"
+## Deprecated: Rscript "$(dirname "$0")/CM21_R40_Missing_dark_construct.R"
 
-# info "Convert S1 to L0 GHI"
-# Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
+## Deprecated: info "Convert S1 to L0 GHI"
+## Deprecated: Rscript "$(dirname "$0")/CM21_R50_Signal_to_GHI.R"
 
 info "Clean output L0 to L1 GHI"
 Rscript "$(dirname "$0")/CM21_R60_GHI_output.R"
