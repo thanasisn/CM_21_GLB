@@ -47,6 +47,8 @@
 #'
 #+ echo=F, include=T
 
+warning("Deprecated by ~/BBand_LAP/process/Export_CM21_GHI_WRDC.R")
+stop("No need to run!")
 
 ####_  Document options _####
 
