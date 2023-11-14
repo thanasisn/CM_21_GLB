@@ -27,10 +27,3 @@ Mark calibration events on the plots
 2022-03-01 GLB / TOT ?
 2022-03-02 GLB / TOT ?
 2022-03-03 GLB / TOT ?
-
-
-## To update everything 
-
-- rebuild BBand_LAP
-- run all CM21 with prepare_global_cm21_ALL
-- see scripts in ~/Aerosols/BASH_help
