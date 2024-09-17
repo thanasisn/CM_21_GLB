@@ -10,7 +10,7 @@ is.POSIXct <- function(x) inherits(x, "POSIXct")
 
 ####  Calibration values from CM21_caldata_06.txt  ####
 cm21_calibration_data <- matrix(
-       c( "1991-01-01 00:00:00", 11.98E-6, 0.5E-2,
+       c( "1993-01-01 00:00:00", 11.98E-6, 0.5E-2,
           "1995-10-21 00:00:00", 11.98E-6,   2E-2,
           "1995-11-02 00:00:00", 11.98E-6,   1E-2, ## <- this is correct!!!
           "2004-07-01 00:00:00", 11.98E-6,   4E-2, ## <- this is correct!!!
