@@ -1,1 +1,0 @@
-../BBand_LAP/tools/Get_data_from_sirena.sh
